@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-labelledby="title desc">
+  <title id="title">Photosynthesis process diagram</title>
+  <desc id="desc">A photosynthesis process image showing sunlight, carbon dioxide, water, glucose, and oxygen.</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="75%">
+      <stop offset="0" stop-color="#132a2a"/>
+      <stop offset="1" stop-color="#10131a"/>
+    </radialGradient>
+    <linearGradient id="leaf" x1="0" x2="1">
+      <stop offset="0" stop-color="#74f5ff"/>
+      <stop offset="1" stop-color="#5cff9c"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#3cd7ff"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <g stroke="#3cd7ff" stroke-opacity=".12" fill="none">
+    <path d="M42 420h210M550 72h205M570 430h180"/>
+    <circle cx="95" cy="98" r="4"/><circle cx="721" cy="385" r="3"/>
+  </g>
+  <g filter="url(#glow)">
+    <circle cx="128" cy="132" r="42" fill="#ffdf6e"/>
+    <g stroke="#ffdf6e" stroke-width="5" stroke-linecap="round">
+      <path d="M128 60v28M128 176v28M56 132h28M172 132h28M77 81l20 20M159 163l20 20M179 81l-20 20M97 163l-20 20"/>
+    </g>
+    <path d="M402 160c-102 23-165 98-190 206 116 8 209-35 259-130 23-44-20-87-69-76z" fill="url(#leaf)" opacity=".86"/>
+    <path d="M242 350c78-70 139-105 218-140" stroke="#053b34" stroke-width="10" stroke-linecap="round" opacity=".45"/>
+    <path d="M285 308c28 2 56-7 86-26M330 268c34 2 66-8 98-31" stroke="#053b34" stroke-width="5" stroke-linecap="round" opacity=".38"/>
+  </g>
+  <g fill="none" stroke="#3cd7ff" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)">
+    <path d="M170 176c50 54 89 83 135 105"/>
+    <path d="M594 128c-48 34-85 65-116 103"/>
+    <path d="M151 378c41-20 79-31 119-35"/>
+    <path d="M460 235c55 38 95 72 135 120"/>
+  </g>
+  <g font-family="Sora, Arial, sans-serif" fill="#e1e2eb">
+    <text x="48" y="66" font-size="34" font-weight="700">Photosynthesis</text>
+    <text x="50" y="102" font-size="17" fill="#bbc9cf">Sunlight + CO2 + water into glucose and oxygen</text>
+    <g font-family="JetBrains Mono, monospace" font-size="17">
+      <text x="82" y="228" fill="#ffdf6e">sunlight</text>
+      <text x="586" y="124" fill="#a8e8ff">CO2</text>
+      <text x="106" y="410" fill="#74f5ff">H2O</text>
+      <text x="600" y="374" fill="#5cff9c">glucose + O2</text>
+    </g>
+  </g>
+</svg>

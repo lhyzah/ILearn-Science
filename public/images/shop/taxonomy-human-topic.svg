@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-labelledby="title desc">
+  <title id="title">Human taxonomy scientific name</title>
+  <desc id="desc">A human profile with scientific name Homo sapiens and taxonomy classification levels.</desc>
+  <defs>
+    <radialGradient id="bg" cx="45%" cy="40%" r="75%">
+      <stop offset="0" stop-color="#1e2433"/>
+      <stop offset="1" stop-color="#10131a"/>
+    </radialGradient>
+    <linearGradient id="skin" x1="0" x2="1">
+      <stop offset="0" stop-color="#d1bcff"/>
+      <stop offset="1" stop-color="#74f5ff"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <g stroke="#3cd7ff" stroke-opacity=".12" fill="none">
+    <path d="M40 380h260M512 80h230M525 430h210"/>
+    <circle cx="108" cy="124" r="4"/><circle cx="694" cy="138" r="5"/><circle cx="598" cy="394" r="3"/>
+  </g>
+  <g transform="translate(90 92)" filter="url(#glow)">
+    <circle cx="157" cy="94" r="76" fill="url(#skin)" opacity=".9"/>
+    <path d="M99 96c34 20 72 20 116 0" stroke="#10131a" stroke-width="10" stroke-linecap="round" opacity=".32"/>
+    <path d="M81 285c18-72 52-108 76-108s58 36 76 108" fill="#00d4ff" fill-opacity=".22" stroke="#a8e8ff" stroke-width="10"/>
+    <path d="M126 75h.1M188 75h.1" stroke="#10131a" stroke-width="13" stroke-linecap="round"/>
+    <path d="M133 125c15 13 34 13 49 0" stroke="#10131a" stroke-width="7" stroke-linecap="round" opacity=".55"/>
+    <circle cx="157" cy="94" r="92" fill="none" stroke="#74f5ff" stroke-width="2" stroke-dasharray="10 12" opacity=".75"/>
+  </g>
+  <g font-family="Sora, Arial, sans-serif">
+    <text x="48" y="66" fill="#e1e2eb" font-size="34" font-weight="700">Taxonomy</text>
+    <text x="50" y="102" fill="#bbc9cf" font-size="17">Human classification and scientific naming</text>
+    <rect x="395" y="112" width="340" height="274" rx="22" fill="#1d2026" fill-opacity=".72" stroke="#3cd7ff" stroke-opacity=".28"/>
+    <text x="425" y="158" fill="#a8e8ff" font-size="28" font-weight="700">Homo sapiens</text>
+    <text x="425" y="186" fill="#bbc9cf" font-size="14">Scientific name</text>
+    <g font-family="JetBrains Mono, monospace" font-size="15" fill="#e1e2eb">
+      <text x="425" y="235">Domain: Eukarya</text>
+      <text x="425" y="265">Kingdom: Animalia</text>
+      <text x="425" y="295">Phylum: Chordata</text>
+      <text x="425" y="325">Class: Mammalia</text>
+      <text x="425" y="355">Species: sapiens</text>
+    </g>
+  </g>
+</svg>

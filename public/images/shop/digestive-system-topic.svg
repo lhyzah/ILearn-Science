@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-labelledby="title desc">
+  <title id="title">Digestive system diagram</title>
+  <desc id="desc">A classroom-style digestive system image with labeled organs on a dark science background.</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="70%">
+      <stop offset="0" stop-color="#172033"/>
+      <stop offset="1" stop-color="#10131a"/>
+    </radialGradient>
+    <linearGradient id="organ" x1="0" x2="1">
+      <stop offset="0" stop-color="#ff8aa8"/>
+      <stop offset="1" stop-color="#ffce73"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <g fill="none" stroke="#3cd7ff" stroke-opacity=".12">
+    <path d="M50 90h180M570 90h180M60 420h200M560 420h190"/>
+    <circle cx="94" cy="114" r="4"/><circle cx="713" cy="384" r="3"/><circle cx="645" cy="126" r="5"/>
+  </g>
+  <g transform="translate(285 45)" filter="url(#glow)">
+    <path d="M115 55c-25 0-45 19-45 43 0 20 13 36 31 42v46c0 20 16 36 36 36h12c20 0 36-16 36-36v-33" stroke="#ffb4ab" stroke-width="18" stroke-linecap="round"/>
+    <path d="M176 145c46 2 78 31 78 74 0 48-38 82-89 82h-61c-25 0-45-20-45-45v-7c0-19 15-34 34-34h66c20 0 36-16 36-36 0-20-16-34-37-34h-19" fill="none" stroke="url(#organ)" stroke-width="30" stroke-linecap="round"/>
+    <path d="M68 324c10-30 36-48 69-48h55c47 0 85 35 85 79 0 46-39 83-88 83h-57c-47 0-85-35-85-79 0-13 3-25 9-35" fill="none" stroke="#74f5ff" stroke-width="18" stroke-linecap="round"/>
+    <path d="M118 334c14-17 35-27 59-27 31 0 58 18 69 45M106 375c16 20 42 32 71 32 29 0 56-12 72-32" stroke="#a8e8ff" stroke-width="10" stroke-linecap="round"/>
+    <ellipse cx="207" cy="164" rx="72" ry="48" fill="#ff9f6e" opacity=".95"/>
+    <path d="M187 160c19 12 39 12 60 0" stroke="#6b2c38" stroke-width="8" stroke-linecap="round" opacity=".55"/>
+  </g>
+  <g font-family="Sora, Arial, sans-serif" fill="#e1e2eb">
+    <text x="48" y="70" font-size="36" font-weight="700">Digestive System</text>
+    <text x="50" y="106" font-size="17" fill="#bbc9cf">Organs, food pathway, enzymes, and absorption</text>
+    <g font-size="14" fill="#a8e8ff">
+      <text x="550" y="152">Esophagus</text>
+      <text x="550" y="204">Stomach</text>
+      <text x="550" y="318">Intestines</text>
+    </g>
+  </g>
+</svg>
