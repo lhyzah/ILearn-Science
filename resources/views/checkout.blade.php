@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>iLearn Science - Secure Checkout</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -626,7 +627,26 @@
             updateSummary();
         });
 
-        function completePurchase() {
+        async function sendReceiptEmail(order) {
+            try {
+                const response = await fetch('{{ route('checkout.receipt-email') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    },
+                    body: JSON.stringify(order),
+                });
+
+                return response.ok;
+            } catch (error) {
+                console.error('Receipt email request failed.', error);
+                return false;
+            }
+        }
+
+        async function completePurchase() {
             if (!validateCheckout(true)) return;
             document.querySelectorAll('#complete-purchase, #mobile-complete-purchase').forEach((button) => {
                 button.disabled = true;
@@ -649,6 +669,10 @@
                 paymentMethod: selectedPaymentMethod,
                 checkedOutAt: new Date().toISOString(),
             };
+            document.querySelectorAll('#complete-purchase, #mobile-complete-purchase').forEach((button) => {
+                button.innerHTML = '<span class="checkout-spinner"></span> Sending branded receipt...';
+            });
+            order.emailSent = await sendReceiptEmail(order);
             localStorage.setItem('ilearnScienceLastCheckout', JSON.stringify(order));
             localStorage.setItem(cartStorageKey, JSON.stringify([]));
             document.querySelector('[data-modal-order-number]').textContent = orderNumber;

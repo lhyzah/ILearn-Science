@@ -8,6 +8,7 @@ Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/blog', [HomeController::class, 'blog'])->name('blog');
 Route::get('/cart', [HomeController::class, 'cart'])->name('cart');
 Route::get('/checkout', [HomeController::class, 'checkout'])->name('checkout');
+Route::post('/checkout/receipt-email', [HomeController::class, 'sendReceiptEmail'])->name('checkout.receipt-email');
 Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
 Route::get('/admin-login', [HomeController::class, 'adminLogin'])->name('admin.login');
 Route::get('/admin-dashboard', [HomeController::class, 'adminDashboard'])->name('admin.dashboard');
