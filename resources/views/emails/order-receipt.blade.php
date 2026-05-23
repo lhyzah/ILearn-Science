@@ -10,6 +10,7 @@
         'google' => 'Google Pay',
     ];
     $paymentMethod = $paymentLabels[$order['paymentMethod']] ?? ucfirst((string) $order['paymentMethod']);
+    $emailSafeImage = fn ($value) => is_string($value) && preg_match('/^https?:\\/\\//i', $value);
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -56,7 +57,7 @@
                                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:12px;border:1px solid rgba(255,255,255,.08);border-radius:18px;background:rgba(39,42,49,.62);">
                                     <tr>
                                         <td style="padding:14px;width:70px;">
-                                            @if ($item['image'])
+                                            @if ($emailSafeImage($item['image']))
                                                 <img src="{{ $item['image'] }}" width="58" height="58" alt="" style="display:block;width:58px;height:58px;border-radius:14px;object-fit:cover;border:1px solid rgba(168,232,255,.22);">
                                             @else
                                                 <div style="width:58px;height:58px;border-radius:14px;background:#32353c;border:1px solid rgba(168,232,255,.22);"></div>

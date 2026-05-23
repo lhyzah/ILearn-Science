@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>iLearn Science - Admin Dashboard</title>
     <script>
         (() => {
@@ -839,6 +840,10 @@
         orderFilter?.addEventListener('change', filterOrders);
 
         const inventoryStorageKey = 'ilearnScienceInventoryProducts';
+        const productsEndpoint = '{{ route('products.index') }}';
+        const productSaveEndpoint = '{{ route('admin.products.save') }}';
+        const productDeleteEndpoint = '{{ url('/admin/products') }}';
+        const adminCsrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
         const inventoryTable = document.getElementById('inventory-table');
         const inventorySearch = document.getElementById('inventory-search');
         const inventoryFilter = document.getElementById('inventory-filter');
@@ -910,6 +915,50 @@
         function saveInventory(products) {
             localStorage.setItem(inventoryStorageKey, JSON.stringify(products));
             localStorage.setItem(`${inventoryStorageKey}Initialized`, 'true');
+        }
+
+        async function syncInventoryFromServer() {
+            try {
+                const response = await fetch(productsEndpoint, { headers: { Accept: 'application/json' } });
+                if (!response.ok) throw new Error('Unable to load products.');
+                const data = await response.json();
+                if (Array.isArray(data.products)) {
+                    saveInventory(data.products);
+                    renderInventory();
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function saveProductToServer(product) {
+            const response = await fetch(productSaveEndpoint, {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': adminCsrfToken,
+                },
+                body: JSON.stringify(product),
+            });
+            if (!response.ok) throw new Error('Product could not be saved.');
+            const data = await response.json();
+            if (Array.isArray(data.products)) saveInventory(data.products);
+            return data;
+        }
+
+        async function deleteProductFromServer(productId) {
+            const response = await fetch(`${productDeleteEndpoint}/${encodeURIComponent(productId)}`, {
+                method: 'DELETE',
+                headers: {
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': adminCsrfToken,
+                },
+            });
+            if (!response.ok) throw new Error('Product could not be deleted.');
+            const data = await response.json();
+            if (Array.isArray(data.products)) saveInventory(data.products);
+            return data;
         }
 
         function escapeHTML(value = '') {
@@ -1052,7 +1101,7 @@
             reader.readAsDataURL(file);
         });
 
-        inventoryForm?.addEventListener('submit', (event) => {
+        inventoryForm?.addEventListener('submit', async (event) => {
             event.preventDefault();
             const nextProduct = productFromForm();
             const products = readInventory();
@@ -1060,13 +1109,21 @@
             if (index >= 0) products[index] = nextProduct;
             else products.unshift(nextProduct);
             saveInventory(products);
-            inventoryMessage.textContent = 'Product saved successfully.';
+            inventoryMessage.textContent = 'Saving product to live customer catalog...';
             inventoryMessage.className = 'min-h-5 font-label text-xs text-primary';
-            renderInventory();
-            setTimeout(closeInventoryModal, 450);
+            try {
+                await saveProductToServer(nextProduct);
+                inventoryMessage.textContent = 'Product saved successfully and synced to customer pages.';
+                renderInventory();
+                setTimeout(closeInventoryModal, 450);
+            } catch (error) {
+                inventoryMessage.textContent = 'Saved locally, but live sync failed. Please try again.';
+                inventoryMessage.className = 'min-h-5 font-label text-xs text-error';
+                renderInventory();
+            }
         });
 
-        inventoryTable?.addEventListener('click', (event) => {
+        inventoryTable?.addEventListener('click', async (event) => {
             const editButton = event.target.closest('[data-inventory-edit]');
             const deleteButton = event.target.closest('[data-inventory-delete]');
             const products = readInventory();
@@ -1079,12 +1136,20 @@
                 if (!product) return;
                 saveInventory(products.filter((item) => item.id !== product.id));
                 renderInventory();
+                try {
+                    await deleteProductFromServer(product.id);
+                    renderInventory();
+                } catch (error) {
+                    inventoryMessage.textContent = 'Product removed locally, but live delete failed. Please try again.';
+                    inventoryMessage.className = 'min-h-5 font-label text-xs text-error';
+                }
             }
         });
 
         inventorySearch?.addEventListener('input', renderInventory);
         inventoryFilter?.addEventListener('change', renderInventory);
         renderInventory();
+        syncInventoryFromServer();
 
         const cartStorageKey = 'ilearnScienceCartItems';
         const checkoutStorageKey = 'ilearnScienceLastCheckout';

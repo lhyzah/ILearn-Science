@@ -394,6 +394,7 @@
     <script>
         const cartStorageKey = 'ilearnScienceCartItems';
         const inventoryStorageKey = 'ilearnScienceInventoryProducts';
+        const productsEndpoint = '{{ route('products.index') }}';
         const starterCartCount = 3;
         let previewProduct = null;
         let lastInventorySnapshot = '';
@@ -446,6 +447,21 @@
                 if (Array.isArray(saved) && (saved.length || initialized)) return saved;
             } catch {}
             return null;
+        }
+
+        async function refreshShopInventoryFromServer() {
+            try {
+                const response = await fetch(productsEndpoint, { headers: { Accept: 'application/json' } });
+                if (!response.ok) throw new Error('Unable to load live products.');
+                const data = await response.json();
+                if (Array.isArray(data.products)) {
+                    localStorage.setItem(inventoryStorageKey, JSON.stringify(data.products));
+                    localStorage.setItem(`${inventoryStorageKey}Initialized`, 'true');
+                    renderShopResources(true);
+                }
+            } catch (error) {
+                console.error(error);
+            }
         }
 
         function normalizeInventoryProduct(product) {
@@ -706,12 +722,16 @@
         });
 
         renderShopResources(true);
+        refreshShopInventoryFromServer();
         updateCartCount();
         window.addEventListener('storage', (event) => {
             if (event.key === cartStorageKey) updateCartCount();
             if (event.key === inventoryStorageKey || event.key === `${inventoryStorageKey}Initialized`) renderShopResources(true);
         });
-        setInterval(() => renderShopResources(false), 1000);
+        setInterval(() => {
+            refreshShopInventoryFromServer();
+            renderShopResources(false);
+        }, 3000);
         window.addEventListener('pageshow', updateCartCount);
     </script>
     @include('partials.auth-ui')

@@ -217,6 +217,23 @@
                 @endforeach
             </section>
 
+            <section class="glass-panel rounded-3xl p-6">
+                <div class="mb-6 flex flex-col justify-between gap-3 md:flex-row md:items-end">
+                    <div>
+                        <p class="font-label text-xs uppercase tracking-[0.3em] text-primary">Live Resource Inventory</p>
+                        <h3 class="mt-2 font-headline text-2xl font-semibold">Available from Admin Inventory</h3>
+                        <p class="mt-1 text-sm text-on-surface-variant">Products added, edited, or deleted by the admin appear here automatically.</p>
+                    </div>
+                    <a class="rounded-xl border border-primary/30 px-4 py-2 font-label text-xs text-primary transition-all hover:bg-primary/10" href="{{ route('shop') }}">Open Full Shop</a>
+                </div>
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4" data-dashboard-products-grid>
+                    <div class="rounded-2xl border border-white/10 bg-surface-container-low/55 p-6 text-center text-on-surface-variant">
+                        <span class="material-symbols-outlined mb-2 text-4xl text-primary">inventory_2</span>
+                        <p>Loading published resources...</p>
+                    </div>
+                </div>
+            </section>
+
             <section class="grid grid-cols-1 gap-gutter xl:grid-cols-12">
                 <article class="glass-panel rounded-3xl p-6 xl:col-span-8">
                     <div class="mb-6 flex items-center justify-between gap-4">
@@ -312,8 +329,16 @@
         @endforeach
     </nav>
 
+    <div id="dashboard-cart-toast" class="fixed bottom-20 right-5 z-50 translate-y-2 rounded-2xl border border-primary/25 bg-surface-container/95 px-5 py-4 text-sm text-on-surface opacity-0 shadow-[0_0_24px_rgba(0,212,255,.22)] backdrop-blur-xl transition-all">
+        <span class="font-label text-primary">Added to cart:</span>
+        <span id="dashboard-cart-toast-product">Science Resource</span>
+    </div>
+
     <script>
         const dashboardCartStorageKey = 'ilearnScienceCartItems';
+        const dashboardInventoryStorageKey = 'ilearnScienceInventoryProducts';
+        const dashboardProductsEndpoint = '{{ route('products.index') }}';
+        let lastDashboardInventorySnapshot = '';
         const defaultDashboardCartItems = [
             {
                 id: 'advanced-biology-ppt',
@@ -349,6 +374,20 @@
             return `₱${Math.max(0, value).toFixed(2)}`;
         }
 
+        function dashboardSlugify(value = '') {
+            return String(value).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'science-resource';
+        }
+
+        function dashboardEscapeHTML(value = '') {
+            return String(value).replace(/[&<>"']/g, (char) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;',
+            }[char]));
+        }
+
         function normalizeDashboardCartItem(item) {
             return {
                 id: item.id || item.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
@@ -370,6 +409,123 @@
             } catch {
                 return [];
             }
+        }
+
+        function setDashboardCartItems(items) {
+            localStorage.setItem(dashboardCartStorageKey, JSON.stringify(items.map(normalizeDashboardCartItem)));
+        }
+
+        function readDashboardInventory() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(dashboardInventoryStorageKey) || 'null');
+                const initialized = localStorage.getItem(`${dashboardInventoryStorageKey}Initialized`) === 'true';
+                return Array.isArray(saved) && (saved.length || initialized) ? saved : [];
+            } catch {
+                return [];
+            }
+        }
+
+        async function refreshDashboardInventoryFromServer() {
+            try {
+                const response = await fetch(dashboardProductsEndpoint, { headers: { Accept: 'application/json' } });
+                if (!response.ok) throw new Error('Unable to load live products.');
+                const data = await response.json();
+                if (Array.isArray(data.products)) {
+                    localStorage.setItem(dashboardInventoryStorageKey, JSON.stringify(data.products));
+                    localStorage.setItem(`${dashboardInventoryStorageKey}Initialized`, 'true');
+                    renderDashboardProducts(true);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        function normalizeDashboardProduct(product) {
+            const category = product.category || product.type || 'Digital Resource';
+            return {
+                id: product.id || dashboardSlugify(product.title),
+                title: product.title || 'Science Resource',
+                meta: category === 'Visual Resource' ? 'Visual Resource' : `${category} Resource`,
+                price: dashboardParsePeso(product.price),
+                priceLabel: dashboardFormatPeso(dashboardParsePeso(product.price)),
+                image: product.image || '',
+                description: product.description || 'Digital learning material for science classes.',
+                category,
+                grade: product.grade || 'All Grades',
+                status: product.status || 'Published',
+            };
+        }
+
+        function showDashboardCartToast(productTitle) {
+            const toast = document.getElementById('dashboard-cart-toast');
+            const label = document.getElementById('dashboard-cart-toast-product');
+            if (!toast) return;
+            if (label) label.textContent = productTitle;
+            toast.classList.remove('translate-y-2', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 1800);
+        }
+
+        function addDashboardProductToCart(product) {
+            const cartItems = getDashboardCartItems();
+            const existing = cartItems.find((item) => item.id === product.id);
+            if (existing) {
+                existing.quantity = (Number(existing.quantity) || 1) + 1;
+            } else {
+                cartItems.push({
+                    id: product.id,
+                    title: product.title,
+                    meta: product.meta,
+                    price: product.price,
+                    image: product.image,
+                    quantity: 1,
+                });
+            }
+            setDashboardCartItems(cartItems);
+            renderDashboardCart();
+            showDashboardCartToast(product.title);
+        }
+
+        function renderDashboardProducts(force = false) {
+            const inventory = readDashboardInventory();
+            const snapshot = JSON.stringify(inventory);
+            if (!force && snapshot === lastDashboardInventorySnapshot) return;
+            lastDashboardInventorySnapshot = snapshot;
+            const products = inventory
+                .filter((product) => (product.status || 'Published') === 'Published')
+                .map(normalizeDashboardProduct);
+            const grid = document.querySelector('[data-dashboard-products-grid]');
+            if (!grid) return;
+
+            grid.innerHTML = products.length ? products.map((product) => `
+                <article class="overflow-hidden rounded-2xl border border-white/10 bg-surface-container-low/55 transition-all hover:border-primary/40">
+                    <div class="relative h-36 overflow-hidden">
+                        ${product.image ? `<img class="h-full w-full object-cover" alt="${dashboardEscapeHTML(product.title)}" src="${dashboardEscapeHTML(product.image)}">` : `<div class="flex h-full w-full items-center justify-center bg-surface-container-high text-primary"><span class="material-symbols-outlined text-5xl">science</span></div>`}
+                        <span class="absolute left-3 top-3 rounded-full bg-surface/85 px-2 py-1 font-label text-[10px] text-primary">${dashboardEscapeHTML(product.category)}</span>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <h4 class="line-clamp-2 font-headline text-lg font-semibold text-on-surface">${dashboardEscapeHTML(product.title)}</h4>
+                            <span class="whitespace-nowrap font-label text-xs text-primary">${dashboardEscapeHTML(product.priceLabel)}</span>
+                        </div>
+                        <p class="mt-2 line-clamp-2 text-sm text-on-surface-variant">${dashboardEscapeHTML(product.description)}</p>
+                        <p class="mt-2 font-label text-[11px] text-on-surface-variant">${dashboardEscapeHTML(product.grade)}</p>
+                        <button class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-primary-container py-2.5 font-label text-xs font-bold text-on-primary shadow-[0_0_16px_rgba(0,212,255,.22)] transition-all hover:scale-[1.02]" type="button" data-dashboard-product-add="${dashboardEscapeHTML(product.id)}">
+                            <span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+                            Add to Cart
+                        </button>
+                    </div>
+                </article>
+            `).join('') : `
+                <div class="rounded-2xl border border-white/10 bg-surface-container-low/55 p-6 text-center text-on-surface-variant md:col-span-2 xl:col-span-4">
+                    <span class="material-symbols-outlined mb-2 text-4xl text-primary">inventory_2</span>
+                    <p class="font-headline text-lg text-on-surface">No admin-published products yet</p>
+                    <p class="mt-1 text-sm">Products saved as Published in the admin inventory will appear here.</p>
+                </div>
+            `;
         }
 
         function renderDashboardCart() {
@@ -444,11 +600,31 @@
         }
 
         updateCustomerDashboardTitle();
+        renderDashboardProducts(true);
+        refreshDashboardInventoryFromServer();
         renderDashboardCart();
+        document.querySelector('[data-dashboard-products-grid]')?.addEventListener('click', (event) => {
+            const addButton = event.target.closest('[data-dashboard-product-add]');
+            if (!addButton) return;
+            const product = readDashboardInventory()
+                .filter((item) => (item.status || 'Published') === 'Published')
+                .map(normalizeDashboardProduct)
+                .find((item) => item.id === addButton.dataset.dashboardProductAdd);
+            if (product) addDashboardProductToCart(product);
+        });
         window.addEventListener('storage', (event) => {
             if (event.key === dashboardCartStorageKey) renderDashboardCart();
+            if (event.key === dashboardInventoryStorageKey || event.key === `${dashboardInventoryStorageKey}Initialized`) renderDashboardProducts(true);
         });
-        window.addEventListener('pageshow', renderDashboardCart);
+        window.addEventListener('pageshow', () => {
+            renderDashboardProducts(true);
+            renderDashboardCart();
+        });
+        setInterval(() => renderDashboardProducts(false), 1000);
+        setInterval(() => {
+            refreshDashboardInventoryFromServer();
+            renderDashboardProducts(false);
+        }, 3000);
     </script>
     @include('partials.auth-ui')
 </body>
