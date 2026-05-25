@@ -205,7 +205,6 @@
 
     <script>
         const cartStorageKey = 'ilearnScienceCartItems';
-        const starterCartCount = 3;
         const taxRate = 0.08;
         const discountAmount = 5;
         const orders = {
@@ -242,6 +241,7 @@
         };
 
         function getCartItems() {
+            if (window.iLearnAuth?.getCartItems) return window.iLearnAuth.getCartItems();
             try {
                 return JSON.parse(localStorage.getItem(cartStorageKey)) || [];
             } catch (error) {
@@ -269,10 +269,6 @@
         }
 
         function getLiveCartItems() {
-            if (localStorage.getItem(cartStorageKey) === null) {
-                return orders['ILS-2026-CART'].items.map((item) => normalizeCartItem({ ...item, quantity: 1 }));
-            }
-
             return getCartItems().map(normalizeCartItem);
         }
 
@@ -307,16 +303,22 @@
         }
 
         function saveCartItems(items) {
+            if (window.iLearnAuth?.setCartItems) {
+                window.iLearnAuth.setCartItems(items);
+                updateCartCount();
+                return;
+            }
             localStorage.setItem(cartStorageKey, JSON.stringify(items));
             updateCartCount();
         }
 
         function updateCartCount() {
             const total = getLiveCartItems().reduce((sum, item) => sum + item.quantity, 0);
+            const signedIn = window.iLearnAuth?.isSignedIn ? window.iLearnAuth.isSignedIn() : false;
             document.querySelectorAll('[data-cart-count]').forEach((badge) => {
                 badge.textContent = total;
-                badge.classList.toggle('hidden', total === 0);
-                badge.classList.toggle('flex', total > 0);
+                badge.classList.toggle('hidden', !signedIn || total === 0);
+                badge.classList.toggle('flex', signedIn && total > 0);
             });
         }
 
@@ -425,6 +427,7 @@
         window.addEventListener('storage', (event) => {
             if (event.key === cartStorageKey) refreshLiveCartReceipt();
         });
+        window.addEventListener('ilearn:cart-updated', refreshLiveCartReceipt);
         window.addEventListener('pageshow', refreshLiveCartReceipt);
     </script>
     @include('partials.auth-ui')

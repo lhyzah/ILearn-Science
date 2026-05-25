@@ -602,9 +602,9 @@
     <script>
         const cartStorageKey = 'ilearnScienceCartItems';
         const inventoryStorageKey = 'ilearnScienceInventoryProducts';
-        const starterCartCount = 3;
 
         function getCartItems() {
+            if (window.iLearnAuth?.getCartItems) return window.iLearnAuth.getCartItems();
             try {
                 return JSON.parse(localStorage.getItem(cartStorageKey)) || [];
             } catch {
@@ -613,16 +613,19 @@
         }
 
         function setCartItems(items) {
+            if (window.iLearnAuth?.setCartItems) {
+                window.iLearnAuth.setCartItems(items);
+                return;
+            }
             localStorage.setItem(cartStorageKey, JSON.stringify(items));
         }
 
         function updateCartCount() {
-            const hasSavedCart = localStorage.getItem(cartStorageKey) !== null;
-            const actualCount = hasSavedCart
-                ? getCartItems().reduce((sum, item) => sum + (Number(item.quantity) || 1), 0)
-                : starterCartCount;
+            const signedIn = window.iLearnAuth?.isSignedIn ? window.iLearnAuth.isSignedIn() : false;
+            const actualCount = signedIn ? getCartItems().reduce((sum, item) => sum + (Number(item.quantity) || 1), 0) : 0;
 
             document.querySelectorAll('[data-cart-count]').forEach((badge) => {
+                badge.classList.toggle('hidden', !signedIn);
                 badge.innerText = actualCount;
             });
             document.querySelectorAll('[data-cart-link]').forEach((link) => {
@@ -790,6 +793,12 @@
         }
 
         function addProductToCart(product) {
+            if (window.iLearnAuth?.addToCart) {
+                if (!window.iLearnAuth.addToCart(product)) return;
+                updateCartCount();
+                showCartToast(product.title);
+                return;
+            }
             const items = getCartItems();
             const existing = items.find((item) => item.id === product.id);
 
@@ -954,6 +963,7 @@
         window.addEventListener('storage', (event) => {
             if (event.key === cartStorageKey) updateCartCount();
         });
+        window.addEventListener('ilearn:cart-updated', updateCartCount);
 
         window.addEventListener('pageshow', updateCartCount);
     </script>

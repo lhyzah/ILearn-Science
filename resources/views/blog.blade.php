@@ -305,9 +305,17 @@
 
         function updateBlogCartBadges() {
             let items = [];
-            try { items = JSON.parse(localStorage.getItem(cartStorageKey) || '[]') || []; } catch {}
+            const signedIn = window.iLearnAuth?.isSignedIn ? window.iLearnAuth.isSignedIn() : false;
+            if (signedIn && window.iLearnAuth?.getCartItems) {
+                items = window.iLearnAuth.getCartItems();
+            } else if (signedIn) {
+                try { items = JSON.parse(localStorage.getItem(cartStorageKey) || '[]') || []; } catch {}
+            }
             const count = items.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
-            document.querySelectorAll('[data-cart-count]').forEach((badge) => badge.textContent = count);
+            document.querySelectorAll('[data-cart-count]').forEach((badge) => {
+                badge.textContent = count;
+                badge.classList.toggle('hidden', !signedIn);
+            });
         }
         updateBlogCartBadges();
         renderPublicBlogPosts();
@@ -335,6 +343,7 @@
             if (event.key === cartStorageKey) updateBlogCartBadges();
             if (event.key === blogStorageKey) renderPublicBlogPosts();
         });
+        window.addEventListener('ilearn:cart-updated', updateBlogCartBadges);
         window.setInterval(renderPublicBlogPosts, 1200);
     </script>
     @include('partials.auth-ui')

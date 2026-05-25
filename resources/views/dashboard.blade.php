@@ -400,8 +400,9 @@
         }
 
         function getDashboardCartItems() {
+            if (window.iLearnAuth?.getCartItems) return window.iLearnAuth.getCartItems().map(normalizeDashboardCartItem);
             if (localStorage.getItem(dashboardCartStorageKey) === null) {
-                return defaultDashboardCartItems.map(normalizeDashboardCartItem);
+                return [];
             }
 
             try {
@@ -412,6 +413,10 @@
         }
 
         function setDashboardCartItems(items) {
+            if (window.iLearnAuth?.setCartItems) {
+                window.iLearnAuth.setCartItems(items);
+                return;
+            }
             localStorage.setItem(dashboardCartStorageKey, JSON.stringify(items.map(normalizeDashboardCartItem)));
         }
 
@@ -538,6 +543,7 @@
             const meta = document.querySelector('[data-dashboard-cart-meta]');
 
             document.querySelectorAll('[data-dashboard-cart-count], [data-cart-count]').forEach((element) => {
+                element.classList.toggle('hidden', !(window.iLearnAuth?.isSignedIn?.()));
                 element.textContent = count;
             });
 
@@ -616,6 +622,7 @@
             if (event.key === dashboardCartStorageKey) renderDashboardCart();
             if (event.key === dashboardInventoryStorageKey || event.key === `${dashboardInventoryStorageKey}Initialized`) renderDashboardProducts(true);
         });
+        window.addEventListener('ilearn:cart-updated', renderDashboardCart);
         window.addEventListener('pageshow', () => {
             renderDashboardProducts(true);
             renderDashboardCart();

@@ -319,9 +319,8 @@
     </div>
     <script>
         const cartStorageKey = 'ilearnScienceCartItems';
-        const starterCartCount = 3;
-
         function getCartItems() {
+            if (window.iLearnAuth?.getCartItems) return window.iLearnAuth.getCartItems();
             try {
                 return JSON.parse(localStorage.getItem(cartStorageKey)) || [];
             } catch {
@@ -330,12 +329,11 @@
         }
 
         function updateCartCount() {
-            const hasSavedCart = localStorage.getItem(cartStorageKey) !== null;
-            const actualCount = hasSavedCart
-                ? getCartItems().reduce((sum, item) => sum + (Number(item.quantity) || 1), 0)
-                : starterCartCount;
+            const signedIn = window.iLearnAuth?.isSignedIn ? window.iLearnAuth.isSignedIn() : false;
+            const actualCount = signedIn ? getCartItems().reduce((sum, item) => sum + (Number(item.quantity) || 1), 0) : 0;
 
             document.querySelectorAll('[data-cart-count]').forEach((badge) => {
+                badge.classList.toggle('hidden', !signedIn);
                 badge.innerText = actualCount;
             });
             document.querySelectorAll('[data-cart-ready-label]').forEach((label) => {
@@ -347,6 +345,7 @@
         window.addEventListener('storage', (event) => {
             if (event.key === cartStorageKey) updateCartCount();
         });
+        window.addEventListener('ilearn:cart-updated', updateCartCount);
         window.addEventListener('pageshow', updateCartCount);
     </script>
     @include('partials.auth-ui')

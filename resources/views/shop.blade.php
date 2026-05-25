@@ -395,7 +395,6 @@
         const cartStorageKey = 'ilearnScienceCartItems';
         const inventoryStorageKey = 'ilearnScienceInventoryProducts';
         const productsEndpoint = '{{ route('products.index') }}';
-        const starterCartCount = 3;
         let previewProduct = null;
         let lastInventorySnapshot = '';
         const shopResourceGrid = document.getElementById('shop-resource-grid');
@@ -457,6 +456,7 @@
                 if (Array.isArray(data.products)) {
                     localStorage.setItem(inventoryStorageKey, JSON.stringify(data.products));
                     localStorage.setItem(`${inventoryStorageKey}Initialized`, 'true');
+                    window.iLearnAuth?.syncProductsToCatalogue?.(data.products);
                     renderShopResources(true);
                 }
             } catch (error) {
@@ -490,7 +490,7 @@
             const inventory = getAdminInventory();
             if (!inventory) return serverRenderedProducts;
             return inventory
-                .filter((product) => (product.status || 'Published') === 'Published')
+                .filter((product) => ['published', 'active'].includes(String(product.status || 'Published').toLowerCase()))
                 .map(normalizeInventoryProduct);
         }
 
@@ -499,6 +499,7 @@
         }
 
         function getCartItems() {
+            if (window.iLearnAuth?.getCartItems) return window.iLearnAuth.getCartItems();
             try {
                 return JSON.parse(localStorage.getItem(cartStorageKey)) || [];
             } catch {
@@ -507,16 +508,19 @@
         }
 
         function setCartItems(items) {
+            if (window.iLearnAuth?.setCartItems) {
+                window.iLearnAuth.setCartItems(items);
+                return;
+            }
             localStorage.setItem(cartStorageKey, JSON.stringify(items));
         }
 
         function updateCartCount() {
-            const hasSavedCart = localStorage.getItem(cartStorageKey) !== null;
-            const actualCount = hasSavedCart
-                ? getCartItems().reduce((sum, item) => sum + (Number(item.quantity) || 1), 0)
-                : starterCartCount;
+            const signedIn = window.iLearnAuth?.isSignedIn ? window.iLearnAuth.isSignedIn() : false;
+            const actualCount = signedIn ? getCartItems().reduce((sum, item) => sum + (Number(item.quantity) || 1), 0) : 0;
 
             document.querySelectorAll('[data-cart-count]').forEach((badge) => {
+                badge.classList.toggle('hidden', !signedIn);
                 badge.innerText = actualCount;
             });
             document.querySelectorAll('[data-cart-link]').forEach((link) => {
@@ -538,6 +542,12 @@
         }
 
         function addProductToCart(product) {
+            if (window.iLearnAuth?.addToCart) {
+                if (!window.iLearnAuth.addToCart(product)) return;
+                updateCartCount();
+                showCartToast(product.title);
+                return;
+            }
             const items = getCartItems();
             const existing = items.find((item) => item.id === product.id);
 
@@ -728,6 +738,7 @@
             if (event.key === cartStorageKey) updateCartCount();
             if (event.key === inventoryStorageKey || event.key === `${inventoryStorageKey}Initialized`) renderShopResources(true);
         });
+        window.addEventListener('ilearn:cart-updated', updateCartCount);
         setInterval(() => {
             refreshShopInventoryFromServer();
             renderShopResources(false);

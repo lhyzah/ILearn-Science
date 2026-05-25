@@ -188,33 +188,6 @@
         const checkoutStorageKey = 'ilearnScienceLastCheckout';
         const taxRate = 0.08;
         const discountAmount = 5;
-        const defaultCartItems = [
-            {
-                id: 'advanced-biology-ppt',
-                title: 'Advanced Biology PPT',
-                meta: 'Digital Resource - v2.4',
-                price: 12.99,
-                image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDAukcxKIeiLZnlciZdGHXQXy4iKMk5x-tGgi6TFF9Sfe2xAbJvYHL-ZC8QnE7ffN8aNYOAezSH0Tj97sk_N4jSWS0Fi-fLIIOe_GEcsQDy-Q3Git7Zsvv9jd-3aksYLZm4n_e9Nwev_zdKaEgIZetNpoYFBQIvs1CsSN9Rj8uZXbmpC3w1SXnltKVlUgxzOY6l7SiVFE5VBWD9mn3M13-GXtO6fWm6DG_Z3oeCsZ474bR-1i29uZ1PURiMSTDrjBNPKGoExuy-MHk',
-                quantity: 1,
-            },
-            {
-                id: 'physics-lab-worksheets',
-                title: 'Physics Lab Worksheets',
-                meta: 'PDF Bundle - 45 Pages',
-                price: 12.99,
-                image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBojzpBdmxN9PsX8hQhpf-SAKxoOzUasNe7LVwmHLwKmusbXaGCTShjD13RlH4TahuD0TLcy5RDFo_-rk_pIgulmr8vhpELtSAVpvE4-i6GIzL5vqnjan5AsqkKAeeTYV1zcxqh-GwPk224UNAqPXYnbYJ7gv5sHGYd8ta3nrnfvkHDI17Rq9TN0hHgzafutTJMBNMjgDHwopj_jhKZRw8AMPKlpweS9z0mJCinBPQQc-w2M4LAdBCjyVswiTkfNyu14SBEGeuz2A8',
-                quantity: 1,
-            },
-            {
-                id: 'chemistry-study-guide',
-                title: 'Chemistry Study Guide',
-                meta: 'Interactive E-Book',
-                price: 12.99,
-                image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCPPifHph78pWofuqtVNjb6V-PLYAh0tthoPV29K8qbg1Hv1B-iMoInZd5zkM3IEUG-p70cbjpgCovfozMZv5CRK-WCHZbyV9qSJARc43tSFj5y0Zy7gIRSHAeHUrbTXYsHGfC1JUD7z0HVOmVRxQ0YLyG5ot_ckNO2l2D3y4RKVsGMl2Vc-96aVEuTetl-Fl96i8qBsHzyRsS5UB7I7_B1lhFS8Z1JW-Fp6LE5l1CDj9BJmh0ha-yaEL7VtNDyl3Dvy25kJZO_dy0',
-                quantity: 1,
-            },
-        ];
-
         function parsePeso(value) {
             return Number.parseFloat(String(value).replace(/[₱,]/g, '')) || 0;
         }
@@ -224,6 +197,7 @@
         }
 
         function getCartItems() {
+            if (window.iLearnAuth?.getCartItems) return window.iLearnAuth.getCartItems();
             try {
                 return JSON.parse(localStorage.getItem(cartStorageKey)) || [];
             } catch {
@@ -254,10 +228,6 @@
             const checkout = getLastCheckout();
             if (checkout?.items?.length) {
                 return checkout.items.map(normalizeCartItem);
-            }
-
-            if (localStorage.getItem(cartStorageKey) === null) {
-                return defaultCartItems.map(normalizeCartItem);
             }
 
             return getCartItems().map(normalizeCartItem);
@@ -329,6 +299,7 @@
         window.addEventListener('storage', (event) => {
             if (event.key === cartStorageKey) updateSuccessOrder();
         });
+        window.addEventListener('ilearn:cart-updated', updateSuccessOrder);
         window.addEventListener('pageshow', updateSuccessOrder);
     </script>
     @include('partials.auth-ui')

@@ -347,10 +347,13 @@
 <script>
 (() => {
     const sessionKey = 'ilearnScienceAuthSession';
+    const currentUserKey = 'ilearnScienceCurrentUser';
     const rememberedKey = 'ilearnScienceRememberedUser';
     const usersKey = 'ilearnScienceRegisteredUsers';
     const activityKey = 'ilearnScienceCustomerActivity';
     const cartKey = 'ilearnScienceCartItems';
+    const cartsKey = 'ilearnScienceUserCarts';
+    const pendingCartKey = 'ilearnSciencePendingCartProduct';
     const checkoutKey = 'ilearnScienceLastCheckout';
     const adminEmail = 'lhyzah@ilearnscience.com';
     const adminPassword = 'Admin@2026';
@@ -364,17 +367,10 @@
         '/mission-control',
         '/orders',
         '/order-success',
-        '/shop',
-        '/resources/cell-biology-interactive-powerpoint',
         '/admin-dashboard',
         '/blog-admin'
     ];
     const protectedSelectors = [
-        '.top-resource-add-to-cart',
-        '.shop-resource-add',
-        '#resource-preview-add',
-        '#shop-preview-add',
-        '#add-cell-biology-to-cart',
         '[data-action="download"]',
         '[data-receipt-download]',
         'a[href*="/about"]',
@@ -384,8 +380,6 @@
         'a[href*="/mission-control"]',
         'a[href*="/orders"]',
         'a[href*="/order-success"]',
-        'a[href*="/shop"]',
-        'a[href*="/resources/"]',
         'a[href*="/checkout"]',
         'a[href*="/admin-dashboard"]',
         'a[href*="/blog-admin"]'
@@ -410,10 +404,129 @@
 
     const getSession = () => {
         try {
-            return JSON.parse(sessionStorage.getItem(sessionKey) || localStorage.getItem(rememberedKey) || 'null');
+            return JSON.parse(sessionStorage.getItem(sessionKey) || localStorage.getItem(currentUserKey) || localStorage.getItem(rememberedKey) || 'null');
         } catch {
             return null;
         }
+    };
+
+    const normalizeCartItem = (item = {}) => ({
+        id: item.id || (item.title || 'science-resource').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+        title: item.title || 'Science Resource',
+        meta: item.meta || item.type || 'Digital Resource',
+        price: Number.parseFloat(String(item.price || 0).replace(/[₱,]/g, '')) || 0,
+        image: item.image || '',
+        quantity: Math.max(1, Number.parseInt(item.quantity || '1', 10) || 1),
+    });
+
+    const cartOwner = () => (getSession()?.email || '').toLowerCase();
+
+    const getAllCarts = () => {
+        try { return JSON.parse(localStorage.getItem(cartsKey) || '{}') || {}; } catch { return {}; }
+    };
+
+    const setAllCarts = (carts) => localStorage.setItem(cartsKey, JSON.stringify(carts));
+
+    const getUserCartItems = () => {
+        const owner = cartOwner();
+        if (!owner) return [];
+        const carts = getAllCarts();
+        return (carts[owner] || []).map(normalizeCartItem);
+    };
+
+    const setUserCartItems = (items) => {
+        const owner = cartOwner();
+        if (!owner) {
+            localStorage.removeItem(cartKey);
+            window.dispatchEvent(new CustomEvent('ilearn:cart-updated', { detail: { count: 0, items: [] } }));
+            return [];
+        }
+        const normalized = items.map(normalizeCartItem);
+        const carts = getAllCarts();
+        carts[owner] = normalized;
+        setAllCarts(carts);
+        originalSetItem(cartKey, JSON.stringify(normalized));
+        const count = normalized.reduce((sum, item) => sum + item.quantity, 0);
+        addCustomerActivity('Cart Updated', `${count} item${count === 1 ? '' : 's'} in cart`, {
+            count,
+            items: normalized.map((item) => item.title).slice(0, 5),
+        });
+        window.dispatchEvent(new CustomEvent('ilearn:cart-updated', { detail: { count, items: normalized } }));
+        return normalized;
+    };
+
+    const syncCurrentUserCartMirror = () => {
+        const owner = cartOwner();
+        if (!owner) {
+            localStorage.removeItem(cartKey);
+            document.querySelectorAll('[data-cart-count]').forEach((badge) => {
+                badge.textContent = '0';
+                badge.classList.add('hidden');
+            });
+            window.dispatchEvent(new CustomEvent('ilearn:cart-updated', { detail: { count: 0, items: [] } }));
+            return [];
+        }
+        const items = getUserCartItems();
+        originalSetItem(cartKey, JSON.stringify(items));
+        document.querySelectorAll('[data-cart-count]').forEach((badge) => {
+            badge.classList.remove('hidden');
+            badge.textContent = items.reduce((sum, item) => sum + item.quantity, 0);
+        });
+        window.dispatchEvent(new CustomEvent('ilearn:cart-updated', { detail: { count: items.reduce((sum, item) => sum + item.quantity, 0), items } }));
+        return items;
+    };
+
+    const addToUserCart = (product) => {
+        if (!signedIn()) {
+            try { sessionStorage.setItem(pendingCartKey, JSON.stringify(normalizeCartItem(product))); } catch {}
+            openAuth(pendingMessage);
+            return false;
+        }
+        const items = getUserCartItems();
+        const normalized = normalizeCartItem(product);
+        const existing = items.find((item) => item.id === normalized.id);
+        if (existing) existing.quantity += normalized.quantity;
+        else items.push(normalized);
+        setUserCartItems(items);
+        return true;
+    };
+
+    const syncProductsToCatalogue = (products = []) => {
+        if (!Array.isArray(products) || !products.length) return;
+        const activeProducts = new Map(products
+            .filter((product) => !['inactive', 'deleted', 'draft'].includes(String(product.status || 'Published').toLowerCase()))
+            .map((product) => {
+                const normalized = normalizeCartItem({
+                    id: product.id,
+                    title: product.title,
+                    meta: product.meta || product.type || product.category || 'Digital Resource',
+                    price: product.price,
+                    image: product.image || product.imageUrl || '',
+                    quantity: 1,
+                });
+                return [normalized.id, normalized];
+            }));
+        const carts = getAllCarts();
+        Object.keys(carts).forEach((owner) => {
+            carts[owner] = (Array.isArray(carts[owner]) ? carts[owner] : [])
+                .map(normalizeCartItem)
+                .filter((item) => activeProducts.has(item.id))
+                .map((item) => ({ ...activeProducts.get(item.id), quantity: item.quantity }));
+        });
+        setAllCarts(carts);
+        syncCurrentUserCartMirror();
+    };
+
+    const consumePendingCartProduct = () => {
+        let product = null;
+        try {
+            product = JSON.parse(sessionStorage.getItem(pendingCartKey) || 'null');
+            sessionStorage.removeItem(pendingCartKey);
+        } catch {}
+        if (!product) return false;
+        addToUserCart(product);
+        showToast(`${product.title || 'Resource'} added to your cart.`);
+        return true;
     };
 
     const activityUser = () => {
@@ -452,6 +565,11 @@
         if (key === cartKey) {
             try {
                 const items = JSON.parse(value) || [];
+                if (signedIn()) {
+                    const carts = getAllCarts();
+                    carts[cartOwner()] = items.map(normalizeCartItem);
+                    setAllCarts(carts);
+                }
                 const count = items.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
                 addCustomerActivity('Cart Updated', `${count} item${count === 1 ? '' : 's'} in cart`, {
                     count,
@@ -474,15 +592,20 @@
     const setSession = (user, remember = false) => {
         const session = { name: user.name, email: user.email, role: user.role, signedInAt: new Date().toISOString() };
         sessionStorage.setItem(sessionKey, JSON.stringify(session));
+        localStorage.setItem(currentUserKey, JSON.stringify(session));
         if (remember) localStorage.setItem(rememberedKey, JSON.stringify(session));
         else localStorage.removeItem(rememberedKey);
+        syncCurrentUserCartMirror();
     };
 
     const clearAuthSession = () => {
         try { sessionStorage.removeItem(sessionKey); } catch {}
+        try { localStorage.removeItem(currentUserKey); } catch {}
         try { localStorage.removeItem(rememberedKey); } catch {}
+        try { localStorage.removeItem(cartKey); } catch {}
         try { localStorage.removeItem('ilearnScienceLastCheckout'); } catch {}
         try { localStorage.removeItem('ilearnScienceDashboardState'); } catch {}
+        syncCurrentUserCartMirror();
     };
 
     const hashText = async (value) => {
@@ -604,18 +727,19 @@
 
     const mountAuthControls = () => {
         const user = getSession();
+        syncCurrentUserCartMirror();
         document.querySelectorAll('[data-auth-slot]').forEach((slot) => slot.remove());
         const slot = document.createElement('div');
         slot.dataset.authSlot = '';
         slot.className = 'auth-shell flex items-center gap-2';
         slot.innerHTML = authControlHTML(user);
-        slot.querySelector('[data-auth-logout]')?.addEventListener('click', (event) => {
+        slot.querySelectorAll('[data-auth-logout]').forEach((logoutButton) => logoutButton.addEventListener('click', (event) => {
             event.preventDefault();
             event.stopPropagation();
             document.querySelectorAll('[data-auth-menu]').forEach((menu) => menu.classList.remove('auth-menu-open'));
             document.querySelectorAll('[data-auth-arrow]').forEach((arrow) => arrow.classList.remove('rotate-180'));
             openLogoutConfirm();
-        });
+        }));
         const preferredMount = document.querySelector('[data-auth-mount]');
         if (preferredMount) {
             preferredMount.appendChild(slot);
@@ -636,9 +760,14 @@
         setSession(user, remember);
         mountAuthControls();
         closeAuth(false);
-        showToast(message);
+        const addedPendingProduct = consumePendingCartProduct();
+        if (!addedPendingProduct) showToast(message);
         setTimeout(() => {
-            window.location.href = pendingHref || '/dashboard';
+            if (pendingHref) {
+                window.location.href = pendingHref;
+                return;
+            }
+            if (!addedPendingProduct) window.location.href = '/dashboard';
         }, 520);
     };
 
@@ -766,6 +895,14 @@
     window.iLearnAuth = {
         isSignedIn: signedIn,
         isAdmin: isAdminUser,
+        currentUser: getSession,
+        getCartItems: getUserCartItems,
+        setCartItems: setUserCartItems,
+        addToCart: addToUserCart,
+        clearCart: () => setUserCartItems([]),
+        refreshCart: syncCurrentUserCartMirror,
+        syncProductsToCatalogue,
+        cartKeyForCurrentUser: () => cartOwner() ? `${cartsKey}:${cartOwner()}` : null,
         openSignIn: (message = pendingMessage) => openAuth(message),
         logout: () => {
             performLogout();

@@ -690,6 +690,8 @@
                     <span class="mb-2 block font-label text-xs uppercase tracking-widest text-on-surface-variant">Status</span>
                     <select class="w-full rounded-xl border border-white/10 bg-surface-container-low px-4 py-3 text-on-surface focus:border-primary focus:ring-0" name="status" required>
                         <option>Published</option>
+                        <option>Active</option>
+                        <option>Inactive</option>
                         <option>Draft</option>
                         <option>Archived</option>
                     </select>
@@ -915,6 +917,7 @@
         function saveInventory(products) {
             localStorage.setItem(inventoryStorageKey, JSON.stringify(products));
             localStorage.setItem(`${inventoryStorageKey}Initialized`, 'true');
+            window.iLearnAuth?.syncProductsToCatalogue?.(products);
         }
 
         async function syncInventoryFromServer() {
@@ -998,8 +1001,8 @@
         }
 
         function updateInventoryStats(products) {
-            const published = products.filter((product) => product.status === 'Published').length;
-            const drafts = products.filter((product) => product.status === 'Draft').length;
+            const published = products.filter((product) => ['Published', 'Active'].includes(product.status)).length;
+            const drafts = products.filter((product) => ['Draft', 'Inactive'].includes(product.status)).length;
             const value = products.reduce((sum, product) => sum + (Number(product.price) || 0), 0);
             const stats = {
                 'inventory-total': products.length,
@@ -1040,7 +1043,7 @@
                     <td class="py-4 font-label text-primary">${formatAdminPeso(product.price)}</td>
                     <td class="py-4 text-on-surface-variant">${escapeHTML(product.grade)}</td>
                     <td class="py-4 text-on-surface-variant">${escapeHTML(product.format)}</td>
-                    <td class="py-4"><span class="rounded-full px-3 py-1 font-label text-xs ${product.status === 'Published' ? 'bg-green-400/10 text-green-300' : product.status === 'Draft' ? 'bg-yellow-400/10 text-yellow-300' : 'bg-error-container/30 text-error'}">${escapeHTML(product.status)}</span></td>
+                    <td class="py-4"><span class="rounded-full px-3 py-1 font-label text-xs ${['Published', 'Active'].includes(product.status) ? 'bg-green-400/10 text-green-300' : ['Draft', 'Inactive'].includes(product.status) ? 'bg-yellow-400/10 text-yellow-300' : 'bg-error-container/30 text-error'}">${escapeHTML(product.status)}</span></td>
                     <td class="py-4 text-on-surface-variant">${escapeHTML(product.stock)}</td>
                     <td class="py-4">
                         <div class="flex justify-end gap-2">
@@ -1152,6 +1155,7 @@
         syncInventoryFromServer();
 
         const cartStorageKey = 'ilearnScienceCartItems';
+        const userCartsStorageKey = 'ilearnScienceUserCarts';
         const checkoutStorageKey = 'ilearnScienceLastCheckout';
         const activityStorageKey = 'ilearnScienceCustomerActivity';
         const currency = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' });
@@ -1180,6 +1184,11 @@
         }
 
         function getLiveCartItems() {
+            const userCarts = safeJSON(userCartsStorageKey, {});
+            if (userCarts && typeof userCarts === 'object' && !Array.isArray(userCarts)) {
+                return Object.values(userCarts).flatMap((items) => Array.isArray(items) ? items.map(normalizeCartItem) : []);
+            }
+
             return safeJSON(cartStorageKey, []).map(normalizeCartItem);
         }
 
@@ -1344,7 +1353,7 @@
         }
 
         window.addEventListener('storage', (event) => {
-            if ([cartStorageKey, checkoutStorageKey, activityStorageKey].includes(event.key)) refreshAdminLiveData();
+            if ([cartStorageKey, userCartsStorageKey, checkoutStorageKey, activityStorageKey].includes(event.key)) refreshAdminLiveData();
         });
         window.addEventListener('pageshow', refreshAdminLiveData);
         setInterval(refreshAdminLiveData, 1000);

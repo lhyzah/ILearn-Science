@@ -364,7 +364,6 @@
 
     <script>
         const cartStorageKey = 'ilearnScienceCartItems';
-        const starterCartCount = 3;
         const cellBiologyProduct = {
             id: 'cell-biology-interactive-powerpoint',
             title: 'Cell Biology Interactive PowerPoint',
@@ -374,6 +373,7 @@
         };
 
         function getCartItems() {
+            if (window.iLearnAuth?.getCartItems) return window.iLearnAuth.getCartItems();
             try {
                 return JSON.parse(localStorage.getItem(cartStorageKey)) || [];
             } catch {
@@ -382,16 +382,19 @@
         }
 
         function setCartItems(items) {
+            if (window.iLearnAuth?.setCartItems) {
+                window.iLearnAuth.setCartItems(items);
+                return;
+            }
             localStorage.setItem(cartStorageKey, JSON.stringify(items));
         }
 
         function updateCartCount() {
-            const hasSavedCart = localStorage.getItem(cartStorageKey) !== null;
-            const actualCount = hasSavedCart
-                ? getCartItems().reduce((sum, item) => sum + (Number(item.quantity) || 1), 0)
-                : starterCartCount;
+            const signedIn = window.iLearnAuth?.isSignedIn ? window.iLearnAuth.isSignedIn() : false;
+            const actualCount = signedIn ? getCartItems().reduce((sum, item) => sum + (Number(item.quantity) || 1), 0) : 0;
 
             document.querySelectorAll('[data-cart-count]').forEach((badge) => {
+                badge.classList.toggle('hidden', !signedIn);
                 badge.innerText = actualCount;
             });
             document.querySelectorAll('[data-cart-link]').forEach((link) => {
@@ -411,6 +414,12 @@
         }
 
         document.getElementById('add-cell-biology-to-cart')?.addEventListener('click', () => {
+            if (window.iLearnAuth?.addToCart) {
+                if (!window.iLearnAuth.addToCart(cellBiologyProduct)) return;
+                updateCartCount();
+                showCartToast();
+                return;
+            }
             const items = getCartItems();
             const existing = items.find((item) => item.id === cellBiologyProduct.id);
 
@@ -429,6 +438,7 @@
         window.addEventListener('storage', (event) => {
             if (event.key === cartStorageKey) updateCartCount();
         });
+        window.addEventListener('ilearn:cart-updated', updateCartCount);
         window.addEventListener('pageshow', updateCartCount);
 
         document.querySelectorAll('.aspect-video.cursor-pointer, button.aspect-video').forEach((thumb) => {
