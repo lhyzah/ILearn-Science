@@ -68,6 +68,30 @@
         box-shadow: 0 0 0 4px rgba(60, 215, 255, 0.11), 0 0 18px rgba(60, 215, 255, 0.16);
         background: rgba(11, 14, 20, 0.92);
     }
+    .auth-password-wrap { position: relative; }
+    .auth-password-wrap .auth-input { padding-right: 52px; }
+    .auth-password-toggle {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        display: flex;
+        height: 38px;
+        width: 38px;
+        transform: translateY(-50%);
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(116, 245, 255, .16);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, .04);
+        color: #a8e8ff;
+        transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease, color 160ms ease;
+    }
+    .auth-password-toggle:hover {
+        border-color: rgba(116, 245, 255, .58);
+        background: rgba(116, 245, 255, .1);
+        box-shadow: 0 0 16px rgba(60, 215, 255, .16);
+        color: #ddfcff;
+    }
     .auth-primary {
         border: 0;
         border-radius: 14px;
@@ -264,7 +288,12 @@
                 </div>
                 <div class="space-y-3">
                     <label class="block text-xs font-bold uppercase tracking-[0.2em] text-[#bbc9cf]">Password</label>
-                    <input id="auth-login-password" class="auth-input" type="password" autocomplete="current-password" placeholder="Enter password">
+                    <div class="auth-password-wrap">
+                        <input id="auth-login-password" class="auth-input" type="password" autocomplete="current-password" placeholder="Enter password">
+                        <button class="auth-password-toggle" type="button" data-auth-password-toggle="auth-login-password" aria-label="Show password" aria-pressed="false">
+                            <span class="material-symbols-outlined text-[20px]">visibility</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="flex items-center justify-between gap-4 text-sm">
                     <label class="flex cursor-pointer items-center gap-2 text-[#bbc9cf]">
@@ -302,11 +331,21 @@
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div class="space-y-3">
                         <label class="block text-xs font-bold uppercase tracking-[0.2em] text-[#bbc9cf]">Password</label>
-                        <input id="auth-signup-password" class="auth-input" type="password" autocomplete="new-password" placeholder="At least 6 characters">
+                        <div class="auth-password-wrap">
+                            <input id="auth-signup-password" class="auth-input" type="password" autocomplete="new-password" placeholder="At least 6 characters">
+                            <button class="auth-password-toggle" type="button" data-auth-password-toggle="auth-signup-password" aria-label="Show password" aria-pressed="false">
+                                <span class="material-symbols-outlined text-[20px]">visibility</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="space-y-3">
                         <label class="block text-xs font-bold uppercase tracking-[0.2em] text-[#bbc9cf]">Confirm Password</label>
-                        <input id="auth-signup-confirm" class="auth-input" type="password" autocomplete="new-password" placeholder="Repeat password">
+                        <div class="auth-password-wrap">
+                            <input id="auth-signup-confirm" class="auth-input" type="password" autocomplete="new-password" placeholder="Repeat password">
+                            <button class="auth-password-toggle" type="button" data-auth-password-toggle="auth-signup-confirm" aria-label="Show password" aria-pressed="false">
+                                <span class="material-symbols-outlined text-[20px]">visibility</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="space-y-3">
@@ -789,6 +828,19 @@
     }, true);
 
     document.addEventListener('click', (event) => {
+        const passwordToggle = event.target.closest('[data-auth-password-toggle]');
+        if (passwordToggle) {
+            const input = document.getElementById(passwordToggle.dataset.authPasswordToggle);
+            if (!input) return;
+            const shouldShow = input.type === 'password';
+            input.type = shouldShow ? 'text' : 'password';
+            passwordToggle.setAttribute('aria-pressed', String(shouldShow));
+            passwordToggle.setAttribute('aria-label', shouldShow ? 'Hide password' : 'Show password');
+            const icon = passwordToggle.querySelector('.material-symbols-outlined');
+            if (icon) icon.textContent = shouldShow ? 'visibility_off' : 'visibility';
+            input.focus();
+            return;
+        }
         if (event.target.closest('[data-auth-login-trigger]')) openAuth();
         if (event.target.closest('[data-auth-switch="signup"]')) setMode('signup');
         if (event.target.closest('[data-auth-switch="signin"]')) setMode('signin');
