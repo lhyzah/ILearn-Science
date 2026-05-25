@@ -10,7 +10,7 @@
             const adminEmail = 'lhyzah@ilearnscience.com';
             const getSession = () => {
                 try {
-                    return JSON.parse(sessionStorage.getItem('ilearnScienceAuthSession') || localStorage.getItem('ilearnScienceRememberedUser') || 'null');
+                    return JSON.parse(sessionStorage.getItem('ilearnScienceAuthSession') || localStorage.getItem('ilearnScienceCurrentUser') || localStorage.getItem('ilearnScienceRememberedUser') || 'null');
                 } catch {
                     return null;
                 }
@@ -714,6 +714,11 @@
                     <input class="w-full rounded-xl border border-white/10 bg-surface-container-low px-4 py-3 text-on-surface focus:border-primary focus:ring-0" name="stock" placeholder="Digital / Unlimited">
                 </label>
 
+                <label class="lg:col-span-12">
+                    <span class="mb-2 block font-label text-xs uppercase tracking-widest text-on-surface-variant">Resource File / Download Link</span>
+                    <input class="w-full rounded-xl border border-white/10 bg-surface-container-low px-4 py-3 text-on-surface focus:border-primary focus:ring-0" name="downloadLink" placeholder="https://drive.google.com/... or secure file link">
+                </label>
+
                 <label class="lg:col-span-8">
                     <span class="mb-2 block font-label text-xs uppercase tracking-widest text-on-surface-variant">Picture URL</span>
                     <input class="w-full rounded-xl border border-white/10 bg-surface-container-low px-4 py-3 text-on-surface focus:border-primary focus:ring-0" name="image" placeholder="https://...">
@@ -853,6 +858,7 @@
         const inventoryForm = document.getElementById('inventory-form');
         const inventoryMessage = document.getElementById('inventory-form-message');
         const inventoryImageUpload = document.getElementById('inventory-image-upload');
+        const productSyncChannel = 'BroadcastChannel' in window ? new BroadcastChannel('ilearn-products-sync') : null;
         const defaultInventoryProducts = [
             {
                 id: 'cell-biology-interactive-powerpoint',
@@ -914,10 +920,30 @@
             }
         }
 
-        function saveInventory(products) {
+        function announceProductSync(products) {
+            try {
+                productSyncChannel?.postMessage({ type: 'products-updated', products, at: Date.now() });
+            } catch {}
+            window.dispatchEvent(new CustomEvent('ilearn:products-updated', { detail: { products } }));
+        }
+
+        function saveInventory(products, shouldAnnounce = true) {
             localStorage.setItem(inventoryStorageKey, JSON.stringify(products));
             localStorage.setItem(`${inventoryStorageKey}Initialized`, 'true');
             window.iLearnAuth?.syncProductsToCatalogue?.(products);
+            if (shouldAnnounce) announceProductSync(products);
+        }
+
+        async function productRequestError(response, fallback) {
+            try {
+                const data = await response.json();
+                const messages = data?.errors
+                    ? Object.values(data.errors).flat().join(' ')
+                    : data?.message;
+                return messages || fallback;
+            } catch {
+                return fallback;
+            }
         }
 
         async function syncInventoryFromServer() {
@@ -926,7 +952,7 @@
                 if (!response.ok) throw new Error('Unable to load products.');
                 const data = await response.json();
                 if (Array.isArray(data.products)) {
-                    saveInventory(data.products);
+                    saveInventory(data.products, false);
                     renderInventory();
                 }
             } catch (error) {
@@ -944,7 +970,7 @@
                 },
                 body: JSON.stringify(product),
             });
-            if (!response.ok) throw new Error('Product could not be saved.');
+            if (!response.ok) throw new Error(await productRequestError(response, 'Product could not be saved.'));
             const data = await response.json();
             if (Array.isArray(data.products)) saveInventory(data.products);
             return data;
@@ -958,7 +984,7 @@
                     'X-CSRF-TOKEN': adminCsrfToken,
                 },
             });
-            if (!response.ok) throw new Error('Product could not be deleted.');
+            if (!response.ok) throw new Error(await productRequestError(response, 'Product could not be deleted.'));
             const data = await response.json();
             if (Array.isArray(data.products)) saveInventory(data.products);
             return data;
@@ -990,6 +1016,7 @@
                 grade: data.get('grade')?.trim() || 'All Grades',
                 format: data.get('format')?.trim() || 'Digital File',
                 stock: data.get('stock')?.trim() || 'Digital / Unlimited',
+                downloadLink: data.get('downloadLink')?.trim() || '',
                 image: data.get('image')?.trim() || '',
                 description: data.get('description')?.trim() || '',
                 details: data.get('details')?.trim() || '',
@@ -1092,35 +1119,57 @@
             if (event.target === inventoryModal) closeInventoryModal();
         });
 
-        inventoryImageUpload?.addEventListener('change', () => {
+        function resizeImageFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error('Picture could not be read.'));
+                reader.onload = () => {
+                    const image = new Image();
+                    image.onerror = () => reject(new Error('Picture could not be prepared.'));
+                    image.onload = () => {
+                        const maxSize = 1200;
+                        const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+                        const canvas = document.createElement('canvas');
+                        canvas.width = Math.max(1, Math.round(image.width * scale));
+                        canvas.height = Math.max(1, Math.round(image.height * scale));
+                        const context = canvas.getContext('2d');
+                        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.82));
+                    };
+                    image.src = reader.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        inventoryImageUpload?.addEventListener('change', async () => {
             const file = inventoryImageUpload.files?.[0];
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = () => {
-                inventoryForm.elements.image.value = reader.result;
-                inventoryMessage.textContent = 'Picture uploaded and ready to save.';
+            inventoryMessage.textContent = 'Preparing picture for upload...';
+            inventoryMessage.className = 'min-h-5 font-label text-xs text-primary';
+            try {
+                inventoryForm.elements.image.value = await resizeImageFile(file);
+                inventoryMessage.textContent = 'Picture uploaded, compressed, and ready to save.';
                 inventoryMessage.className = 'min-h-5 font-label text-xs text-primary';
-            };
-            reader.readAsDataURL(file);
+            } catch (error) {
+                inventoryMessage.textContent = error.message || 'Picture upload failed. Please try another image.';
+                inventoryMessage.className = 'min-h-5 font-label text-xs text-error';
+            }
         });
 
         inventoryForm?.addEventListener('submit', async (event) => {
             event.preventDefault();
             const nextProduct = productFromForm();
-            const products = readInventory();
-            const index = products.findIndex((product) => product.id === nextProduct.id);
-            if (index >= 0) products[index] = nextProduct;
-            else products.unshift(nextProduct);
-            saveInventory(products);
             inventoryMessage.textContent = 'Saving product to live customer catalog...';
             inventoryMessage.className = 'min-h-5 font-label text-xs text-primary';
             try {
-                await saveProductToServer(nextProduct);
+                const data = await saveProductToServer(nextProduct);
                 inventoryMessage.textContent = 'Product saved successfully and synced to customer pages.';
+                if (Array.isArray(data.products)) saveInventory(data.products);
                 renderInventory();
                 setTimeout(closeInventoryModal, 450);
             } catch (error) {
-                inventoryMessage.textContent = 'Saved locally, but live sync failed. Please try again.';
+                inventoryMessage.textContent = error.message || 'Product could not be saved. Please check the required fields.';
                 inventoryMessage.className = 'min-h-5 font-label text-xs text-error';
                 renderInventory();
             }
@@ -1137,13 +1186,16 @@
             if (deleteButton) {
                 const product = products.find((item) => item.id === deleteButton.dataset.inventoryDelete);
                 if (!product) return;
-                saveInventory(products.filter((item) => item.id !== product.id));
-                renderInventory();
+                inventoryMessage.textContent = `Deleting ${product.title} from the live catalog...`;
+                inventoryMessage.className = 'min-h-5 font-label text-xs text-primary';
                 try {
-                    await deleteProductFromServer(product.id);
+                    const data = await deleteProductFromServer(product.id);
+                    if (Array.isArray(data.products)) saveInventory(data.products);
                     renderInventory();
+                    inventoryMessage.textContent = 'Product deleted and removed from the customer catalog.';
+                    inventoryMessage.className = 'min-h-5 font-label text-xs text-primary';
                 } catch (error) {
-                    inventoryMessage.textContent = 'Product removed locally, but live delete failed. Please try again.';
+                    inventoryMessage.textContent = error.message || 'Product could not be deleted. Please try again.';
                     inventoryMessage.className = 'min-h-5 font-label text-xs text-error';
                 }
             }

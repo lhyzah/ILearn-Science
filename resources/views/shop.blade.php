@@ -395,6 +395,7 @@
         const cartStorageKey = 'ilearnScienceCartItems';
         const inventoryStorageKey = 'ilearnScienceInventoryProducts';
         const productsEndpoint = '{{ route('products.index') }}';
+        const productSyncChannel = 'BroadcastChannel' in window ? new BroadcastChannel('ilearn-products-sync') : null;
         let previewProduct = null;
         let lastInventorySnapshot = '';
         const shopResourceGrid = document.getElementById('shop-resource-grid');
@@ -448,15 +449,19 @@
             return null;
         }
 
+        function saveLiveProducts(products) {
+            localStorage.setItem(inventoryStorageKey, JSON.stringify(products));
+            localStorage.setItem(`${inventoryStorageKey}Initialized`, 'true');
+            window.iLearnAuth?.syncProductsToCatalogue?.(products);
+        }
+
         async function refreshShopInventoryFromServer() {
             try {
                 const response = await fetch(productsEndpoint, { headers: { Accept: 'application/json' } });
                 if (!response.ok) throw new Error('Unable to load live products.');
                 const data = await response.json();
                 if (Array.isArray(data.products)) {
-                    localStorage.setItem(inventoryStorageKey, JSON.stringify(data.products));
-                    localStorage.setItem(`${inventoryStorageKey}Initialized`, 'true');
-                    window.iLearnAuth?.syncProductsToCatalogue?.(data.products);
+                    saveLiveProducts(data.products);
                     renderShopResources(true);
                 }
             } catch (error) {
@@ -481,6 +486,7 @@
                 focus: product.topic || product.focus || product.subject || 'Science learning resource',
                 includes: product.details || product.includes || 'Editable product information|Digital resource access|Teacher-ready classroom material',
                 image: product.image || '',
+                downloadLink: product.downloadLink || '',
                 field: slugify(subject),
                 status: product.status || 'Published',
             };
@@ -739,6 +745,18 @@
             if (event.key === inventoryStorageKey || event.key === `${inventoryStorageKey}Initialized`) renderShopResources(true);
         });
         window.addEventListener('ilearn:cart-updated', updateCartCount);
+        window.addEventListener('ilearn:products-updated', (event) => {
+            if (Array.isArray(event.detail?.products)) {
+                saveLiveProducts(event.detail.products);
+                renderShopResources(true);
+            }
+        });
+        productSyncChannel?.addEventListener('message', (event) => {
+            if (event.data?.type === 'products-updated') {
+                saveLiveProducts(event.data.products || []);
+                renderShopResources(true);
+            }
+        });
         setInterval(() => {
             refreshShopInventoryFromServer();
             renderShopResources(false);

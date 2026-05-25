@@ -190,13 +190,14 @@
     <script>
         (() => {
             const sessionKey = 'ilearnScienceAuthSession';
+            const currentUserKey = 'ilearnScienceCurrentUser';
             const rememberedKey = 'ilearnScienceRememberedUser';
             const adminEmail = 'lhyzah@ilearnscience.com';
             const adminPassword = 'Admin@2026';
 
             const getSession = () => {
                 try {
-                    return JSON.parse(sessionStorage.getItem(sessionKey) || localStorage.getItem(rememberedKey) || 'null');
+                    return JSON.parse(sessionStorage.getItem(sessionKey) || localStorage.getItem(currentUserKey) || localStorage.getItem(rememberedKey) || 'null');
                 } catch {
                     return null;
                 }
@@ -253,6 +254,7 @@
                     signedInAt: new Date().toISOString(),
                 };
                 sessionStorage.setItem(sessionKey, JSON.stringify(session));
+                localStorage.setItem(currentUserKey, JSON.stringify(session));
                 if (rememberInput.checked) localStorage.setItem(rememberedKey, JSON.stringify(session));
                 else localStorage.removeItem(rememberedKey);
 

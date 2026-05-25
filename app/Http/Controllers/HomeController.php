@@ -105,7 +105,8 @@ class HomeController extends Controller
             'subject' => ['nullable', 'string', 'max:80'],
             'topic' => ['nullable', 'string', 'max:120'],
             'tags' => ['nullable', 'string', 'max:240'],
-            'image' => ['nullable', 'string', 'max:600000'],
+            'image' => ['nullable', 'string', 'max:2500000'],
+            'downloadLink' => ['nullable', 'string', 'max:1200'],
             'description' => ['required', 'string', 'max:1200'],
             'details' => ['nullable', 'string', 'max:4000'],
         ]);

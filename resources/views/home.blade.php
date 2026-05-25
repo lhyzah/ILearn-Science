@@ -322,7 +322,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-gutter sm:grid-cols-2 lg:grid-cols-4">
+                <div id="home-resource-grid" class="grid grid-cols-1 gap-gutter sm:grid-cols-2 lg:grid-cols-4">
                     @php
                         $products = [
                             ['Advanced Cellular Biology PPT', 'PPT', '₱24.99', '(48)', 'Grades 9-12', 'PPTX + PDF', 'A complete visual lesson deck covering cell structure, organelles, transport, and cell specialization with teacher prompts and quick-check questions.', '60+ editable slides|Warm-up and exit ticket prompts|Embedded mini quizzes|Teacher notes and answer guide', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCLzEjlQCU5fHwYEIz2R2om7Jx8QSDoipIrhpmyU3TcB5O8Y16oqUPuQvFJi1U9OlWrpAQQrsbFM79MMUOdeKRAxFTZkK43gCkrF5kVNMBoEG5BH4KR_wOeRPHcvlruJQMgnO_BJFYUTTfXOgR0HqvuiZw5Sg7fKE5wYm4DF6EdqWCaL5ok5yUXzs1UF15JINwhe9l7zKrwlXh4Ad6sGs8RwFtXUgTlPQkz2YmtPgt_uSZCqBuAC-64pX9aMBIvqwt7OQ9drd7OTd0'],
@@ -602,6 +602,9 @@
     <script>
         const cartStorageKey = 'ilearnScienceCartItems';
         const inventoryStorageKey = 'ilearnScienceInventoryProducts';
+        const productsEndpoint = '{{ route('products.index') }}';
+        const productSyncChannel = 'BroadcastChannel' in window ? new BroadcastChannel('ilearn-products-sync') : null;
+        const homeResourceGrid = document.getElementById('home-resource-grid');
 
         function getCartItems() {
             if (window.iLearnAuth?.getCartItems) return window.iLearnAuth.getCartItems();
@@ -688,6 +691,102 @@
             };
         }
 
+        function escapeHTML(value = '') {
+            return String(value).replace(/[&<>"']/g, (character) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;',
+            }[character]));
+        }
+
+        function formatProductPeso(value) {
+            const amount = Number.parseFloat(String(value).replace(/[₱,]/g, '')) || 0;
+            return `₱${amount.toFixed(2)}`;
+        }
+
+        function activeInventoryProducts(products) {
+            return (Array.isArray(products) ? products : [])
+                .filter((item) => ['published', 'active'].includes(String(item.status || 'Published').toLowerCase()));
+        }
+
+        function saveLiveProducts(products) {
+            localStorage.setItem(inventoryStorageKey, JSON.stringify(products));
+            localStorage.setItem(`${inventoryStorageKey}Initialized`, 'true');
+            window.iLearnAuth?.syncProductsToCatalogue?.(products);
+        }
+
+        function homeProductCard(product) {
+            const normalized = normalizeProductForSearch({
+                id: product.id,
+                title: product.title,
+                type: product.category,
+                meta: `${product.category || 'Digital'} Resource`,
+                price: formatProductPeso(product.price),
+                reviews: product.downloads || '(New)',
+                grade: product.grade,
+                format: product.format,
+                description: product.description,
+                includes: product.details || product.tags || 'Editable resource|Digital download|Teacher-ready activity',
+                image: product.image || product.imageUrl,
+            });
+
+            return `
+                <article class="glass-panel reveal shimmer-on-hover group overflow-hidden rounded-xl transition-all duration-300 hover:scale-[1.02]" data-admin-product-card="${escapeHTML(normalized.id)}">
+                    <div class="relative h-48 overflow-hidden">
+                        ${normalized.image ? `<img alt="${escapeHTML(normalized.title)}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" src="${escapeHTML(normalized.image)}">` : `<div class="flex h-full w-full items-center justify-center bg-surface-container-high text-primary"><span class="material-symbols-outlined text-5xl">science</span></div>`}
+                        <div class="absolute right-2 top-2 rounded bg-primary-container px-2 py-1 font-label text-xs font-bold text-on-primary-container shadow-[0_0_12px_rgba(0,212,255,0.35)]">${escapeHTML(normalized.type)}</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="mb-2 font-headline text-lg font-semibold">${escapeHTML(normalized.title)}</h3>
+                        <p class="mb-4 line-clamp-2 text-sm text-on-surface-variant">${escapeHTML(normalized.description)}</p>
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="font-headline text-2xl font-semibold text-primary">${escapeHTML(normalized.price)}</span>
+                            <div class="flex items-center gap-2">
+                                <button class="top-resource-preview rounded-lg border border-primary/30 bg-surface-container-high p-2 text-primary transition-colors hover:bg-primary hover:text-on-primary-container" type="button" aria-label="Preview ${escapeHTML(normalized.title)}" data-product-title="${escapeHTML(normalized.title)}" data-product-type="${escapeHTML(normalized.type)}" data-product-price="${escapeHTML(normalized.price)}" data-product-reviews="${escapeHTML(normalized.reviews)}" data-product-grade="${escapeHTML(normalized.grade)}" data-product-format="${escapeHTML(normalized.format)}" data-product-description="${escapeHTML(normalized.description)}" data-product-includes="${escapeHTML(normalized.includes)}" data-product-image="${escapeHTML(normalized.image)}">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </button>
+                                <button class="top-resource-add-to-cart rounded-lg bg-surface-container-high p-2 transition-colors hover:bg-primary hover:text-on-primary-container" type="button" aria-label="Add ${escapeHTML(normalized.title)} to cart" data-product-id="${escapeHTML(normalized.id)}" data-product-title="${escapeHTML(normalized.title)}" data-product-meta="${escapeHTML(normalized.meta)}" data-product-price="${escapeHTML(normalized.price)}" data-product-image="${escapeHTML(normalized.image)}">
+                                    <span class="material-symbols-outlined">add_shopping_cart</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        function renderHomeAdminProducts(products = null) {
+            if (!homeResourceGrid) return;
+            let source = products;
+            if (!source) {
+                try { source = JSON.parse(localStorage.getItem(inventoryStorageKey) || '[]') || []; } catch { source = []; }
+            }
+            homeResourceGrid.querySelectorAll('[data-admin-product-card]').forEach((card) => card.remove());
+            const existingIds = new Set(Array.from(homeResourceGrid.querySelectorAll('article:not([data-admin-product-card]) .top-resource-add-to-cart')).map((button) => button.dataset.productId));
+            const cards = activeInventoryProducts(source)
+                .filter((product) => product.id && !existingIds.has(product.id))
+                .map(homeProductCard)
+                .join('');
+            if (cards) homeResourceGrid.insertAdjacentHTML('beforeend', cards);
+        }
+
+        async function refreshHomeProductsFromServer() {
+            try {
+                const response = await fetch(productsEndpoint, { headers: { Accept: 'application/json' } });
+                if (!response.ok) throw new Error('Unable to load products.');
+                const data = await response.json();
+                if (Array.isArray(data.products)) {
+                    saveLiveProducts(data.products);
+                    renderHomeAdminProducts(data.products);
+                    renderProductSearchResults(document.getElementById('product-search-input')?.value || '');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
         function getHomepageSearchProducts() {
             const products = Array.from(document.querySelectorAll('.top-resource-preview')).map((button) => normalizeProductForSearch({
                 id: button.closest('article')?.querySelector('.top-resource-add-to-cart')?.dataset.productId,
@@ -706,7 +805,7 @@
             try {
                 const inventory = JSON.parse(localStorage.getItem(inventoryStorageKey) || '[]') || [];
                 inventory
-                    .filter((item) => (item.status || 'Published') === 'Published')
+                    .filter((item) => ['published', 'active'].includes(String(item.status || 'Published').toLowerCase()))
                     .forEach((item) => products.push(normalizeProductForSearch({
                         id: item.id,
                         title: item.title,
@@ -962,9 +1061,22 @@
 
         window.addEventListener('storage', (event) => {
             if (event.key === cartStorageKey) updateCartCount();
+            if (event.key === inventoryStorageKey || event.key === `${inventoryStorageKey}Initialized`) {
+                renderHomeAdminProducts();
+                renderProductSearchResults(document.getElementById('product-search-input')?.value || '');
+            }
         });
         window.addEventListener('ilearn:cart-updated', updateCartCount);
+        window.addEventListener('ilearn:products-updated', (event) => renderHomeAdminProducts(event.detail?.products || null));
+        productSyncChannel?.addEventListener('message', (event) => {
+            if (event.data?.type === 'products-updated') {
+                saveLiveProducts(event.data.products || []);
+                renderHomeAdminProducts(event.data.products || []);
+            }
+        });
 
+        refreshHomeProductsFromServer();
+        setInterval(refreshHomeProductsFromServer, 5000);
         window.addEventListener('pageshow', updateCartCount);
     </script>
     @include('partials.auth-ui')
