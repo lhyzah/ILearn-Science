@@ -12,6 +12,9 @@ Route::post('/checkout/receipt-email', [HomeController::class, 'sendReceiptEmail
 Route::get('/products/live', [HomeController::class, 'productsIndex'])->name('products.index');
 Route::post('/admin/products', [HomeController::class, 'saveProduct'])->name('admin.products.save');
 Route::delete('/admin/products/{id}', [HomeController::class, 'deleteProduct'])->name('admin.products.delete');
+Route::get('/blogs/live', [HomeController::class, 'blogsIndex'])->name('blogs.index');
+Route::post('/admin/blog-posts', [HomeController::class, 'saveBlogPost'])->name('admin.blog-posts.save');
+Route::delete('/admin/blog-posts/{id}', [HomeController::class, 'deleteBlogPost'])->name('admin.blog-posts.delete');
 Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
 Route::get('/admin-login', [HomeController::class, 'adminLogin'])->name('admin.login');
 Route::get('/admin-dashboard', [HomeController::class, 'adminDashboard'])->name('admin.dashboard');

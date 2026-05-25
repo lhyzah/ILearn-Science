@@ -16,6 +16,11 @@ class HomeController extends Controller
         return storage_path('app/ilearn-products.json');
     }
 
+    private function blogStorePath(): string
+    {
+        return storage_path('app/ilearn-blog-posts.json');
+    }
+
     private function defaultProducts(): array
     {
         return [
@@ -91,6 +96,69 @@ class HomeController extends Controller
         File::put($this->productStorePath(), json_encode(array_values($products), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 
+    private function defaultBlogPosts(): array
+    {
+        return [
+            [
+                'id' => 'blog-digestive-system-lessons',
+                'title' => 'Digestive System Lessons That Students Can Actually Visualize',
+                'slug' => 'digestive-system-lessons-that-students-can-actually-visualize',
+                'category' => 'Biology',
+                'status' => 'Published',
+                'meta' => 'Use diagrams, model cards, and quick checks to help students follow food as it moves through the human body.',
+                'content' => 'The strongest digestive system lessons help students connect each organ to a specific task, then sequence the whole process from ingestion to absorption. Use diagrams, model cards, and short checks so learners can describe what happens in the mouth, stomach, small intestine, and large intestine with confidence.',
+                'image' => '/images/shop/digestive-system-topic.svg',
+                'views' => 980,
+                'updatedAt' => '2026-05-24T10:00:00+08:00',
+                'publishedAt' => '2026-05-24T10:00:00+08:00',
+            ],
+            [
+                'id' => 'blog-heredity-family-traits',
+                'title' => 'Teaching Heredity With Simple Family Trait Simulations',
+                'slug' => 'teaching-heredity-with-simple-family-trait-simulations',
+                'category' => 'Genetics',
+                'status' => 'Published',
+                'meta' => 'Make inheritance patterns easier to discuss with student-friendly trait cards and classroom scenarios.',
+                'content' => 'Heredity becomes easier when students can model traits instead of memorizing vocabulary alone. Trait cards, parent-offspring scenarios, and guided predictions help learners connect dominant and recessive traits to real inheritance patterns.',
+                'image' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuAZBMYNDXcOHEDnSv8aUbarKS9z-gDUK5nWzUl-CE8CXF46HW-YUafVsOhoheg7FBjLs_Bu2Nkx2TEX7j6aTlh85EHlCOL4bSFOinoye7AP0K7l3SiDtKSzlnbZ4wgnJmHGgD5VUBCGCg-8_Y1I1yvzgDA25FyHS9ffdzzyjNwvuHMwOCs8EXmuTh_vAh5XKS53qMlrryJ9EuJkOnUyBI9ZeOmusks8xeXrdgP2xMgSh4uV6F0bOXrD4rRjAFQXk1Rs3a8C7zF4bmE',
+                'views' => 760,
+                'updatedAt' => '2026-05-23T14:30:00+08:00',
+                'publishedAt' => '2026-05-23T14:30:00+08:00',
+            ],
+            [
+                'id' => 'blog-photosynthesis-process',
+                'title' => 'Photosynthesis as a Process, Not a Memorized Formula',
+                'slug' => 'photosynthesis-as-a-process-not-a-memorized-formula',
+                'category' => 'Plants',
+                'status' => 'Published',
+                'meta' => 'Help students connect light, carbon dioxide, water, glucose, and oxygen through visual sequencing.',
+                'content' => 'A process-first approach lets students explain what enters the plant, what changes inside the leaf, and why glucose matters for growth. Use visual sequencing to connect sunlight, chloroplasts, carbon dioxide, water, glucose, and oxygen into one coherent story.',
+                'image' => '/images/shop/photosynthesis-process-topic.svg',
+                'views' => 1140,
+                'updatedAt' => '2026-05-22T09:15:00+08:00',
+                'publishedAt' => '2026-05-22T09:15:00+08:00',
+            ],
+        ];
+    }
+
+    private function readBlogPosts(): array
+    {
+        $path = $this->blogStorePath();
+        if (!File::exists($path)) {
+            return $this->defaultBlogPosts();
+        }
+
+        $posts = json_decode(File::get($path), true);
+
+        return is_array($posts) ? array_values($posts) : $this->defaultBlogPosts();
+    }
+
+    private function writeBlogPosts(array $posts): void
+    {
+        File::ensureDirectoryExists(dirname($this->blogStorePath()));
+        File::put($this->blogStorePath(), json_encode(array_values($posts), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    }
+
     private function validatedProduct(Request $request): array
     {
         $validated = $request->validate([
@@ -114,6 +182,33 @@ class HomeController extends Controller
         $validated['id'] = $validated['id'] ?: Str::slug($validated['title']) . '-' . Str::lower(Str::random(5));
         $validated['price'] = (float) $validated['price'];
         $validated['updatedAt'] = now()->toIso8601String();
+
+        return $validated;
+    }
+
+    private function validatedBlogPost(Request $request): array
+    {
+        $validated = $request->validate([
+            'id' => ['nullable', 'string', 'max:160'],
+            'title' => ['required', 'string', 'max:180'],
+            'slug' => ['nullable', 'string', 'max:180'],
+            'category' => ['required', 'string', 'max:80'],
+            'status' => ['required', 'string', 'max:40'],
+            'meta' => ['nullable', 'string', 'max:500'],
+            'content' => ['required', 'string', 'max:12000'],
+            'image' => ['nullable', 'string', 'max:2500000'],
+            'views' => ['nullable', 'integer', 'min:0'],
+            'publishedAt' => ['nullable', 'string', 'max:80'],
+        ]);
+
+        $validated['id'] = $validated['id'] ?: 'blog-' . Str::slug($validated['title']) . '-' . Str::lower(Str::random(5));
+        $validated['slug'] = Str::slug($validated['slug'] ?: $validated['title']);
+        $validated['views'] = (int) ($validated['views'] ?? 0);
+        $validated['updatedAt'] = now()->toIso8601String();
+
+        if (($validated['status'] ?? '') === 'Published' && empty($validated['publishedAt'])) {
+            $validated['publishedAt'] = now()->toIso8601String();
+        }
 
         return $validated;
     }
@@ -185,6 +280,13 @@ class HomeController extends Controller
         ]);
     }
 
+    public function blogsIndex()
+    {
+        return response()->json([
+            'posts' => $this->readBlogPosts(),
+        ]);
+    }
+
     public function saveProduct(Request $request)
     {
         $product = $this->validatedProduct($request);
@@ -212,6 +314,41 @@ class HomeController extends Controller
 
         return response()->json([
             'products' => $products,
+        ]);
+    }
+
+    public function saveBlogPost(Request $request)
+    {
+        $post = $this->validatedBlogPost($request);
+        $posts = $this->readBlogPosts();
+        $index = collect($posts)->search(fn ($item) => ($item['id'] ?? null) === $post['id']);
+
+        if ($index === false) {
+            array_unshift($posts, $post);
+        } else {
+            $existing = $posts[$index];
+            $post['views'] = (int) ($existing['views'] ?? $post['views'] ?? 0);
+            if (($post['status'] ?? '') === 'Published' && empty($post['publishedAt']) && !empty($existing['publishedAt'])) {
+                $post['publishedAt'] = $existing['publishedAt'];
+            }
+            $posts[$index] = $post;
+        }
+
+        $this->writeBlogPosts($posts);
+
+        return response()->json([
+            'post' => $post,
+            'posts' => $posts,
+        ]);
+    }
+
+    public function deleteBlogPost(string $id)
+    {
+        $posts = array_values(array_filter($this->readBlogPosts(), fn ($post) => ($post['id'] ?? '') !== $id));
+        $this->writeBlogPosts($posts);
+
+        return response()->json([
+            'posts' => $posts,
         ]);
     }
 

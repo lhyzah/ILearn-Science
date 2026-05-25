@@ -3,13 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>iLearn Science - Mission Control Dashboard</title>
     <script>
         (() => {
             const adminEmail = 'lhyzah@ilearnscience.com';
             const getSession = () => {
                 try {
-                    return JSON.parse(sessionStorage.getItem('ilearnScienceAuthSession') || localStorage.getItem('ilearnScienceRememberedUser') || 'null');
+                    return JSON.parse(sessionStorage.getItem('ilearnScienceAuthSession') || localStorage.getItem('ilearnScienceCurrentUser') || localStorage.getItem('ilearnScienceRememberedUser') || 'null');
                 } catch {
                     return null;
                 }
@@ -352,6 +353,11 @@
     <script>
         const blogStorageKey = 'ilearnScienceBlogPosts';
         const blogInitializedKey = 'ilearnScienceBlogPostsInitialized';
+        const blogsEndpoint = '{{ route('blogs.index') }}';
+        const blogSaveEndpoint = '{{ route('admin.blog-posts.save') }}';
+        const blogDeleteEndpoint = '{{ url('/admin/blog-posts') }}';
+        const adminCsrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        const blogSyncChannel = 'BroadcastChannel' in window ? new BroadcastChannel('ilearn-blog-sync') : null;
         const defaultBlogImage = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDeA7aDCt1BhhNA6WQB-EGoUJittQ_zWiHMhgO7UPQFu7ewJlQywHQ2i9svSlMorENGTB4OXPPtG55T78teaOLzwgFzwc-rXcBlrY9S7EriKVyoAMS_0W1w8Bm-UMKPwrjdaX4C3T5Y8jMLETbi5n1naMUsffVmwTf3I2gaYr3_wzuw5_glmvYgGz7MSRbhMdOTObD3QzMyx02dZ4UVVpX67_pEhFd3iPZcf5NVpVESqINm3KdWCrlz5nViUL_8oe1G-y2p3r4ur3I';
         let currentBlogPostId = null;
 
@@ -424,10 +430,73 @@
             return [...defaultBlogPosts];
         }
 
-        function saveBlogPosts(posts) {
+        function announceBlogSync(posts) {
+            window.dispatchEvent(new CustomEvent('ilearn:blogs-updated', { detail: { posts } }));
+            window.dispatchEvent(new Event('ilearn-blog-posts-updated'));
+            blogSyncChannel?.postMessage({ type: 'blogs-updated', posts });
+        }
+
+        function saveBlogPosts(posts, shouldAnnounce = true) {
             localStorage.setItem(blogStorageKey, JSON.stringify(posts));
             localStorage.setItem(blogInitializedKey, 'true');
-            window.dispatchEvent(new Event('ilearn-blog-posts-updated'));
+            if (shouldAnnounce) announceBlogSync(posts);
+        }
+
+        async function readBlogRequestError(response, fallbackMessage) {
+            try {
+                const data = await response.json();
+                if (data?.message) return data.message;
+                if (data?.errors) return Object.values(data.errors).flat().join(' ');
+            } catch {}
+            return fallbackMessage;
+        }
+
+        async function syncBlogsFromServer() {
+            const response = await fetch(blogsEndpoint, { headers: { Accept: 'application/json' } });
+            if (!response.ok) throw new Error('Unable to load live blog posts.');
+            const data = await response.json();
+            if (Array.isArray(data.posts)) {
+                saveBlogPosts(data.posts, false);
+                renderBlogAdmin();
+                return data.posts;
+            }
+            return readBlogPosts();
+        }
+
+        async function saveBlogPostToServer(post) {
+            const response = await fetch(blogSaveEndpoint, {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': adminCsrfToken,
+                },
+                body: JSON.stringify(post),
+            });
+            if (!response.ok) {
+                throw new Error(await readBlogRequestError(response, 'Blog post could not be saved.'));
+            }
+
+            const data = await response.json();
+            if (Array.isArray(data.posts)) saveBlogPosts(data.posts);
+            return data;
+        }
+
+        async function deleteBlogPostFromServer(postId) {
+            const response = await fetch(`${blogDeleteEndpoint}/${encodeURIComponent(postId)}`, {
+                method: 'DELETE',
+                headers: {
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': adminCsrfToken,
+                },
+            });
+            if (!response.ok) {
+                throw new Error(await readBlogRequestError(response, 'Blog post could not be deleted.'));
+            }
+
+            const data = await response.json();
+            if (Array.isArray(data.posts)) saveBlogPosts(data.posts);
+            return data;
         }
 
         function relativeTime(value) {
@@ -468,7 +537,29 @@
             updateVisualPreview(src || '');
         }
 
-        function processBlogVisual(file) {
+        function resizeBlogImage(file, maxSize = 1400, quality = 0.84) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error('The image could not be read.'));
+                reader.onload = () => {
+                    const image = new Image();
+                    image.onerror = () => reject(new Error('The image could not be processed.'));
+                    image.onload = () => {
+                        const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+                        const canvas = document.createElement('canvas');
+                        canvas.width = Math.max(1, Math.round(image.width * scale));
+                        canvas.height = Math.max(1, Math.round(image.height * scale));
+                        const context = canvas.getContext('2d');
+                        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    image.src = reader.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function processBlogVisual(file) {
             if (!file) return;
             if (!file.type.startsWith('image/')) {
                 showEditorStatus('Please upload an image file.', 'error');
@@ -479,13 +570,13 @@
                 return;
             }
 
-            const reader = new FileReader();
-            reader.onload = () => {
-                setBlogVisual(reader.result);
+            try {
+                const resizedImage = await resizeBlogImage(file);
+                setBlogVisual(resizedImage);
                 showEditorStatus('Mission visual added.');
-            };
-            reader.onerror = () => showEditorStatus('The image could not be read.', 'error');
-            reader.readAsDataURL(file);
+            } catch (error) {
+                showEditorStatus(error.message || 'The image could not be read.', 'error');
+            }
         }
 
         function renderBlogAdmin() {
@@ -576,16 +667,18 @@
             };
         }
 
-        function saveCurrentPost(status) {
+        async function saveCurrentPost(status) {
             const nextPost = buildBlogPost(status);
             if (!nextPost) return;
-            const posts = readBlogPosts();
-            const existing = posts.find((post) => post.id === nextPost.id);
-            const merged = existing ? { ...existing, ...nextPost, views: existing.views || 0 } : nextPost;
-            const nextPosts = existing ? posts.map((post) => post.id === merged.id ? merged : post) : [merged, ...posts];
-            saveBlogPosts(nextPosts);
-            fillBlogEditor(merged);
-            showEditorStatus(status === 'Published' ? 'Blog post published for customers.' : 'Draft saved.');
+            showEditorStatus(status === 'Published' ? 'Publishing to customers...' : 'Saving draft...');
+            try {
+                const data = await saveBlogPostToServer(nextPost);
+                const savedPost = data.post || nextPost;
+                fillBlogEditor(savedPost);
+                showEditorStatus(status === 'Published' ? 'Blog post published and synced to customers.' : 'Draft saved and synced.');
+            } catch (error) {
+                showEditorStatus(error.message || 'Blog post could not be saved.', 'error');
+            }
         }
 
         document.querySelectorAll('.glass-panel').forEach((panel) => {
@@ -674,10 +767,14 @@
                 const postId = deleteButton.dataset.blogDelete;
                 const post = readBlogPosts().find((item) => item.id === postId);
                 if (!post || !confirm(`Delete "${post.title}"?`)) return;
-                saveBlogPosts(readBlogPosts().filter((item) => item.id !== postId));
-                if (currentBlogPostId === postId) fillBlogEditor(null);
-                renderBlogAdmin();
-                showEditorStatus('Blog post deleted.');
+                showEditorStatus('Deleting blog post...');
+                deleteBlogPostFromServer(postId)
+                    .then(() => {
+                        if (currentBlogPostId === postId) fillBlogEditor(null);
+                        renderBlogAdmin();
+                        showEditorStatus('Blog post deleted and removed from customer pages.');
+                    })
+                    .catch((error) => showEditorStatus(error.message || 'Blog post could not be deleted.', 'error'));
             }
         });
 
@@ -685,12 +782,25 @@
             if (event.key === blogStorageKey) renderBlogAdmin();
         });
         window.addEventListener('ilearn-blog-posts-updated', renderBlogAdmin);
+        window.addEventListener('ilearn:blogs-updated', renderBlogAdmin);
+        blogSyncChannel?.addEventListener('message', (event) => {
+            if (event.data?.type === 'blogs-updated' && Array.isArray(event.data.posts)) {
+                saveBlogPosts(event.data.posts, false);
+                renderBlogAdmin();
+            }
+        });
 
         if (!localStorage.getItem(blogInitializedKey) && !localStorage.getItem(blogStorageKey)) {
-            saveBlogPosts(defaultBlogPosts);
+            saveBlogPosts(defaultBlogPosts, false);
         }
         renderBlogAdmin();
         fillBlogEditor(readBlogPosts()[0] || null);
+        syncBlogsFromServer()
+            .then((posts) => {
+                const selected = posts.find((post) => post.id === currentBlogPostId) || posts[0] || null;
+                fillBlogEditor(selected);
+            })
+            .catch((error) => showEditorStatus(error.message || 'Live blog posts could not be loaded.', 'error'));
     </script>
     @include('partials.auth-ui')
 </body>

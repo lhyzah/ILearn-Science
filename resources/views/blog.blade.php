@@ -188,6 +188,8 @@
         const cartStorageKey = 'ilearnScienceCartItems';
         const blogStorageKey = 'ilearnScienceBlogPosts';
         const blogInitializedKey = 'ilearnScienceBlogPostsInitialized';
+        const blogsEndpoint = '{{ route('blogs.index') }}';
+        const blogSyncChannel = 'BroadcastChannel' in window ? new BroadcastChannel('ilearn-blog-sync') : null;
         const defaultBlogImage = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDeA7aDCt1BhhNA6WQB-EGoUJittQ_zWiHMhgO7UPQFu7ewJlQywHQ2i9svSlMorENGTB4OXPPtG55T78teaOLzwgFzwc-rXcBlrY9S7EriKVyoAMS_0W1w8Bm-UMKPwrjdaX4C3T5Y8jMLETbi5n1naMUsffVmwTf3I2gaYr3_wzuw5_glmvYgGz7MSRbhMdOTObD3QzMyx02dZ4UVVpX67_pEhFd3iPZcf5NVpVESqINm3KdWCrlz5nViUL_8oe1G-y2p3r4ur3I';
         const fallbackBlogPosts = [
             {
@@ -249,6 +251,23 @@
                 if (Array.isArray(saved) && initialized) return saved;
             } catch {}
             return fallbackBlogPosts;
+        }
+
+        function saveLiveBlogPosts(posts, shouldRender = true) {
+            localStorage.setItem(blogStorageKey, JSON.stringify(posts));
+            localStorage.setItem(blogInitializedKey, 'true');
+            if (shouldRender) renderPublicBlogPosts();
+        }
+
+        async function refreshBlogPostsFromServer() {
+            try {
+                const response = await fetch(blogsEndpoint, { headers: { Accept: 'application/json' } });
+                if (!response.ok) throw new Error('Unable to load live blog posts.');
+                const data = await response.json();
+                if (Array.isArray(data.posts)) saveLiveBlogPosts(data.posts);
+            } catch (error) {
+                console.error(error);
+            }
         }
 
         function readMinutes(post) {
@@ -319,6 +338,7 @@
         }
         updateBlogCartBadges();
         renderPublicBlogPosts();
+        refreshBlogPostsFromServer();
 
         document.getElementById('public-blog-grid').addEventListener('click', (event) => {
             const button = event.target.closest('[data-read-blog]');
@@ -344,7 +364,16 @@
             if (event.key === blogStorageKey) renderPublicBlogPosts();
         });
         window.addEventListener('ilearn:cart-updated', updateBlogCartBadges);
-        window.setInterval(renderPublicBlogPosts, 1200);
+        window.addEventListener('ilearn:blogs-updated', (event) => {
+            if (Array.isArray(event.detail?.posts)) saveLiveBlogPosts(event.detail.posts);
+            else renderPublicBlogPosts();
+        });
+        blogSyncChannel?.addEventListener('message', (event) => {
+            if (event.data?.type === 'blogs-updated' && Array.isArray(event.data.posts)) {
+                saveLiveBlogPosts(event.data.posts);
+            }
+        });
+        window.setInterval(refreshBlogPostsFromServer, 5000);
     </script>
     @include('partials.auth-ui')
 </body>

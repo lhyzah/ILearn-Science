@@ -302,6 +302,22 @@
                     </section>
 
                     <section class="glass-panel rounded-3xl p-6">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <h3 class="font-headline text-2xl font-semibold">Latest Science Blog</h3>
+                                <p class="mt-1 text-sm text-on-surface-variant">Articles published from the admin blog appear here.</p>
+                            </div>
+                            <a class="rounded-xl border border-primary/30 px-3 py-2 font-label text-xs text-primary transition-all hover:bg-primary/10" href="{{ route('blog') }}">Read Blog</a>
+                        </div>
+                        <div class="mt-5 space-y-3" data-dashboard-blog-list>
+                            <div class="rounded-2xl border border-white/5 bg-surface-container-low/50 p-5 text-center text-on-surface-variant">
+                                <span class="material-symbols-outlined text-4xl text-primary">article</span>
+                                <p class="mt-2">Loading latest posts...</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="glass-panel rounded-3xl p-6">
                         <h3 class="font-headline text-2xl font-semibold">Recommended Next</h3>
                         <p class="mt-2 text-sm text-on-surface-variant">Based on your Biology purchases.</p>
                         <a class="mt-5 flex gap-4 rounded-2xl border border-primary/15 bg-primary-container/10 p-4 transition-all hover:border-primary/45" href="{{ route('shop') }}">
@@ -337,8 +353,13 @@
     <script>
         const dashboardCartStorageKey = 'ilearnScienceCartItems';
         const dashboardInventoryStorageKey = 'ilearnScienceInventoryProducts';
+        const dashboardBlogStorageKey = 'ilearnScienceBlogPosts';
+        const dashboardBlogInitializedKey = 'ilearnScienceBlogPostsInitialized';
         const dashboardProductsEndpoint = '{{ route('products.index') }}';
+        const dashboardBlogsEndpoint = '{{ route('blogs.index') }}';
+        const dashboardBlogSyncChannel = 'BroadcastChannel' in window ? new BroadcastChannel('ilearn-blog-sync') : null;
         let lastDashboardInventorySnapshot = '';
+        let lastDashboardBlogSnapshot = '';
         const defaultDashboardCartItems = [
             {
                 id: 'advanced-biology-ppt',
@@ -445,6 +466,33 @@
             }
         }
 
+        function readDashboardBlogs() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(dashboardBlogStorageKey) || '[]');
+                const initialized = localStorage.getItem(dashboardBlogInitializedKey) === 'true';
+                return Array.isArray(saved) && (saved.length || initialized) ? saved : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function saveDashboardBlogs(posts, shouldRender = true) {
+            localStorage.setItem(dashboardBlogStorageKey, JSON.stringify(posts));
+            localStorage.setItem(dashboardBlogInitializedKey, 'true');
+            if (shouldRender) renderDashboardBlogs(true);
+        }
+
+        async function refreshDashboardBlogsFromServer() {
+            try {
+                const response = await fetch(dashboardBlogsEndpoint, { headers: { Accept: 'application/json' } });
+                if (!response.ok) throw new Error('Unable to load live blog posts.');
+                const data = await response.json();
+                if (Array.isArray(data.posts)) saveDashboardBlogs(data.posts);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
         function normalizeDashboardProduct(product) {
             const category = product.category || product.type || 'Digital Resource';
             return {
@@ -533,6 +581,50 @@
             `;
         }
 
+        function dashboardReadMinutes(post) {
+            const words = String(post.content || post.meta || '').trim().split(/\s+/).filter(Boolean).length;
+            return `${Math.max(2, Math.ceil(words / 180))} min read`;
+        }
+
+        function renderDashboardBlogs(force = false) {
+            const posts = readDashboardBlogs();
+            const snapshot = JSON.stringify(posts);
+            if (!force && snapshot === lastDashboardBlogSnapshot) return;
+            lastDashboardBlogSnapshot = snapshot;
+
+            const list = document.querySelector('[data-dashboard-blog-list]');
+            if (!list) return;
+            const published = posts
+                .filter((post) => (post.status || 'Draft') === 'Published')
+                .sort((a, b) => new Date(b.publishedAt || b.updatedAt || 0) - new Date(a.publishedAt || a.updatedAt || 0))
+                .slice(0, 3);
+
+            if (!published.length) {
+                list.innerHTML = `
+                    <div class="rounded-2xl border border-white/5 bg-surface-container-low/50 p-5 text-center">
+                        <span class="material-symbols-outlined text-4xl text-primary">article</span>
+                        <p class="mt-2 font-headline text-lg font-semibold">No published posts yet</p>
+                        <p class="mt-1 text-sm text-on-surface-variant">Admin-published blog articles will appear here automatically.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = published.map((post) => `
+                <a class="flex gap-4 rounded-2xl border border-white/5 bg-surface-container-low/50 p-3 transition-all hover:border-primary/35" href="{{ route('blog') }}">
+                    <img class="h-16 w-16 flex-shrink-0 rounded-xl object-cover" alt="${dashboardEscapeHTML(post.title)}" src="${dashboardEscapeHTML(post.image || '/images/shop/photosynthesis-process-topic.svg')}">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2">
+                            <span class="rounded-full bg-primary-container/10 px-2 py-0.5 font-label text-[10px] text-primary">${dashboardEscapeHTML(post.category || 'Science')}</span>
+                            <span class="font-label text-[10px] text-on-surface-variant">${dashboardReadMinutes(post)}</span>
+                        </div>
+                        <p class="mt-2 line-clamp-1 text-sm font-semibold text-on-surface">${dashboardEscapeHTML(post.title || 'Untitled Post')}</p>
+                        <p class="mt-1 line-clamp-2 text-xs text-on-surface-variant">${dashboardEscapeHTML(post.meta || String(post.content || '').slice(0, 120))}</p>
+                    </div>
+                </a>
+            `).join('');
+        }
+
         function renderDashboardCart() {
             const items = getDashboardCartItems();
             const count = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -608,6 +700,8 @@
         updateCustomerDashboardTitle();
         renderDashboardProducts(true);
         refreshDashboardInventoryFromServer();
+        renderDashboardBlogs(true);
+        refreshDashboardBlogsFromServer();
         renderDashboardCart();
         document.querySelector('[data-dashboard-products-grid]')?.addEventListener('click', (event) => {
             const addButton = event.target.closest('[data-dashboard-product-add]');
@@ -621,16 +715,30 @@
         window.addEventListener('storage', (event) => {
             if (event.key === dashboardCartStorageKey) renderDashboardCart();
             if (event.key === dashboardInventoryStorageKey || event.key === `${dashboardInventoryStorageKey}Initialized`) renderDashboardProducts(true);
+            if (event.key === dashboardBlogStorageKey || event.key === dashboardBlogInitializedKey) renderDashboardBlogs(true);
         });
         window.addEventListener('ilearn:cart-updated', renderDashboardCart);
+        window.addEventListener('ilearn:blogs-updated', (event) => {
+            if (Array.isArray(event.detail?.posts)) saveDashboardBlogs(event.detail.posts);
+            else renderDashboardBlogs(true);
+        });
+        dashboardBlogSyncChannel?.addEventListener('message', (event) => {
+            if (event.data?.type === 'blogs-updated' && Array.isArray(event.data.posts)) {
+                saveDashboardBlogs(event.data.posts);
+            }
+        });
         window.addEventListener('pageshow', () => {
             renderDashboardProducts(true);
+            renderDashboardBlogs(true);
             renderDashboardCart();
         });
         setInterval(() => renderDashboardProducts(false), 1000);
+        setInterval(() => renderDashboardBlogs(false), 1000);
         setInterval(() => {
             refreshDashboardInventoryFromServer();
             renderDashboardProducts(false);
+            refreshDashboardBlogsFromServer();
+            renderDashboardBlogs(false);
         }, 3000);
     </script>
     @include('partials.auth-ui')
