@@ -323,65 +323,11 @@
                 </div>
 
                 <div id="home-resource-grid" class="grid grid-cols-1 gap-gutter sm:grid-cols-2 lg:grid-cols-4">
-                    @php
-                        $products = [
-                            ['Advanced Cellular Biology PPT', 'PPT', '₱24.99', '(48)', 'Grades 9-12', 'PPTX + PDF', 'A complete visual lesson deck covering cell structure, organelles, transport, and cell specialization with teacher prompts and quick-check questions.', '60+ editable slides|Warm-up and exit ticket prompts|Embedded mini quizzes|Teacher notes and answer guide', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCLzEjlQCU5fHwYEIz2R2om7Jx8QSDoipIrhpmyU3TcB5O8Y16oqUPuQvFJi1U9OlWrpAQQrsbFM79MMUOdeKRAxFTZkK43gCkrF5kVNMBoEG5BH4KR_wOeRPHcvlruJQMgnO_BJFYUTTfXOgR0HqvuiZw5Sg7fKE5wYm4DF6EdqWCaL5ok5yUXzs1UF15JINwhe9l7zKrwlXh4Ad6sGs8RwFtXUgTlPQkz2YmtPgt_uSZCqBuAC-64pX9aMBIvqwt7OQ9drd7OTd0'],
-                            ['Solar System Exploration Pack', 'Worksheet', '₱12.99', '(102)', 'Grades 5-8', 'PDF + Google Slides', 'A printable and digital activity pack that guides students through planets, moon phases, scale models, and orbital motion.', 'Planet comparison worksheets|Vocabulary review pages|Cut-and-sort activities|Answer keys included', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCLlLu1NPD62oVEdU7qFL2vlSpVsh9JdCY93HmEExvQCqihQLyJMmj5iGY0lCDwBemnbYamNOGdAymZeGTXCIWbdhv24YeuaZNBcsx26Xg7y2OmjVdsIS6908TNfTrerb2MsVWcNeAvGVjIxgMEjxcWzbTE-1JuRTw9EQuCmho5Ae6rJRyDTbNuEEXHNpIaz8wVjpXtgkbj25ql2-bKW1ktStmR1DZECaxeFQWkgzBKdioEz1PSGcvBYs67KDYcUmNXJHHXVVyhIW0'],
-                            ['Microscopic World Lab Guide', 'Kit', '₱29.99', '(34)', 'Grades 7-10', 'Lab Kit PDF', 'A guided microscopy unit for observing cells, microorganisms, and slide samples with structured lab routines.', 'Observation log templates|Microscope setup guide|Lab safety checklist|Claim-evidence-reasoning prompts', 'https://lh3.googleusercontent.com/aida-public/AB6AXuANxOUcXWnURXGgCmo7edo6WSRWkpJAJPP-M3ceELDQLujFszZVUnl3mglXBtLBPqnMBia80vDdpUzoPovsRsZtLZpgfJrx3HANM0bbCSyjwUPmAvtmNVrStA62PwwaGmU6oRLmc9P_go5EFGnX1yWT9tjJ1ifDtpXD_Mze82pN3RAPDBmiv2H2ga9n0rePRKslGfvM42VW2yWYmpuu1Pu6LQJjfaAJye0izmF7PT4AOOgRg9frPtoGKDfRau4awWcyUCnzAk4Oofs'],
-                            ['Physics Fundamentals Quiz', 'Reviewer', '₱15.99', '(21)', 'Grades 8-11', 'PDF + Editable DOCX', 'A ready-to-use review and quiz bundle for motion, forces, energy, waves, and electricity fundamentals.', '120 question bank|Multiple-choice and short answer|Topic review sheets|Answer key with explanations', 'https://lh3.googleusercontent.com/aida-public/AB6AXuBDw3fWQxS2VKqx320PyIALZ8hclivf8Pr0tt3a8V3nl02culJCqO0XiUGgnOtUxD5dcmfmiTxOAfeyTQ1SEovAk-4LiwKCAShlOHyI_Te9iCPgb932R48k7YtAR82Mu4ihQnKNku-LalnMHOPT-Je22G0rbg-QDFhz2zv_twB8m9ADiYqYXMllfVnVOgNHSjuLMxFQ468A3z5USPlYJ5UoyduNqyj17uez_0_0MS8gVkTSEXqHASPZp2A4xkOIz-59DFNItvBMqac'],
-                        ];
-                    @endphp
-
-                    @foreach ($products as [$title, $type, $price, $reviews, $grade, $format, $description, $includes, $image])
-                        <article class="glass-panel reveal shimmer-on-hover group overflow-hidden rounded-xl transition-all duration-300 hover:scale-[1.02]">
-                            <div class="relative h-48 overflow-hidden">
-                                <img alt="{{ $title }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" src="{{ $image }}">
-                                <div class="absolute right-2 top-2 rounded bg-primary-container px-2 py-1 font-label text-xs font-bold text-on-primary-container shadow-[0_0_12px_rgba(0,212,255,0.35)]">{{ $type }}</div>
-                            </div>
-                            <div class="p-6">
-                                <h3 class="mb-2 font-headline text-lg font-semibold">{{ $title }}</h3>
-                                <div class="mb-4 flex items-center gap-1">
-                                    @for ($i = 0; $i < 5; $i++)
-                                        <span class="material-symbols-outlined text-sm text-yellow-400" style="font-variation-settings: 'FILL' 1;">star</span>
-                                    @endfor
-                                    <span class="ml-1 text-xs text-on-surface-variant">{{ $reviews }}</span>
-                                </div>
-                                <div class="flex items-center justify-between gap-3">
-                                    <span class="font-headline text-2xl font-semibold text-primary">{{ $price }}</span>
-                                    <div class="flex items-center gap-2">
-                                        <button
-                                            class="top-resource-preview rounded-lg border border-primary/30 bg-surface-container-high p-2 text-primary transition-colors hover:bg-primary hover:text-on-primary-container"
-                                            type="button"
-                                            aria-label="Preview {{ $title }}"
-                                            data-product-title="{{ $title }}"
-                                            data-product-type="{{ $type }}"
-                                            data-product-price="{{ $price }}"
-                                            data-product-reviews="{{ $reviews }}"
-                                            data-product-grade="{{ $grade }}"
-                                            data-product-format="{{ $format }}"
-                                            data-product-description="{{ $description }}"
-                                            data-product-includes="{{ $includes }}"
-                                            data-product-image="{{ $image }}"
-                                        >
-                                            <span class="material-symbols-outlined">visibility</span>
-                                        </button>
-                                        <button
-                                            class="top-resource-add-to-cart rounded-lg bg-surface-container-high p-2 transition-colors hover:bg-primary hover:text-on-primary-container"
-                                            type="button"
-                                            aria-label="Add {{ $title }} to cart"
-                                            data-product-id="{{ \Illuminate\Support\Str::slug($title) }}"
-                                            data-product-title="{{ $title }}"
-                                            data-product-meta="{{ $type }} Resource"
-                                            data-product-price="{{ $price }}"
-                                            data-product-image="{{ $image }}"
-                                        >
-                                            <span class="material-symbols-outlined">add_shopping_cart</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </article>
-                    @endforeach
+                    <div class="glass-panel col-span-full rounded-xl p-8 text-center text-on-surface-variant">
+                        <span class="material-symbols-outlined mb-3 text-4xl text-primary">sync</span>
+                        <p class="font-headline text-xl text-on-surface">Loading live science resources...</p>
+                        <p class="mt-2 text-sm">Products added in the admin dashboard will appear here automatically.</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -763,13 +709,17 @@
             if (!source) {
                 try { source = JSON.parse(localStorage.getItem(inventoryStorageKey) || '[]') || []; } catch { source = []; }
             }
-            homeResourceGrid.querySelectorAll('[data-admin-product-card]').forEach((card) => card.remove());
-            const existingIds = new Set(Array.from(homeResourceGrid.querySelectorAll('article:not([data-admin-product-card]) .top-resource-add-to-cart')).map((button) => button.dataset.productId));
             const cards = activeInventoryProducts(source)
-                .filter((product) => product.id && !existingIds.has(product.id))
                 .map(homeProductCard)
                 .join('');
-            if (cards) homeResourceGrid.insertAdjacentHTML('beforeend', cards);
+            homeResourceGrid.innerHTML = cards || `
+                <div class="glass-panel col-span-full rounded-xl p-8 text-center text-on-surface-variant">
+                    <span class="material-symbols-outlined mb-3 text-4xl text-primary">inventory_2</span>
+                    <p class="font-headline text-xl text-on-surface">No active resources yet</p>
+                    <p class="mt-2 text-sm">Add or publish products from the admin inventory and they will appear here.</p>
+                </div>
+            `;
+            homeResourceGrid.querySelectorAll('.reveal').forEach((element) => element.classList.add('active'));
         }
 
         async function refreshHomeProductsFromServer() {
@@ -984,34 +934,35 @@
 
             updateCartCount();
 
-            document.querySelectorAll('.top-resource-add-to-cart').forEach((button) => {
-                button.addEventListener('click', () => {
+            homeResourceGrid?.addEventListener('click', (event) => {
+                const addButton = event.target.closest('.top-resource-add-to-cart');
+                if (addButton) {
                     addProductToCart({
-                        id: button.dataset.productId,
-                        title: button.dataset.productTitle,
-                        meta: button.dataset.productMeta,
-                        price: button.dataset.productPrice,
-                        image: button.dataset.productImage,
+                        id: addButton.dataset.productId,
+                        title: addButton.dataset.productTitle,
+                        meta: addButton.dataset.productMeta,
+                        price: addButton.dataset.productPrice,
+                        image: addButton.dataset.productImage,
                     });
-                });
-            });
+                    return;
+                }
 
-            document.querySelectorAll('.top-resource-preview').forEach((button) => {
-                button.addEventListener('click', () => {
+                const previewButton = event.target.closest('.top-resource-preview');
+                if (previewButton) {
                     openResourcePreview({
-                        id: button.closest('article').querySelector('.top-resource-add-to-cart').dataset.productId,
-                        title: button.dataset.productTitle,
-                        type: button.dataset.productType,
-                        meta: `${button.dataset.productType} Resource`,
-                        price: button.dataset.productPrice,
-                        reviews: button.dataset.productReviews,
-                        grade: button.dataset.productGrade,
-                        format: button.dataset.productFormat,
-                        description: button.dataset.productDescription,
-                        includes: button.dataset.productIncludes,
-                        image: button.dataset.productImage,
+                        id: previewButton.closest('article')?.querySelector('.top-resource-add-to-cart')?.dataset.productId,
+                        title: previewButton.dataset.productTitle,
+                        type: previewButton.dataset.productType,
+                        meta: `${previewButton.dataset.productType} Resource`,
+                        price: previewButton.dataset.productPrice,
+                        reviews: previewButton.dataset.productReviews,
+                        grade: previewButton.dataset.productGrade,
+                        format: previewButton.dataset.productFormat,
+                        description: previewButton.dataset.productDescription,
+                        includes: previewButton.dataset.productIncludes,
+                        image: previewButton.dataset.productImage,
                     });
-                });
+                }
             });
 
             document.getElementById('resource-preview-close')?.addEventListener('click', closeResourcePreview);
