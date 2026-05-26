@@ -664,22 +664,7 @@
             });
 
             const receipt = await sendReceiptEmail(order);
-            if (!receipt.ok || !receipt.sent) {
-                checkoutProcessing = false;
-                const helper = document.getElementById('checkout-helper');
-                if (helper) {
-                    helper.textContent = receipt.message || 'Order could not be completed. Please try again.';
-                    helper.classList.remove('text-primary');
-                    helper.classList.add('text-error');
-                }
-                document.querySelectorAll('#complete-purchase, #mobile-complete-purchase').forEach((button) => {
-                    button.innerHTML = '<span class="material-symbols-outlined">rocket_launch</span> Complete Purchase';
-                });
-                validateCheckout(true);
-                return;
-            }
-
-            order.emailSent = true;
+            order.emailSent = Boolean(receipt.ok && receipt.sent);
             order.emailMessage = receipt.message;
             localStorage.setItem('ilearnScienceLastCheckout', JSON.stringify(order));
             if (window.iLearnAuth?.clearCart) window.iLearnAuth.clearCart();
