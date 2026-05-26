@@ -125,7 +125,6 @@
         </div>
         <div class="space-y-1 px-2">
             <a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant transition-all hover:text-primary" href="#"><span class="material-symbols-outlined">settings</span><span class="font-label text-sm">Settings</span></a>
-            <a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant transition-all hover:text-primary" href="#"><span class="material-symbols-outlined">logout</span><span class="font-label text-sm">Log Out</span></a>
         </div>
     </nav>
 
