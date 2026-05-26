@@ -316,7 +316,7 @@
                         <p class="mt-2 text-on-surface-variant">Fuel your classroom with high-octane scientific materials.</p>
                     </div>
                     <div class="mobile-scroll flex w-full gap-2 overflow-x-auto pb-2 md:w-auto">
-                        @foreach (['All', 'PPT Templates', 'Worksheets', 'Visual Resources', 'Test and Quizzes', 'Study Guides'] as $category)
+                        @foreach (['All', 'PowerPoint Presentation (PPTX)', 'Worksheet', 'Visual Resources', 'Study Guides', 'Test/Quiz'] as $category)
                             <button
                                 class="resource-category-filter glass-panel whitespace-nowrap rounded-full px-4 py-2 font-label text-xs transition-all hover:border-primary/50 {{ $loop->first ? 'border-primary/40 bg-primary-container/10 text-primary shadow-[0_0_15px_rgba(60,215,255,0.18)]' : 'text-on-surface-variant' }}"
                                 type="button"
@@ -682,11 +682,11 @@
                 product.title,
             ].filter(Boolean).join(' ').toLowerCase();
 
-            if (/(ppt|pptx|powerpoint|presentation|slide|template)/.test(combined)) return 'PPT Templates';
-            if (/(worksheet|activity sheet|practice sheet|handout|printable)/.test(combined)) return 'Worksheets';
-            if (/(visual|diagram|chart|infographic|poster|image|illustration|model|map)/.test(combined)) return 'Visual Resources';
-            if (/(test|quiz|assessment|exam|question bank|reviewer)/.test(combined)) return 'Test and Quizzes';
+            if (/(ppt|pptx|powerpoint|presentation|slide|template)/.test(combined)) return 'PowerPoint Presentation (PPTX)';
+            if (/(worksheet|activity sheet|practice sheet|handout|printable)/.test(combined)) return 'Worksheet';
+            if (/(visual resource|visual resources|diagram|chart|infographic|poster|image|illustration|model|map)/.test(combined)) return 'Visual Resources';
             if (/(study guide|guide|lesson guide|reference|module|reading)/.test(combined)) return 'Study Guides';
+            if (/(test|quiz|assessment|exam|question bank|reviewer)/.test(combined)) return 'Test/Quiz';
 
             return product.category || product.type || 'Digital Resources';
         }
@@ -709,11 +709,12 @@
         }
 
         function homeProductCard(product) {
+            const productCategory = canonicalResourceCategory(product);
             const normalized = normalizeProductForSearch({
                 id: product.id,
                 title: product.title,
-                type: product.category,
-                meta: `${product.category || 'Digital'} Resource`,
+                type: productCategory,
+                meta: `${productCategory} Resource`,
                 price: formatProductPeso(product.price),
                 reviews: product.downloads || '(New)',
                 grade: product.grade,

@@ -557,12 +557,11 @@
                             <input id="inventory-search" class="rounded-xl border border-white/10 bg-surface-container-low px-4 py-2 font-label text-sm text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:ring-0" placeholder="Search products">
                             <select id="inventory-filter" class="rounded-xl border border-white/10 bg-surface-container-low px-4 py-2 font-label text-sm text-on-surface focus:border-primary focus:ring-0">
                                 <option>All Categories</option>
-                                <option>Presentation</option>
-                                <option>Worksheet</option>
-                                <option>Study Guide</option>
-                                <option>Visual Resource</option>
+                                <option>PowerPoint Presentation (PPTX)</option>
+                                <option>Visual Resources</option>
+                                <option>Study Guides</option>
                                 <option>Test/Quiz</option>
-                                <option>Science Kit</option>
+                                <option>Worksheet</option>
                             </select>
                             <button class="rounded-xl bg-primary-container px-4 py-2 font-label text-sm font-bold text-on-primary shadow-[0_0_18px_rgba(0,212,255,0.3)] transition-all hover:scale-[1.02]" type="button" data-inventory-add>
                                 <span class="material-symbols-outlined align-middle text-[18px]">add</span>
@@ -580,6 +579,19 @@
                                 </div>
                                 <p class="mt-3 font-headline text-2xl font-semibold text-primary" data-inventory-stat="{{ $target }}">0</p>
                             </div>
+                        @endforeach
+                    </div>
+
+                    <div id="inventory-category-tabs" class="mt-5 flex gap-2 overflow-x-auto pb-2">
+                        @foreach (['All Categories', 'PowerPoint Presentation (PPTX)', 'Visual Resources', 'Study Guides', 'Test/Quiz', 'Worksheet'] as $category)
+                            <button
+                                class="inventory-category-tab whitespace-nowrap rounded-2xl border px-4 py-2 font-label text-xs transition-all {{ $loop->first ? 'border-primary/40 bg-primary-container/10 text-primary shadow-[0_0_16px_rgba(0,212,255,0.18)]' : 'border-white/10 bg-surface-container-low/70 text-on-surface-variant hover:border-primary/35 hover:text-primary' }}"
+                                type="button"
+                                data-inventory-category-tab="{{ $category }}"
+                                aria-pressed="{{ $loop->first ? 'true' : 'false' }}"
+                            >
+                                {{ $category }}
+                            </button>
                         @endforeach
                     </div>
 
@@ -695,12 +707,11 @@
                 <label class="lg:col-span-3">
                     <span class="mb-2 block font-label text-xs uppercase tracking-widest text-on-surface-variant">Category</span>
                     <select class="w-full rounded-xl border border-white/10 bg-surface-container-low px-4 py-3 text-on-surface focus:border-primary focus:ring-0" name="category" required>
-                        <option>Presentation</option>
-                        <option>Worksheet</option>
-                        <option>Study Guide</option>
-                        <option>Visual Resource</option>
+                        <option>PowerPoint Presentation (PPTX)</option>
+                        <option>Visual Resources</option>
+                        <option>Study Guides</option>
                         <option>Test/Quiz</option>
-                        <option>Science Kit</option>
+                        <option>Worksheet</option>
                     </select>
                 </label>
                 <label class="lg:col-span-3">
@@ -871,6 +882,7 @@
         const inventoryTable = document.getElementById('inventory-table');
         const inventorySearch = document.getElementById('inventory-search');
         const inventoryFilter = document.getElementById('inventory-filter');
+        const inventoryCategoryTabs = document.querySelectorAll('.inventory-category-tab');
         const inventoryModal = document.getElementById('inventory-modal');
         const inventoryForm = document.getElementById('inventory-form');
         const inventoryMessage = document.getElementById('inventory-form-message');
@@ -880,7 +892,7 @@
             {
                 id: 'cell-biology-interactive-powerpoint',
                 title: 'Cell Biology Interactive PowerPoint',
-                category: 'Presentation',
+                category: 'PowerPoint Presentation (PPTX)',
                 status: 'Published',
                 price: 450,
                 grade: 'Grade 9-12',
@@ -896,7 +908,7 @@
             {
                 id: 'photosynthesis-visual-pack',
                 title: 'Photosynthesis Visual Pack',
-                category: 'Visual Resource',
+                category: 'Visual Resources',
                 status: 'Published',
                 price: 280,
                 grade: 'Grade 7-10',
@@ -1021,13 +1033,48 @@
             return `₱${(Number.parseFloat(value) || 0).toFixed(2)}`;
         }
 
+        function canonicalInventoryCategory(productOrCategory) {
+            const combined = typeof productOrCategory === 'string'
+                ? productOrCategory.toLowerCase()
+                : [
+                    productOrCategory?.category,
+                    productOrCategory?.type,
+                    productOrCategory?.productType,
+                    productOrCategory?.format,
+                    productOrCategory?.title,
+                ].filter(Boolean).join(' ').toLowerCase();
+
+            if (/(ppt|pptx|powerpoint|presentation|slide|template)/.test(combined)) return 'PowerPoint Presentation (PPTX)';
+            if (/(visual resource|visual resources|diagram|chart|infographic|poster|image|illustration|model|map)/.test(combined)) return 'Visual Resources';
+            if (/(study guide|guide|lesson guide|reference|module|reading)/.test(combined)) return 'Study Guides';
+            if (/(test|quiz|assessment|exam|question bank|reviewer)/.test(combined)) return 'Test/Quiz';
+            if (/(worksheet|activity sheet|practice sheet|handout|printable)/.test(combined)) return 'Worksheet';
+
+            return productOrCategory?.category || productOrCategory || 'Worksheet';
+        }
+
+        function setInventoryCategoryFilter(category) {
+            if (inventoryFilter) inventoryFilter.value = category;
+            inventoryCategoryTabs.forEach((button) => {
+                const isActive = button.dataset.inventoryCategoryTab === category;
+                button.setAttribute('aria-pressed', String(isActive));
+                button.classList.toggle('border-primary/40', isActive);
+                button.classList.toggle('bg-primary-container/10', isActive);
+                button.classList.toggle('text-primary', isActive);
+                button.classList.toggle('shadow-[0_0_16px_rgba(0,212,255,0.18)]', isActive);
+                button.classList.toggle('border-white/10', !isActive);
+                button.classList.toggle('bg-surface-container-low/70', !isActive);
+                button.classList.toggle('text-on-surface-variant', !isActive);
+            });
+        }
+
         function productFromForm() {
             const data = new FormData(inventoryForm);
             const title = data.get('title')?.trim() || 'Untitled Product';
             return {
                 id: data.get('id') || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || `product-${Date.now()}`,
                 title,
-                category: data.get('category') || 'Presentation',
+                category: canonicalInventoryCategory(data.get('category') || 'PowerPoint Presentation (PPTX)'),
                 status: data.get('status') || 'Draft',
                 price: Number.parseFloat(data.get('price')) || 0,
                 grade: data.get('grade')?.trim() || 'All Grades',
@@ -1066,7 +1113,7 @@
             const category = inventoryFilter?.value || 'All Categories';
             const visibleProducts = products.filter((product) => {
                 const matchesTerm = [product.title, product.description, product.topic, product.subject, product.tags].join(' ').toLowerCase().includes(term);
-                const matchesCategory = category === 'All Categories' || product.category === category;
+                const matchesCategory = category === 'All Categories' || canonicalInventoryCategory(product) === category;
                 return matchesTerm && matchesCategory;
             });
 
@@ -1083,7 +1130,7 @@
                             </div>
                         </div>
                     </td>
-                    <td class="py-4"><span class="rounded-full border border-primary/20 bg-primary-container/10 px-3 py-1 font-label text-xs text-primary">${escapeHTML(product.category)}</span></td>
+                    <td class="py-4"><span class="rounded-full border border-primary/20 bg-primary-container/10 px-3 py-1 font-label text-xs text-primary">${escapeHTML(canonicalInventoryCategory(product))}</span></td>
                     <td class="py-4 font-label text-primary">${formatAdminPeso(product.price)}</td>
                     <td class="py-4 text-on-surface-variant">${escapeHTML(product.grade)}</td>
                     <td class="py-4 text-on-surface-variant">${escapeHTML(product.format)}</td>
@@ -1114,8 +1161,12 @@
                     const field = inventoryForm.elements[key];
                     if (field) field.value = value ?? '';
                 });
+                if (inventoryForm.elements.category) {
+                    inventoryForm.elements.category.value = canonicalInventoryCategory(product);
+                }
             } else {
                 inventoryForm.elements.id.value = '';
+                inventoryForm.elements.category.value = 'PowerPoint Presentation (PPTX)';
                 inventoryForm.elements.status.value = 'Published';
                 inventoryForm.elements.stock.value = 'Digital / Unlimited';
                 inventoryForm.elements.subject.value = 'Biology';
@@ -1225,7 +1276,16 @@
         });
 
         inventorySearch?.addEventListener('input', renderInventory);
-        inventoryFilter?.addEventListener('change', renderInventory);
+        inventoryFilter?.addEventListener('change', () => {
+            setInventoryCategoryFilter(inventoryFilter.value || 'All Categories');
+            renderInventory();
+        });
+        inventoryCategoryTabs.forEach((button) => {
+            button.addEventListener('click', () => {
+                setInventoryCategoryFilter(button.dataset.inventoryCategoryTab || 'All Categories');
+                renderInventory();
+            });
+        });
         renderInventory();
         syncInventoryFromServer();
 

@@ -33,7 +33,7 @@ class HomeController extends Controller
             [
                 'id' => 'cell-biology-interactive-powerpoint',
                 'title' => 'Cell Biology Interactive PowerPoint',
-                'category' => 'Presentation',
+                'category' => 'PowerPoint Presentation (PPTX)',
                 'status' => 'Published',
                 'price' => 450,
                 'grade' => 'Grade 9-12',
@@ -50,7 +50,7 @@ class HomeController extends Controller
             [
                 'id' => 'photosynthesis-visual-pack',
                 'title' => 'Photosynthesis Visual Pack',
-                'category' => 'Visual Resource',
+                'category' => 'Visual Resources',
                 'status' => 'Published',
                 'price' => 280,
                 'grade' => 'Grade 7-10',
