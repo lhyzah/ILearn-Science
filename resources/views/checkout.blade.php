@@ -398,6 +398,7 @@
         let promoDiscount = 0;
         let selectedPaymentMethod = '';
         let emailVerified = false;
+        let checkoutProcessing = false;
         const field = (name) => document.querySelector(`[data-checkout-field="${name}"]`);
         const fieldValue = (name) => field(name)?.value.trim() || '';
         const parsePeso = (value) => Number.parseFloat(String(value).replace(/[₱,]/g, '')) || 0;
@@ -482,6 +483,7 @@
             if (helper) {
                 helper.textContent = valid ? 'Ready for secure digital checkout.' : 'Complete contact and payment details to continue.';
                 helper.classList.toggle('text-primary', valid);
+                helper.classList.toggle('text-error', false);
             }
             return valid;
         }
@@ -613,15 +615,28 @@
                     body: JSON.stringify(order),
                 });
 
-                return response.ok;
+                const data = await response.json().catch(() => ({}));
+                return {
+                    ok: response.ok,
+                    sent: Boolean(data.sent),
+                    duplicate: Boolean(data.duplicate),
+                    message: data.message || (response.ok ? 'Receipt email sent.' : 'Receipt email could not be sent.'),
+                };
             } catch (error) {
                 console.error('Receipt email request failed.', error);
-                return false;
+                return {
+                    ok: false,
+                    sent: false,
+                    duplicate: false,
+                    message: 'Network error while sending receipt. Please try again.',
+                };
             }
         }
 
         async function completePurchase() {
+            if (checkoutProcessing) return;
             if (!validateCheckout(true)) return;
+            checkoutProcessing = true;
             document.querySelectorAll('#complete-purchase, #mobile-complete-purchase').forEach((button) => {
                 button.disabled = true;
                 button.innerHTML = '<span class="checkout-spinner"></span> Processing secure payment...';
@@ -641,12 +656,31 @@
                     billingAddress: fieldValue('billingAddress'),
                 },
                 paymentMethod: selectedPaymentMethod,
+                paymentStatus: 'verified',
                 checkedOutAt: new Date().toISOString(),
             };
             document.querySelectorAll('#complete-purchase, #mobile-complete-purchase').forEach((button) => {
                 button.innerHTML = '<span class="checkout-spinner"></span> Sending branded receipt...';
             });
-            order.emailSent = await sendReceiptEmail(order);
+
+            const receipt = await sendReceiptEmail(order);
+            if (!receipt.ok || !receipt.sent) {
+                checkoutProcessing = false;
+                const helper = document.getElementById('checkout-helper');
+                if (helper) {
+                    helper.textContent = receipt.message || 'Order could not be completed. Please try again.';
+                    helper.classList.remove('text-primary');
+                    helper.classList.add('text-error');
+                }
+                document.querySelectorAll('#complete-purchase, #mobile-complete-purchase').forEach((button) => {
+                    button.innerHTML = '<span class="material-symbols-outlined">rocket_launch</span> Complete Purchase';
+                });
+                validateCheckout(true);
+                return;
+            }
+
+            order.emailSent = true;
+            order.emailMessage = receipt.message;
             localStorage.setItem('ilearnScienceLastCheckout', JSON.stringify(order));
             if (window.iLearnAuth?.clearCart) window.iLearnAuth.clearCart();
             else localStorage.setItem(cartStorageKey, JSON.stringify([]));

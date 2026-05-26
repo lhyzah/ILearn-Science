@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -19,6 +20,11 @@ class HomeController extends Controller
     private function blogStorePath(): string
     {
         return storage_path('app/ilearn-blog-posts.json');
+    }
+
+    private function fallbackOrderStorePath(): string
+    {
+        return storage_path('app/ilearn-orders.json');
     }
 
     private function defaultProducts(): array
@@ -157,6 +163,59 @@ class HomeController extends Controller
     {
         File::ensureDirectoryExists(dirname($this->blogStorePath()));
         File::put($this->blogStorePath(), json_encode(array_values($posts), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    }
+
+    private function writeFallbackOrder(array $order, string $emailStatus = 'pending', ?string $emailError = null): array
+    {
+        $path = $this->fallbackOrderStorePath();
+        $orders = $this->readFallbackOrders();
+
+        $orderRecord = [
+            'order_number' => $order['orderNumber'],
+            'customer_name' => $order['customer']['name'],
+            'customer_email' => $order['customer']['email'],
+            'customer_school' => $order['customer']['school'] ?? null,
+            'payment_method' => $order['paymentMethod'],
+            'payment_status' => $order['paymentStatus'] ?? 'verified',
+            'email_status' => $emailStatus,
+            'email_error' => $emailError,
+            'items' => $order['items'],
+            'totals' => $order['totals'],
+            'checked_out_at' => $order['checkedOutAt'],
+            'email_sent_at' => $emailStatus === 'sent' ? now()->toIso8601String() : null,
+            'updated_at' => now()->toIso8601String(),
+        ];
+
+        $orders = array_values(array_filter($orders, fn ($item) => ($item['order_number'] ?? null) !== $order['orderNumber']));
+        array_unshift($orders, $orderRecord);
+
+        File::ensureDirectoryExists(dirname($path));
+        File::put($path, json_encode($orders, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+        return $orderRecord;
+    }
+
+    private function readFallbackOrders(): array
+    {
+        $path = $this->fallbackOrderStorePath();
+        if (!File::exists($path)) {
+            return [];
+        }
+
+        $orders = json_decode(File::get($path), true);
+
+        return is_array($orders) ? $orders : [];
+    }
+
+    private function findFallbackOrder(string $orderNumber): ?array
+    {
+        foreach ($this->readFallbackOrders() as $order) {
+            if (($order['order_number'] ?? null) === $orderNumber) {
+                return $order;
+            }
+        }
+
+        return null;
     }
 
     private function validatedProduct(Request $request): array
@@ -370,6 +429,7 @@ class HomeController extends Controller
             'customer.email' => ['required', 'email:rfc', 'max:255'],
             'customer.school' => ['nullable', 'string', 'max:180'],
             'paymentMethod' => ['required', 'string', 'max:80'],
+            'paymentStatus' => ['nullable', 'string', 'max:40'],
             'checkedOutAt' => ['nullable', 'string', 'max:120'],
         ]);
 
@@ -390,8 +450,58 @@ class HomeController extends Controller
             ],
             'customer' => $validated['customer'],
             'paymentMethod' => $validated['paymentMethod'],
+            'paymentStatus' => $validated['paymentStatus'] ?? 'verified',
             'checkedOutAt' => $validated['checkedOutAt'] ?? now()->toIso8601String(),
         ];
+
+        if (!in_array($order['paymentStatus'], ['verified', 'paid', 'success'], true)) {
+            return response()->json([
+                'sent' => false,
+                'message' => 'Payment is not verified yet. Confirmation email was not sent.',
+            ], 422);
+        }
+
+        $orderModel = null;
+        try {
+            $orderModel = Order::updateOrCreate(
+                ['order_number' => $order['orderNumber']],
+                [
+                    'customer_name' => $order['customer']['name'],
+                    'customer_email' => $order['customer']['email'],
+                    'customer_school' => $order['customer']['school'] ?? null,
+                    'payment_method' => $order['paymentMethod'],
+                    'payment_status' => $order['paymentStatus'],
+                    'email_status' => 'pending',
+                    'items' => $order['items'],
+                    'totals' => $order['totals'],
+                    'checked_out_at' => $order['checkedOutAt'],
+                ]
+            );
+
+            if ($orderModel->email_sent_at) {
+                return response()->json([
+                    'sent' => true,
+                    'duplicate' => true,
+                    'message' => 'Receipt email was already sent for this order.',
+                ]);
+            }
+        } catch (Throwable $exception) {
+            Log::warning('Order database save failed; using fallback order store.', [
+                'order_number' => $order['orderNumber'],
+                'error' => $exception->getMessage(),
+            ]);
+
+            $fallbackOrder = $this->findFallbackOrder($order['orderNumber']);
+            if (($fallbackOrder['email_status'] ?? null) === 'sent') {
+                return response()->json([
+                    'sent' => true,
+                    'duplicate' => true,
+                    'message' => 'Receipt email was already sent for this order.',
+                ]);
+            }
+
+            $this->writeFallbackOrder($order, 'pending');
+        }
 
         try {
             Mail::send('emails.order-receipt', ['order' => $order], function ($message) use ($order) {
@@ -399,7 +509,28 @@ class HomeController extends Controller
                     ->to($order['customer']['email'], $order['customer']['name'])
                     ->subject("Your iLearn Science order {$order['orderNumber']} is ready");
             });
+
+            if ($orderModel) {
+                $orderModel->forceFill([
+                    'email_status' => 'sent',
+                    'email_sent_at' => now(),
+                    'email_failed_at' => null,
+                    'email_error' => null,
+                ])->save();
+            } else {
+                $this->writeFallbackOrder($order, 'sent');
+            }
         } catch (Throwable $exception) {
+            if ($orderModel) {
+                $orderModel->forceFill([
+                    'email_status' => 'failed',
+                    'email_failed_at' => now(),
+                    'email_error' => $exception->getMessage(),
+                ])->save();
+            } else {
+                $this->writeFallbackOrder($order, 'failed', $exception->getMessage());
+            }
+
             Log::error('Checkout receipt email failed.', [
                 'order_number' => $order['orderNumber'],
                 'customer_email' => $order['customer']['email'],

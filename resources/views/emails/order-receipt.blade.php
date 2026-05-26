@@ -10,6 +10,8 @@
         'google' => 'Google Pay',
     ];
     $paymentMethod = $paymentLabels[$order['paymentMethod']] ?? ucfirst((string) $order['paymentMethod']);
+    $purchaseDate = \Illuminate\Support\Carbon::parse($order['checkedOutAt'] ?? now())->timezone('Asia/Manila')->format('M d, Y • h:i A');
+    $paymentStatus = strtoupper($order['paymentStatus'] ?? 'verified');
     $emailSafeImage = fn ($value) => is_string($value) && preg_match('/^https?:\\/\\//i', $value);
 @endphp
 <!DOCTYPE html>
@@ -38,16 +40,32 @@
                                 </tr>
                             </table>
                             <h1 style="margin:34px 0 10px;font-family:Sora,Arial,sans-serif;font-size:34px;line-height:1.12;color:#00d4ff;">Mission Accomplished</h1>
-                            <p style="margin:0;color:#e1e2eb;font-size:17px;line-height:1.6;">Hi {{ $order['customer']['name'] }}, your science learning resources are ready for instant download.</p>
+                            <p style="margin:0;color:#e1e2eb;font-size:17px;line-height:1.6;">Hi {{ $order['customer']['name'] }}, thank you for purchasing from iLearn Science. Your science learning resources are confirmed and ready for instant access.</p>
                         </td>
                     </tr>
                     <tr>
                         <td style="padding:28px 30px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:18px;border:1px solid rgba(255,255,255,.08);border-radius:20px;background:rgba(39,42,49,.52);">
+                                <tr>
+                                    <td style="padding:16px 18px;">
+                                        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:#bbc9cf;">Date of Purchase</div>
+                                        <div style="margin-top:7px;font-family:Sora,Arial,sans-serif;font-size:15px;font-weight:700;color:#e1e2eb;">{{ $purchaseDate }}</div>
+                                    </td>
+                                    <td style="padding:16px 18px;">
+                                        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:#bbc9cf;">Payment Status</div>
+                                        <div style="margin-top:7px;font-family:Sora,Arial,sans-serif;font-size:15px;font-weight:700;color:#74f5ff;">{{ $paymentStatus }}</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" style="padding:0 18px 16px;color:#bbc9cf;font-size:13px;">Confirmation sent to {{ $order['customer']['email'] }}</td>
+                                </tr>
+                            </table>
+
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid rgba(116,245,255,.18);border-radius:20px;background:rgba(11,14,20,.52);">
                                 <tr>
                                     <td style="padding:18px 20px;">
                                         <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:#74f5ff;">Digital Delivery</div>
-                                        <p style="margin:8px 0 0;color:#bbc9cf;line-height:1.55;">Your downloadable learning materials are connected to this order and will also be available from your iLearn Science dashboard.</p>
+                                        <p style="margin:8px 0 0;color:#bbc9cf;line-height:1.55;">Your downloadable learning materials are connected to this order. Sign in to your iLearn Science dashboard, open Downloads, and access each resource from your library.</p>
                                     </td>
                                 </tr>
                             </table>
@@ -92,13 +110,15 @@
                             </table>
 
                             <div style="text-align:center;margin:30px 0 6px;">
-                                <a href="{{ url('/dashboard') }}" style="display:inline-block;text-decoration:none;border-radius:18px;background:#00d4ff;color:#003642;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800;letter-spacing:.05em;padding:15px 24px;box-shadow:0 0 24px rgba(0,212,255,.34);">OPEN DOWNLOADS</a>
+                                <a href="{{ url('/dashboard') }}" style="display:inline-block;text-decoration:none;border-radius:18px;background:#00d4ff;color:#003642;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:800;letter-spacing:.05em;padding:15px 24px;box-shadow:0 0 24px rgba(0,212,255,.34);">ACCESS YOUR RESOURCES</a>
                             </div>
                         </td>
                     </tr>
                     <tr>
                         <td style="padding:22px 30px;border-top:1px solid rgba(255,255,255,.08);background:rgba(11,14,20,.52);">
+                            <p style="margin:0 0 10px;color:#bbc9cf;font-size:12px;line-height:1.6;">Need help accessing your files? Contact iLearn Science Support at <a href="mailto:support@ilearnscienceresources.dreamhosters.com" style="color:#a8e8ff;text-decoration:none;">support@ilearnscienceresources.dreamhosters.com</a>.</p>
                             <p style="margin:0;color:#bbc9cf;font-size:12px;line-height:1.6;">Secure checkout notice: this confirmation was generated by iLearn Science for digital resource delivery. If you did not place this order, please contact support immediately.</p>
+                            <p style="margin:14px 0 0;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#859398;">© {{ date('Y') }} iLearn Science. Premium digital science learning resources.</p>
                         </td>
                     </tr>
                 </table>
