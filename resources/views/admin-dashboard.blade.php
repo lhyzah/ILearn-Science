@@ -1033,24 +1033,32 @@
             return `₱${(Number.parseFloat(value) || 0).toFixed(2)}`;
         }
 
+        function normalizeInventoryCategoryName(value = '') {
+            const normalized = String(value).trim().toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ');
+
+            if (/(^|\s)(ppt|pptx|powerpoint|presentation|presentations|slide|slides|template|templates)(\s|$)/.test(normalized)) return 'PowerPoint Presentation (PPTX)';
+            if (/(^|\s)(visual resource|visual resources|visual|diagram|chart|infographic|poster|image|illustration|model|map)(\s|$)/.test(normalized)) return 'Visual Resources';
+            if (/(^|\s)(study guide|study guides|guide|lesson guide|reference|module|reading)(\s|$)/.test(normalized)) return 'Study Guides';
+            if (/(^|\s)(test|quiz|quizzes|assessment|exam|question bank|reviewer)(\s|$)/.test(normalized)) return 'Test/Quiz';
+            if (/(^|\s)(worksheet|worksheets|activity sheet|practice sheet|handout|printable)(\s|$)/.test(normalized)) return 'Worksheet';
+
+            return '';
+        }
+
         function canonicalInventoryCategory(productOrCategory) {
-            const combined = typeof productOrCategory === 'string'
-                ? productOrCategory.toLowerCase()
-                : [
-                    productOrCategory?.category,
-                    productOrCategory?.type,
-                    productOrCategory?.productType,
-                    productOrCategory?.format,
-                    productOrCategory?.title,
-                ].filter(Boolean).join(' ').toLowerCase();
+            if (typeof productOrCategory === 'string') {
+                return normalizeInventoryCategoryName(productOrCategory) || productOrCategory || 'Worksheet';
+            }
 
-            if (/(ppt|pptx|powerpoint|presentation|slide|template)/.test(combined)) return 'PowerPoint Presentation (PPTX)';
-            if (/(visual resource|visual resources|diagram|chart|infographic|poster|image|illustration|model|map)/.test(combined)) return 'Visual Resources';
-            if (/(study guide|guide|lesson guide|reference|module|reading)/.test(combined)) return 'Study Guides';
-            if (/(test|quiz|assessment|exam|question bank|reviewer)/.test(combined)) return 'Test/Quiz';
-            if (/(worksheet|activity sheet|practice sheet|handout|printable)/.test(combined)) return 'Worksheet';
+            const selectedCategory = normalizeInventoryCategoryName(productOrCategory?.category)
+                || normalizeInventoryCategoryName(productOrCategory?.type)
+                || normalizeInventoryCategoryName(productOrCategory?.productType);
 
-            return productOrCategory?.category || productOrCategory || 'Worksheet';
+            if (selectedCategory) return selectedCategory;
+
+            return normalizeInventoryCategoryName([productOrCategory?.format, productOrCategory?.title, productOrCategory?.tags].filter(Boolean).join(' '))
+                || productOrCategory?.category
+                || 'Worksheet';
         }
 
         function setInventoryCategoryFilter(category) {

@@ -673,22 +673,29 @@
             window.iLearnAuth?.syncProductsToCatalogue?.(products);
         }
 
+        function normalizeResourceCategoryName(value = '') {
+            const normalized = String(value).trim().toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ');
+
+            if (/(^|\s)(ppt|pptx|powerpoint|presentation|presentations|slide|slides|template|templates)(\s|$)/.test(normalized)) return 'PowerPoint Presentation (PPTX)';
+            if (/(^|\s)(worksheet|worksheets|activity sheet|practice sheet|handout|printable)(\s|$)/.test(normalized)) return 'Worksheet';
+            if (/(^|\s)(visual resource|visual resources|visual|diagram|chart|infographic|poster|image|illustration|model|map)(\s|$)/.test(normalized)) return 'Visual Resources';
+            if (/(^|\s)(study guide|study guides|guide|lesson guide|reference|module|reading)(\s|$)/.test(normalized)) return 'Study Guides';
+            if (/(^|\s)(test|quiz|quizzes|assessment|exam|question bank|reviewer)(\s|$)/.test(normalized)) return 'Test/Quiz';
+
+            return '';
+        }
+
         function canonicalResourceCategory(product) {
-            const combined = [
-                product.category,
-                product.type,
-                product.productType,
-                product.format,
-                product.title,
-            ].filter(Boolean).join(' ').toLowerCase();
+            const selectedCategory = normalizeResourceCategoryName(product.category)
+                || normalizeResourceCategoryName(product.type)
+                || normalizeResourceCategoryName(product.productType);
 
-            if (/(ppt|pptx|powerpoint|presentation|slide|template)/.test(combined)) return 'PowerPoint Presentation (PPTX)';
-            if (/(worksheet|activity sheet|practice sheet|handout|printable)/.test(combined)) return 'Worksheet';
-            if (/(visual resource|visual resources|diagram|chart|infographic|poster|image|illustration|model|map)/.test(combined)) return 'Visual Resources';
-            if (/(study guide|guide|lesson guide|reference|module|reading)/.test(combined)) return 'Study Guides';
-            if (/(test|quiz|assessment|exam|question bank|reviewer)/.test(combined)) return 'Test/Quiz';
+            if (selectedCategory) return selectedCategory;
 
-            return product.category || product.type || 'Digital Resources';
+            return normalizeResourceCategoryName([product.format, product.title, product.tags].filter(Boolean).join(' '))
+                || product.category
+                || product.type
+                || 'Digital Resources';
         }
 
         function matchesResourceCategory(product, category) {

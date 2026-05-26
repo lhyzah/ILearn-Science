@@ -93,7 +93,52 @@ class HomeController extends Controller
 
         $products = json_decode(File::get($path), true);
 
-        return is_array($products) ? array_values($products) : $this->defaultProducts();
+        return is_array($products)
+            ? array_map(fn (array $product) => $this->normalizeProduct($product), array_values($products))
+            : $this->defaultProducts();
+    }
+
+    private function normalizeProduct(array $product): array
+    {
+        $product['category'] = $this->normalizeProductCategory($product['category'] ?? '');
+
+        return $product;
+    }
+
+    private function normalizeProductCategory(string $category): string
+    {
+        $normalized = preg_replace('/[^a-z0-9]+/', ' ', strtolower($category));
+
+        return match (true) {
+            str_contains($normalized, 'ppt'),
+            str_contains($normalized, 'powerpoint'),
+            str_contains($normalized, 'presentation'),
+            str_contains($normalized, 'slide'),
+            str_contains($normalized, 'template') => 'PowerPoint Presentation (PPTX)',
+            str_contains($normalized, 'visual'),
+            str_contains($normalized, 'diagram'),
+            str_contains($normalized, 'chart'),
+            str_contains($normalized, 'infographic'),
+            str_contains($normalized, 'poster'),
+            str_contains($normalized, 'image'),
+            str_contains($normalized, 'illustration') => 'Visual Resources',
+            str_contains($normalized, 'study guide'),
+            str_contains($normalized, 'guide'),
+            str_contains($normalized, 'reference'),
+            str_contains($normalized, 'module'),
+            str_contains($normalized, 'reading') => 'Study Guides',
+            str_contains($normalized, 'test'),
+            str_contains($normalized, 'quiz'),
+            str_contains($normalized, 'assessment'),
+            str_contains($normalized, 'exam'),
+            str_contains($normalized, 'reviewer') => 'Test/Quiz',
+            str_contains($normalized, 'worksheet'),
+            str_contains($normalized, 'activity sheet'),
+            str_contains($normalized, 'practice sheet'),
+            str_contains($normalized, 'handout'),
+            str_contains($normalized, 'printable') => 'Worksheet',
+            default => $category ?: 'Worksheet',
+        };
     }
 
     private function writeProducts(array $products): void
@@ -239,6 +284,7 @@ class HomeController extends Controller
         ]);
 
         $validated['id'] = $validated['id'] ?: Str::slug($validated['title']) . '-' . Str::lower(Str::random(5));
+        $validated['category'] = $this->normalizeProductCategory($validated['category']);
         $validated['price'] = (float) $validated['price'];
         $validated['updatedAt'] = now()->toIso8601String();
 
