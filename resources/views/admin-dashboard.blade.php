@@ -583,8 +583,25 @@
                         @endforeach
                     </div>
 
+                    <div class="mt-5 flex flex-col gap-3 rounded-2xl border border-primary/15 bg-primary-container/10 p-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <p class="font-label text-xs uppercase tracking-widest text-primary">Product Action Tabs</p>
+                            <p class="mt-1 text-sm text-on-surface-variant">Use the always-visible Edit and Delete tabs beside each product to update or remove it from the live customer catalogue.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="inline-flex items-center gap-2 rounded-xl border border-primary/30 bg-surface-container-low/70 px-4 py-2 font-label text-xs text-primary">
+                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                                Edit opens product details
+                            </span>
+                            <span class="inline-flex items-center gap-2 rounded-xl border border-error/30 bg-error-container/10 px-4 py-2 font-label text-xs text-error">
+                                <span class="material-symbols-outlined text-[18px]">delete</span>
+                                Delete removes product
+                            </span>
+                        </div>
+                    </div>
+
                     <div class="mt-6 overflow-x-auto">
-                        <table class="w-full min-w-[1120px] text-left">
+                        <table class="w-full min-w-[1220px] text-left">
                             <thead>
                                 <tr class="border-b border-white/10 font-label text-xs uppercase tracking-widest text-on-surface-variant">
                                     <th class="pb-4">Product</th>
@@ -594,7 +611,7 @@
                                     <th class="pb-4">Format</th>
                                     <th class="pb-4">Status</th>
                                     <th class="pb-4">Inventory</th>
-                                    <th class="pb-4 text-right">Actions</th>
+                                    <th class="sticky right-0 z-10 bg-surface-container/95 pb-4 pl-4 text-right backdrop-blur-xl">Edit / Delete</th>
                                 </tr>
                             </thead>
                             <tbody id="inventory-table" class="divide-y divide-white/5">
@@ -1072,10 +1089,16 @@
                     <td class="py-4 text-on-surface-variant">${escapeHTML(product.format)}</td>
                     <td class="py-4"><span class="rounded-full px-3 py-1 font-label text-xs ${['Published', 'Active'].includes(product.status) ? 'bg-green-400/10 text-green-300' : ['Draft', 'Inactive'].includes(product.status) ? 'bg-yellow-400/10 text-yellow-300' : 'bg-error-container/30 text-error'}">${escapeHTML(product.status)}</span></td>
                     <td class="py-4 text-on-surface-variant">${escapeHTML(product.stock)}</td>
-                    <td class="py-4">
+                    <td class="sticky right-0 bg-surface-container/95 py-4 pl-4 backdrop-blur-xl">
                         <div class="flex justify-end gap-2">
-                            <button class="rounded-lg border border-primary/25 px-3 py-2 font-label text-xs text-primary transition hover:bg-primary/10" type="button" data-inventory-edit="${escapeHTML(product.id)}">Edit</button>
-                            <button class="rounded-lg border border-error/25 px-3 py-2 font-label text-xs text-error transition hover:bg-error-container/20" type="button" data-inventory-delete="${escapeHTML(product.id)}">Delete</button>
+                            <button class="inline-flex items-center gap-1.5 rounded-xl border border-primary/35 bg-primary-container/10 px-3 py-2 font-label text-xs font-bold text-primary shadow-[0_0_12px_rgba(0,212,255,.12)] transition hover:bg-primary-container/20 hover:shadow-[0_0_18px_rgba(0,212,255,.24)]" type="button" data-inventory-edit="${escapeHTML(product.id)}" title="Edit ${escapeHTML(product.title)}">
+                                <span class="material-symbols-outlined text-[17px]">edit</span>
+                                Edit
+                            </button>
+                            <button class="inline-flex items-center gap-1.5 rounded-xl border border-error/35 bg-error-container/10 px-3 py-2 font-label text-xs font-bold text-error transition hover:bg-error-container/25 hover:shadow-[0_0_18px_rgba(255,180,171,.16)]" type="button" data-inventory-delete="${escapeHTML(product.id)}" title="Delete ${escapeHTML(product.title)}">
+                                <span class="material-symbols-outlined text-[17px]">delete</span>
+                                Delete
+                            </button>
                         </div>
                     </td>
                 </tr>
