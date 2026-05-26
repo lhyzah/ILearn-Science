@@ -481,17 +481,17 @@
         </div>
     </div>
 
-    <div id="resource-preview-modal" class="fixed inset-0 z-[80] hidden items-center justify-center bg-surface-container-lowest/70 p-6 backdrop-blur-md">
-        <div class="glass-panel relative w-full max-w-3xl overflow-hidden rounded-2xl border-primary/30 shadow-[0_0_35px_rgba(0,212,255,0.22)]">
+    <div id="resource-preview-modal" class="fixed inset-0 z-[80] hidden items-center justify-center bg-surface-container-lowest/70 p-4 backdrop-blur-md md:p-6">
+        <div class="glass-panel relative flex max-h-[calc(100vh-2rem)] w-full max-w-5xl flex-col overflow-y-auto rounded-2xl border-primary/30 shadow-[0_0_35px_rgba(0,212,255,0.22)]">
             <button id="resource-preview-close" class="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-high/90 text-on-surface-variant transition-colors hover:text-primary" type="button" aria-label="Close preview">
                 <span class="material-symbols-outlined">close</span>
             </button>
-            <div class="grid grid-cols-1 md:grid-cols-2">
-                <div class="relative min-h-[280px] overflow-hidden">
-                    <img id="resource-preview-image" class="h-full w-full object-cover" alt="">
+            <div class="grid min-h-0 grid-cols-1 md:grid-cols-2">
+                <div class="relative flex min-h-[260px] items-center justify-center overflow-hidden bg-surface-container-lowest/70 p-4 md:min-h-[520px]">
+                    <img id="resource-preview-image" class="max-h-[42vh] w-full object-contain md:max-h-[calc(100vh-8rem)]" alt="">
                     <div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent md:bg-gradient-to-r"></div>
                 </div>
-                <div class="flex flex-col justify-center p-8">
+                <div class="flex flex-col justify-center p-6 md:p-8">
                     <span id="resource-preview-type" class="mb-4 w-fit rounded bg-primary-container px-3 py-1 font-label text-xs font-bold text-on-primary-container shadow-[0_0_12px_rgba(0,212,255,0.35)]"></span>
                     <h3 id="resource-preview-title" class="font-headline text-3xl font-semibold text-on-surface"></h3>
                     <div class="mt-4 grid grid-cols-2 gap-3">
