@@ -317,7 +317,14 @@
                     </div>
                     <div class="mobile-scroll flex w-full gap-2 overflow-x-auto pb-2 md:w-auto">
                         @foreach (['All', 'PPT Templates', 'Worksheets', 'Visual Resources', 'Test and Quizzes', 'Study Guides'] as $category)
-                            <button class="glass-panel whitespace-nowrap rounded-full px-4 py-2 font-label text-xs text-on-surface-variant transition-all hover:border-primary/50 {{ $loop->first ? 'text-primary' : '' }}">{{ $category }}</button>
+                            <button
+                                class="resource-category-filter glass-panel whitespace-nowrap rounded-full px-4 py-2 font-label text-xs transition-all hover:border-primary/50 {{ $loop->first ? 'border-primary/40 bg-primary-container/10 text-primary shadow-[0_0_15px_rgba(60,215,255,0.18)]' : 'text-on-surface-variant' }}"
+                                type="button"
+                                data-resource-category="{{ $category }}"
+                                aria-pressed="{{ $loop->first ? 'true' : 'false' }}"
+                            >
+                                {{ $category }}
+                            </button>
                         @endforeach
                     </div>
                 </div>
@@ -551,6 +558,9 @@
         const productsEndpoint = '{{ route('products.index') }}';
         const productSyncChannel = 'BroadcastChannel' in window ? new BroadcastChannel('ilearn-products-sync') : null;
         const homeResourceGrid = document.getElementById('home-resource-grid');
+        const resourceCategoryButtons = document.querySelectorAll('.resource-category-filter');
+        let currentHomeProducts = [];
+        let currentHomeCategory = 'All';
 
         function getCartItems() {
             if (window.iLearnAuth?.getCartItems) return window.iLearnAuth.getCartItems();
@@ -663,6 +673,41 @@
             window.iLearnAuth?.syncProductsToCatalogue?.(products);
         }
 
+        function canonicalResourceCategory(product) {
+            const combined = [
+                product.category,
+                product.type,
+                product.productType,
+                product.format,
+                product.title,
+            ].filter(Boolean).join(' ').toLowerCase();
+
+            if (/(ppt|pptx|powerpoint|presentation|slide|template)/.test(combined)) return 'PPT Templates';
+            if (/(worksheet|activity sheet|practice sheet|handout|printable)/.test(combined)) return 'Worksheets';
+            if (/(visual|diagram|chart|infographic|poster|image|illustration|model|map)/.test(combined)) return 'Visual Resources';
+            if (/(test|quiz|assessment|exam|question bank|reviewer)/.test(combined)) return 'Test and Quizzes';
+            if (/(study guide|guide|lesson guide|reference|module|reading)/.test(combined)) return 'Study Guides';
+
+            return product.category || product.type || 'Digital Resources';
+        }
+
+        function matchesResourceCategory(product, category) {
+            return category === 'All' || canonicalResourceCategory(product) === category;
+        }
+
+        function setActiveResourceCategory(category) {
+            currentHomeCategory = category;
+            resourceCategoryButtons.forEach((button) => {
+                const isActive = button.dataset.resourceCategory === category;
+                button.setAttribute('aria-pressed', String(isActive));
+                button.classList.toggle('border-primary/40', isActive);
+                button.classList.toggle('bg-primary-container/10', isActive);
+                button.classList.toggle('text-primary', isActive);
+                button.classList.toggle('shadow-[0_0_15px_rgba(60,215,255,0.18)]', isActive);
+                button.classList.toggle('text-on-surface-variant', !isActive);
+            });
+        }
+
         function homeProductCard(product) {
             const normalized = normalizeProductForSearch({
                 id: product.id,
@@ -709,14 +754,16 @@
             if (!source) {
                 try { source = JSON.parse(localStorage.getItem(inventoryStorageKey) || '[]') || []; } catch { source = []; }
             }
+            currentHomeProducts = activeInventoryProducts(source);
             const cards = activeInventoryProducts(source)
+                .filter((product) => matchesResourceCategory(product, currentHomeCategory))
                 .map(homeProductCard)
                 .join('');
             homeResourceGrid.innerHTML = cards || `
                 <div class="glass-panel col-span-full rounded-xl p-8 text-center text-on-surface-variant">
                     <span class="material-symbols-outlined mb-3 text-4xl text-primary">inventory_2</span>
-                    <p class="font-headline text-xl text-on-surface">No active resources yet</p>
-                    <p class="mt-2 text-sm">Add or publish products from the admin inventory and they will appear here.</p>
+                    <p class="font-headline text-xl text-on-surface">No ${escapeHTML(currentHomeCategory === 'All' ? 'active' : currentHomeCategory.toLowerCase())} resources yet</p>
+                    <p class="mt-2 text-sm">Add or publish products in this category from the admin inventory and they will appear here.</p>
                 </div>
             `;
             homeResourceGrid.querySelectorAll('.reveal').forEach((element) => element.classList.add('active'));
@@ -933,6 +980,13 @@
             document.querySelectorAll('.reveal').forEach((element) => revealObserver.observe(element));
 
             updateCartCount();
+
+            resourceCategoryButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    setActiveResourceCategory(button.dataset.resourceCategory || 'All');
+                    renderHomeAdminProducts(currentHomeProducts);
+                });
+            });
 
             homeResourceGrid?.addEventListener('click', (event) => {
                 const addButton = event.target.closest('.top-resource-add-to-cart');
