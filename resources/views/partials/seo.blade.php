@@ -3,7 +3,20 @@
     $seoTitle = $seoTitle ?? 'iLearn Science Resources | Digital Science Teaching Materials for Teachers';
     $seoDescription = $seoDescription ?? 'Download engaging science PowerPoint presentations, worksheets, quizzes, lesson plans, and digital teaching resources designed to help teachers prepare less and teach more.';
     $seoCanonical = $seoCanonical ?? url()->current();
-    $seoImage = $seoImage ?? asset('images/shop/photosynthesis-process-topic.svg');
+    $normalizeSeoImage = function ($image) {
+        $fallbackImage = asset('images/shop/photosynthesis-process-topic.svg');
+
+        if (! is_string($image) || $image === '' || str_starts_with($image, 'data:')) {
+            return $fallbackImage;
+        }
+
+        if (str_starts_with($image, 'http://') || str_starts_with($image, 'https://')) {
+            return $image;
+        }
+
+        return str_starts_with($image, '/') ? url($image) : asset($image);
+    };
+    $seoImage = $normalizeSeoImage($seoImage ?? asset('images/shop/photosynthesis-process-topic.svg'));
     $seoRobots = $seoRobots ?? 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
     $seoType = $seoType ?? 'website';
     $seoKeywords = $seoKeywords ?? 'science teaching resources, science PowerPoint presentations, printable science worksheets, digital learning materials, science lesson plans, educational science resources, classroom science activities, editable science presentations';
@@ -31,7 +44,23 @@
             ],
         ],
     ];
-    $jsonLd = array_merge($baseStructuredData, $structuredData);
+    $sanitizeSchemaImages = function ($value) use (&$sanitizeSchemaImages, $normalizeSeoImage) {
+        if (! is_array($value)) {
+            return $value;
+        }
+
+        foreach ($value as $key => $item) {
+            if (in_array($key, ['image', 'logo'], true) && is_string($item)) {
+                $value[$key] = $normalizeSeoImage($item);
+                continue;
+            }
+
+            $value[$key] = $sanitizeSchemaImages($item);
+        }
+
+        return $value;
+    };
+    $jsonLd = array_map($sanitizeSchemaImages, array_merge($baseStructuredData, $structuredData));
 @endphp
 
 <title>{{ $seoTitle }}</title>
