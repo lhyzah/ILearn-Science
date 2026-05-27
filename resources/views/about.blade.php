@@ -150,7 +150,6 @@
 
                 <div class="mt-6 px-4 text-[10px] font-bold uppercase tracking-widest text-slate-500">My Library</div>
                 @foreach ([
-                    ['inventory_2', 'My Resources'],
                     ['download', 'Downloads'],
                     ['local_mall', 'Purchased Materials'],
                     ['favorite', 'Saved Items'],
@@ -180,10 +179,6 @@
                 <a class="flex items-center gap-4 rounded-lg px-4 py-2.5 text-slate-400 transition-all hover:text-white" href="#">
                     <span class="material-symbols-outlined">settings</span>
                     <span class="text-sm">Settings</span>
-                </a>
-                <a class="mt-4 flex items-center gap-4 rounded-lg px-4 py-2.5 text-red-400 transition-all hover:bg-red-500/10" href="#">
-                    <span class="material-symbols-outlined">logout</span>
-                    <span class="text-sm font-medium">Logout</span>
                 </a>
             </div>
 
