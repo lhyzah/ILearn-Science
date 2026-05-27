@@ -35,6 +35,10 @@
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
     Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
 
+    SetEnvIfNoCase Request_URI "^/(products|blogs)/live" no_cache_feed=1
+    Header always unset Cache-Control env=no_cache_feed
+    Header always set Cache-Control "no-store, no-cache, must-revalidate, max-age=0" env=no_cache_feed
+
     <FilesMatch "\.(css|js|jpg|jpeg|png|gif|webp|svg|ico|woff2?)$">
         Header set Cache-Control "public, max-age=31536000, immutable"
     </FilesMatch>
