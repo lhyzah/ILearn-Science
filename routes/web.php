@@ -4,6 +4,7 @@ use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/sitemap.xml', [HomeController::class, 'sitemap'])->name('sitemap');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/blog', [HomeController::class, 'blog'])->name('blog');
 Route::get('/cart', [HomeController::class, 'cart'])->name('cart');
@@ -24,4 +25,5 @@ Route::get('/orders', [HomeController::class, 'orders'])->name('orders');
 Route::get('/order-success', [HomeController::class, 'orderSuccess'])->name('order-success');
 Route::get('/shop', [HomeController::class, 'shop'])->name('shop');
 Route::get('/resources/cell-biology-interactive-powerpoint', [HomeController::class, 'cellBiology'])->name('resources.cell-biology');
+Route::get('/resources/{id}', [HomeController::class, 'resourceShow'])->name('resources.show');
 Route::post('/generate', [HomeController::class, 'generate'])->name('generate');

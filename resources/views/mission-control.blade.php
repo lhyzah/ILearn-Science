@@ -104,7 +104,7 @@
     <div class="relative z-10 flex min-h-screen">
         <aside class="sticky top-0 hidden h-screen w-64 flex-col gap-2 border-r border-white/5 bg-surface-container/40 py-unit shadow-[5px_0_20px_rgba(0,0,0,0.5)] backdrop-blur-lg md:flex">
             <div class="px-6 py-8">
-                <img alt="iLearn Science Logo" class="mb-4 h-12 w-12 drop-shadow-[0_0_10px_rgba(0,212,255,0.3)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdi3U_a4kDUWzM_GHVgoWPwSxV_M0ArKwoQykrKrEziRIuMX3p2abCzGsYcoWoIpna4dwzvhq7nLNvwi8t7u6DcrAEKZZc1Gp2BciMVcAEu3_ZcGQa4tqO02rgDe8NFfaJIseT9OfJLBYWGVObfofXyxkK90T7oAMAewcO__WwuipwraLEJ34ebshwYyCLkPQvkm7cb3cnm5-OKB8W7OP1E_6LNNJBWEoxRNuSTxNlUl_ktkOG_v6eL5VkkDcenLm4N-WVu8zoDAs">
+                <img loading="lazy" decoding="async" alt="iLearn Science Logo" class="mb-4 h-12 w-12 drop-shadow-[0_0_10px_rgba(0,212,255,0.3)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdi3U_a4kDUWzM_GHVgoWPwSxV_M0ArKwoQykrKrEziRIuMX3p2abCzGsYcoWoIpna4dwzvhq7nLNvwi8t7u6DcrAEKZZc1Gp2BciMVcAEu3_ZcGQa4tqO02rgDe8NFfaJIseT9OfJLBYWGVObfofXyxkK90T7oAMAewcO__WwuipwraLEJ34ebshwYyCLkPQvkm7cb3cnm5-OKB8W7OP1E_6LNNJBWEoxRNuSTxNlUl_ktkOG_v6eL5VkkDcenLm4N-WVu8zoDAs">
                 <h1 class="font-headline text-2xl font-bold tracking-tight text-primary">iLearn Science</h1>
                 <p class="mt-1 font-label text-xs uppercase tracking-widest opacity-50">Navigation Cluster</p>
             </div>
@@ -134,7 +134,7 @@
 
             <div class="mt-auto p-4">
                 <div class="glass-panel flex items-center gap-3 rounded-xl border border-primary/20 p-4">
-                    <img alt="Commander Smith" class="h-10 w-10 rounded-full border-2 border-primary object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUTwV5yFGVIt6ma5k8S7LdzS4YImHgh5MO3b7RfPp5WYRKIPInyV37JX3sdgrdWGvWlLNyNVvUKTMUtVdkaCwvT8LfWP8-Bwt8KEshJ047r1Bzu9ZFMQx_WecO_ou2P0QvyEb6spMlD9In95ETaRwqwdZcB1gBeTcZmLVhp12QVLTIEop1zlv5yj-sXn78h829PN_tONnXOC9FcRqYC4Q-hroHVj1qKDOx3E_GYodmqqunC8rcfMQeCybZKBDPqZqNmwQJkXQtRJk">
+                    <img loading="lazy" decoding="async" alt="Commander Smith" class="h-10 w-10 rounded-full border-2 border-primary object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUTwV5yFGVIt6ma5k8S7LdzS4YImHgh5MO3b7RfPp5WYRKIPInyV37JX3sdgrdWGvWlLNyNVvUKTMUtVdkaCwvT8LfWP8-Bwt8KEshJ047r1Bzu9ZFMQx_WecO_ou2P0QvyEb6spMlD9In95ETaRwqwdZcB1gBeTcZmLVhp12QVLTIEop1zlv5yj-sXn78h829PN_tONnXOC9FcRqYC4Q-hroHVj1qKDOx3E_GYodmqqunC8rcfMQeCybZKBDPqZqNmwQJkXQtRJk">
                     <div>
                         <p class="font-bold text-on-surface">Commander Smith</p>
                         <p class="text-xs opacity-60">Mission Specialist</p>
@@ -151,7 +151,7 @@
             <header class="sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b border-white/10 bg-surface/80 px-4 shadow-[0_0_15px_rgba(168,232,255,0.1)] backdrop-blur-xl md:px-margin-desktop">
                 <a class="flex items-center gap-4" href="{{ route('home') }}">
                     <span class="material-symbols-outlined cursor-pointer text-primary md:hidden">menu</span>
-                    <img alt="iLearn Science Logo" class="h-8 w-8 object-contain md:h-10 md:w-10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdi3U_a4kDUWzM_GHVgoWPwSxV_M0ArKwoQykrKrEziRIuMX3p2abCzGsYcoWoIpna4dwzvhq7nLNvwi8t7u6DcrAEKZZc1Gp2BciMVcAEu3_ZcGQa4tqO02rgDe8NFfaJIseT9OfJLBYWGVObfofXyxkK90T7oAMAewcO__WwuipwraLEJ34ebshwYyCLkPQvkm7cb3cnm5-OKB8W7OP1E_6LNNJBWEoxRNuSTxNlUl_ktkOG_v6eL5VkkDcenLm4N-WVu8zoDAs">
+                    <img loading="lazy" decoding="async" alt="iLearn Science Logo" class="h-8 w-8 object-contain md:h-10 md:w-10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdi3U_a4kDUWzM_GHVgoWPwSxV_M0ArKwoQykrKrEziRIuMX3p2abCzGsYcoWoIpna4dwzvhq7nLNvwi8t7u6DcrAEKZZc1Gp2BciMVcAEu3_ZcGQa4tqO02rgDe8NFfaJIseT9OfJLBYWGVObfofXyxkK90T7oAMAewcO__WwuipwraLEJ34ebshwYyCLkPQvkm7cb3cnm5-OKB8W7OP1E_6LNNJBWEoxRNuSTxNlUl_ktkOG_v6eL5VkkDcenLm4N-WVu8zoDAs">
                     <span class="font-headline text-2xl font-bold tracking-tight text-primary">iLearn Science</span>
                 </a>
                 <div class="mx-8 hidden max-w-md flex-1 sm:block">
@@ -207,7 +207,7 @@
 
                     <aside class="lg:col-span-4">
                         <div class="glass-panel group relative h-full overflow-hidden rounded-2xl">
-                            <img alt="Earth from orbit" class="h-48 w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCv9Nl3tqPm1tCwM9kzYwkUZWcrvPKs8aLoeJ2odD4vZnNwvi1fKHGLEQsgUwF4J5k9eZ0e5SB70jNceDh_8SU8NfM8mWUWlsya8nsJF6gxMmEqkdz8px1DJDCBVOQjiFhzMJv6Zkmyc56AKReLo-di19eZho1rDjRMuNtKZCA_GxfwY9CGUwJHC9BZITZUG97oqE-Cy6dbAWwNbNZsB8XIJ0rZH9Ks5zrW9LwbdHhqr8PbBIc4f1QQ_9oulOEtUWUPZnjH17bIJoc">
+                            <img loading="lazy" decoding="async" alt="Earth from orbit" class="h-48 w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCv9Nl3tqPm1tCwM9kzYwkUZWcrvPKs8aLoeJ2odD4vZnNwvi1fKHGLEQsgUwF4J5k9eZ0e5SB70jNceDh_8SU8NfM8mWUWlsya8nsJF6gxMmEqkdz8px1DJDCBVOQjiFhzMJv6Zkmyc56AKReLo-di19eZho1rDjRMuNtKZCA_GxfwY9CGUwJHC9BZITZUG97oqE-Cy6dbAWwNbNZsB8XIJ0rZH9Ks5zrW9LwbdHhqr8PbBIc4f1QQ_9oulOEtUWUPZnjH17bIJoc">
                             <div class="p-6">
                                 <div class="mb-4 flex items-center gap-4">
                                     <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 text-primary">
@@ -246,7 +246,7 @@
                         @foreach ($resources as [$title, $meta, $type, $image])
                             <article class="glass-panel glow-border group overflow-hidden rounded-2xl transition-all">
                                 <div class="relative h-48 overflow-hidden">
-                                    <img alt="{{ $title }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" src="{{ $image }}">
+                                    <img loading="lazy" decoding="async" alt="{{ $title }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" src="{{ $image }}">
                                     <span class="absolute left-3 top-3 rounded-full border border-primary/20 bg-surface/80 px-3 py-1 text-xs text-primary backdrop-blur-md">{{ $type }}</span>
                                 </div>
                                 <div class="p-6">
@@ -311,7 +311,7 @@
                         <div class="-mx-2 flex gap-6 overflow-x-auto px-2 pb-6 scroll-smooth">
                             @foreach ([['Astrophysics Basics', '₱12.00', 'https://lh3.googleusercontent.com/aida-public/AB6AXuBb6FKiPZoCpP8IrnOU8jUhMfQzNHGb2aAPPerRQftL9nF4PP90AuT8woLbzalh33QGFqbFtYJZZeONSClrXQ8zF6_gqnD0yJLUxFBBGZ-yJUX7KHd6Y_-pzZ4EDqqXUb2IcWYO0X5wiRoq2J9r1l2JbdUDt1-dALf1wPzjOMhhHtQ7EKdmOolt5D7YAWnD6mGMB506iB2PKxv6sC8G2uKBGxT4gO-FbuieYzYBPJCpZEsKKRvI1pdS_6Jx3InWOqLRak7pOQIBXLk'], ['Genetics Mastery', '₱24.00', 'https://lh3.googleusercontent.com/aida-public/AB6AXuAZBMYNDXcOHEDnSv8aUbarKS9z-gDUK5nWzUl-CE8CXF46HW-YUafVsOhoheg7FBjLs_Bu2Nkx2TEX7j6aTlh85EHlCOL4bSFOinoye7AP0K7l3SiDtKSzlnbZ4wgnJmHGgD5VUBCGCg-8_Y1I1yvzgDA25FyHS9ffdzzyjNwvuHMwOCs8EXmuTh_vAh5XKS53qMlrryJ9EuJkOnUyBI9ZeOmusks8xeXrdgP2xMgSh4uV6F0bOXrD4rRjAFQXk1Rs3a8C7zF4bmE'], ['Optics & Light Lab', '₱18.50', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCoA-9GetPiOWxauriAG3FmKxMKNChdC7ebs1i7YOS1DOIGbDkhm6qOU6OE2x2cuNzWOoLhIFqEFDYKoX-TrLyxIM5zG-umn48146SLELO5kUiQqfIeaZcmzdJZQg2_sIFXp7ZqOGnKioNOSx0pSoQim7SUUmnKg54XOCNtSmSfUk7Lz7XAkksEJF7EFdFTAXlvUfhYfKYedWpBmp_aqaUT7yiGd9L6ACIZ-EI2rixKFTi7F2RlPr8yOO1wHLsIxDwtGx0AD0huRmc']] as [$title, $price, $image])
                                 <article class="glass-panel glow-border group w-64 flex-shrink-0 overflow-hidden rounded-2xl">
-                                    <img alt="{{ $title }}" class="h-32 w-full object-cover" src="{{ $image }}">
+                                    <img loading="lazy" decoding="async" alt="{{ $title }}" class="h-32 w-full object-cover" src="{{ $image }}">
                                     <div class="p-4">
                                         <h4 class="line-clamp-1 font-bold text-on-surface">{{ $title }}</h4>
                                         <div class="mt-4 flex items-center justify-between">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -320,7 +321,11 @@ class HomeController extends Controller
 
     public function index()
     {
-        return view('home');
+        $products = $this->readProducts();
+
+        return view('home', [
+            'seoProducts' => $products,
+        ]);
     }
 
     public function about()
@@ -330,7 +335,9 @@ class HomeController extends Controller
 
     public function blog()
     {
-        return view('blog');
+        return view('blog', [
+            'seoPosts' => $this->readBlogPosts(),
+        ]);
     }
 
     public function cart()
@@ -597,12 +604,81 @@ class HomeController extends Controller
 
     public function shop()
     {
-        return view('shop');
+        return view('shop', [
+            'seoProducts' => $this->readProducts(),
+        ]);
     }
 
     public function cellBiology()
     {
-        return view('resources.cell-biology');
+        return view('resources.cell-biology', [
+            'seoProduct' => collect($this->readProducts())->firstWhere('id', 'cell-biology-interactive-powerpoint'),
+        ]);
+    }
+
+    public function resourceShow(string $id)
+    {
+        $product = collect($this->readProducts())->first(fn ($item) => ($item['id'] ?? '') === $id);
+
+        abort_unless($product, 404);
+
+        if ($id === 'cell-biology-interactive-powerpoint') {
+            return $this->cellBiology();
+        }
+
+        return view('resources.show', [
+            'product' => $product,
+            'relatedProducts' => collect($this->readProducts())
+                ->filter(fn ($item) => ($item['id'] ?? '') !== $id && in_array(strtolower($item['status'] ?? 'published'), ['published', 'active'], true))
+                ->take(3)
+                ->values(),
+        ]);
+    }
+
+    public function sitemap()
+    {
+        $urls = collect([
+            ['loc' => route('home'), 'priority' => '1.0', 'changefreq' => 'daily'],
+            ['loc' => route('shop'), 'priority' => '0.9', 'changefreq' => 'daily'],
+            ['loc' => route('blog'), 'priority' => '0.8', 'changefreq' => 'weekly'],
+            ['loc' => route('about'), 'priority' => '0.7', 'changefreq' => 'monthly'],
+            ['loc' => route('resources.cell-biology'), 'priority' => '0.85', 'changefreq' => 'weekly'],
+        ]);
+
+        $productUrls = collect($this->readProducts())
+            ->filter(fn ($product) => in_array(strtolower($product['status'] ?? 'published'), ['published', 'active'], true))
+            ->map(fn ($product) => [
+                'loc' => route('resources.show', $product['id'] ?? Str::slug($product['title'] ?? 'resource')),
+                'priority' => '0.8',
+                'changefreq' => 'weekly',
+                'lastmod' => $product['updatedAt'] ?? now()->toAtomString(),
+            ]);
+
+        $blogUrls = collect($this->readBlogPosts())
+            ->filter(fn ($post) => in_array(strtolower($post['status'] ?? 'published'), ['published', 'active'], true))
+            ->map(fn ($post) => [
+                'loc' => route('blog') . '#post-' . Str::slug($post['slug'] ?? $post['id'] ?? $post['title'] ?? 'article'),
+                'priority' => '0.65',
+                'changefreq' => 'monthly',
+                'lastmod' => $post['updatedAt'] ?? $post['publishedAt'] ?? now()->toAtomString(),
+            ]);
+
+        $sitemapUrls = $urls->merge($productUrls)->merge($blogUrls)->unique('loc')->values();
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
+
+        foreach ($sitemapUrls as $url) {
+            $xml .= '    <url>' . PHP_EOL;
+            $xml .= '        <loc>' . e($url['loc']) . '</loc>' . PHP_EOL;
+            $xml .= '        <lastmod>' . e(Carbon::parse($url['lastmod'] ?? now())->toAtomString()) . '</lastmod>' . PHP_EOL;
+            $xml .= '        <changefreq>' . e($url['changefreq']) . '</changefreq>' . PHP_EOL;
+            $xml .= '        <priority>' . e($url['priority']) . '</priority>' . PHP_EOL;
+            $xml .= '    </url>' . PHP_EOL;
+        }
+
+        $xml .= '</urlset>';
+
+        return response($xml, 200)->header('Content-Type', 'application/xml');
     }
 
     public function generate(Request $request)

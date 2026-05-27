@@ -3,7 +3,30 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>iLearn Science - Blog</title>
+    @include('partials.seo', [
+        'seoTitle' => 'Science Teaching Blog | Classroom Activities, Worksheets and Lesson Ideas',
+        'seoDescription' => 'Read science teaching strategies, classroom activity ideas, digital resource guides, biology lessons, worksheet tips, and practical support for science teachers.',
+        'seoCanonical' => route('blog'),
+        'seoImage' => asset('images/shop/digestive-system-topic.svg'),
+        'structuredData' => [
+            [
+                ('@' . 'context') => 'https://schema.org',
+                '@type' => 'Blog',
+                'name' => 'iLearn Science Teaching Blog',
+                'url' => route('blog'),
+                'blogPost' => collect($seoPosts ?? [])->take(10)->map(fn ($post) => [
+                    '@type' => 'BlogPosting',
+                    'headline' => $post['title'] ?? 'Science teaching article',
+                    'description' => $post['meta'] ?? 'Science teaching tips and classroom resources.',
+                    'image' => $post['image'] ?? asset('images/shop/digestive-system-topic.svg'),
+                    'datePublished' => $post['publishedAt'] ?? $post['updatedAt'] ?? now()->toAtomString(),
+                    'dateModified' => $post['updatedAt'] ?? now()->toAtomString(),
+                    'author' => ['@type' => 'Organization', 'name' => 'iLearn Science Resources'],
+                    'mainEntityOfPage' => route('blog') . '#post-' . \Illuminate\Support\Str::slug($post['slug'] ?? $post['title'] ?? 'article'),
+                ])->values()->all(),
+            ],
+        ],
+    ])
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -91,7 +114,7 @@
     <header class="sticky top-0 z-50 border-b border-primary/10 bg-surface/75 backdrop-blur-2xl">
         <nav class="mx-auto flex max-w-container-max items-center justify-between gap-4 px-4 py-4 lg:px-8">
             <a class="flex items-center gap-3" href="{{ route('home') }}">
-                <img alt="iLearn Science Logo" class="h-11 w-11 rounded-full border border-primary/20 object-contain shadow-[0_0_16px_rgba(60,215,255,.2)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRlFDOjxkn2sD8rhXX_C9oZtkMTA0F2zIbuZyG9wIVQvasApaG3RmYgyG2Pvp2jL5OiIRqxkIx75Tsq4ci10yb8-EExxTPy1tjBBGxv1_B3mcIr9zJxx3s_rlbkerqWnrBAlY0nMbog5hJGyrtHKkEW2ogz66o1R7h0OAPWRoU3Y4Dy9K6RZJItpyPL-ZXT9Xn5m73Ru9ye9BaZqOLXhg7JJvqaSDws24wBFWt5ncypHJMLUZ0mtJgObLNXtQbZinBc0Bg4jGSDVg">
+                <img loading="lazy" decoding="async" alt="iLearn Science Logo" class="h-11 w-11 rounded-full border border-primary/20 object-contain shadow-[0_0_16px_rgba(60,215,255,.2)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRlFDOjxkn2sD8rhXX_C9oZtkMTA0F2zIbuZyG9wIVQvasApaG3RmYgyG2Pvp2jL5OiIRqxkIx75Tsq4ci10yb8-EExxTPy1tjBBGxv1_B3mcIr9zJxx3s_rlbkerqWnrBAlY0nMbog5hJGyrtHKkEW2ogz66o1R7h0OAPWRoU3Y4Dy9K6RZJItpyPL-ZXT9Xn5m73Ru9ye9BaZqOLXhg7JJvqaSDws24wBFWt5ncypHJMLUZ0mtJgObLNXtQbZinBc0Bg4jGSDVg">
                 <span class="font-headline text-xl font-bold text-primary md:text-2xl">iLearn Science</span>
             </a>
             <div class="flex items-center gap-2">
@@ -112,14 +135,14 @@
             <div>
                 <p class="font-label text-xs uppercase tracking-[0.36em] text-primary">Customer Reading Hub</p>
                 <h1 class="mt-4 font-headline text-4xl font-extrabold leading-tight text-on-surface md:text-6xl">Science teaching ideas, classroom guides, and resource spotlights.</h1>
-                <p class="mt-5 max-w-2xl text-lg leading-8 text-on-surface-variant">Read practical science articles made for teachers, students, and parents. Blog management and publishing tools stay private inside the admin dashboard.</p>
+                <p class="mt-5 max-w-2xl text-lg leading-8 text-on-surface-variant">Read practical science articles made for teachers, students, and parents, with classroom strategies, activity ideas, and resource guides for modern lessons.</p>
                 <div class="mt-7 flex flex-wrap gap-3">
                     <a class="rounded-xl bg-primary-container px-5 py-3 font-label text-sm font-bold text-on-primary shadow-[0_0_20px_rgba(0,212,255,.32)] transition-all hover:scale-[1.02]" href="#latest-posts">Read Latest Posts</a>
                     <a class="rounded-xl border border-primary/35 px-5 py-3 font-label text-sm text-primary transition-all hover:bg-primary/10" href="{{ route('shop') }}">Explore Resources</a>
                 </div>
             </div>
             <article class="glass-panel overflow-hidden rounded-3xl">
-                <img alt="Students exploring science resources" class="h-80 w-full object-cover opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeA7aDCt1BhhNA6WQB-EGoUJittQ_zWiHMhgO7UPQFu7ewJlQywHQ2i9svSlMorENGTB4OXPPtG55T78teaOLzwgFzwc-rXcBlrY9S7EriKVyoAMS_0W1w8Bm-UMKPwrjdaX4C3T5Y8jMLETbi5n1naMUsffVmwTf3I2gaYr3_wzuw5_glmvYgGz7MSRbhMdOTObD3QzMyx02dZ4UVVpX67_pEhFd3iPZcf5NVpVESqINm3KdWCrlz5nViUL_8oe1G-y2p3r4ur3I">
+                <img loading="lazy" decoding="async" alt="Students exploring science resources" class="h-80 w-full object-cover opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeA7aDCt1BhhNA6WQB-EGoUJittQ_zWiHMhgO7UPQFu7ewJlQywHQ2i9svSlMorENGTB4OXPPtG55T78teaOLzwgFzwc-rXcBlrY9S7EriKVyoAMS_0W1w8Bm-UMKPwrjdaX4C3T5Y8jMLETbi5n1naMUsffVmwTf3I2gaYr3_wzuw5_glmvYgGz7MSRbhMdOTObD3QzMyx02dZ4UVVpX67_pEhFd3iPZcf5NVpVESqINm3KdWCrlz5nViUL_8oe1G-y2p3r4ur3I">
                 <div class="p-6">
                     <span class="inline-flex rounded-full border border-primary/25 bg-primary-container/10 px-3 py-1 font-label text-xs text-primary">Featured</span>
                     <h2 class="mt-4 font-headline text-2xl font-bold">How to Turn Digital Science Resources Into Active Learning Missions</h2>
@@ -148,7 +171,7 @@
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4" id="public-blog-grid">
                 @foreach ($posts as [$title, $summary, $tag, $time, $image])
                     <article class="glass-panel glow-hover overflow-hidden rounded-3xl">
-                        <img alt="{{ $title }}" class="h-44 w-full object-cover opacity-85" src="{{ $image }}">
+                        <img loading="lazy" decoding="async" alt="{{ $title }}" class="h-44 w-full object-cover opacity-85" src="{{ $image }}">
                         <div class="p-5">
                             <div class="flex items-center justify-between gap-3">
                                 <span class="rounded-full border border-primary/25 bg-primary-container/10 px-3 py-1 font-label text-[11px] text-primary">{{ $tag }}</span>
@@ -169,7 +192,7 @@
 
     <div class="fixed inset-0 z-[70] hidden items-center justify-center bg-surface-container-lowest/70 p-4 backdrop-blur-xl" id="blog-reader-modal">
         <article class="glass-panel max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl">
-            <img alt="" class="h-64 w-full object-cover opacity-85" id="blog-reader-image" src="">
+            <img loading="lazy" decoding="async" alt="Science teaching blog featured image" class="h-64 w-full object-cover opacity-85" id="blog-reader-image" src="">
             <div class="p-6 md:p-8">
                 <div class="mb-4 flex items-center justify-between gap-4">
                     <span class="rounded-full border border-primary/25 bg-primary-container/10 px-3 py-1 font-label text-xs text-primary" id="blog-reader-category"></span>
@@ -294,7 +317,7 @@
 
             grid.innerHTML = published.map((post) => `
                 <article class="glass-panel glow-hover overflow-hidden rounded-3xl">
-                    <img alt="${escapeHtml(post.title)}" class="h-44 w-full object-cover opacity-85" src="${escapeHtml(post.image || defaultBlogImage)}">
+                    <img loading="lazy" decoding="async" alt="${escapeHtml(post.title)}" class="h-44 w-full object-cover opacity-85" src="${escapeHtml(post.image || defaultBlogImage)}">
                     <div class="p-5">
                         <div class="flex items-center justify-between gap-3">
                             <span class="rounded-full border border-primary/25 bg-primary-container/10 px-3 py-1 font-label text-[11px] text-primary">${escapeHtml(post.category || 'Science')}</span>

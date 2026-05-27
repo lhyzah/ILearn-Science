@@ -132,7 +132,7 @@
 <body class="custom-scrollbar font-body text-on-surface antialiased">
     <header class="fixed top-0 z-50 flex h-16 w-full items-center justify-between border-b border-white/10 bg-surface-dim/80 px-4 shadow-[0_0_15px_rgba(168,232,255,0.1)] backdrop-blur-xl md:px-margin-desktop">
         <a class="flex items-center gap-3 transition-transform hover:scale-[1.02] active:scale-95" href="{{ route('home') }}" aria-label="Go to iLearn Science home page">
-            <img alt="iLearn Science Logo" class="h-11 w-11 rounded-full border border-primary/20 object-contain shadow-[0_0_12px_rgba(60,215,255,0.25)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRlFDOjxkn2sD8rhXX_C9oZtkMTA0F2zIbuZyG9wIVQvasApaG3RmYgyG2Pvp2jL5OiIRqxkIx75Tsq4ci10yb8-EExxTPy1tjBBGxv1_B3mcIr9zJxx3s_rlbkerqWnrBAlY0nMbog5hJGyrtHKkEW2ogz66o1R7h0OAPWRoU3Y4Dy9K6RZJItpyPL-ZXT9Xn5m73Ru9ye9BaZqOLXhg7JJvqaSDws24wBFWt5ncypHJMLUZ0mtJgObLNXtQbZinBc0Bg4jGSDVg">
+            <img loading="lazy" decoding="async" alt="iLearn Science Logo" class="h-11 w-11 rounded-full border border-primary/20 object-contain shadow-[0_0_12px_rgba(60,215,255,0.25)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRlFDOjxkn2sD8rhXX_C9oZtkMTA0F2zIbuZyG9wIVQvasApaG3RmYgyG2Pvp2jL5OiIRqxkIx75Tsq4ci10yb8-EExxTPy1tjBBGxv1_B3mcIr9zJxx3s_rlbkerqWnrBAlY0nMbog5hJGyrtHKkEW2ogz66o1R7h0OAPWRoU3Y4Dy9K6RZJItpyPL-ZXT9Xn5m73Ru9ye9BaZqOLXhg7JJvqaSDws24wBFWt5ncypHJMLUZ0mtJgObLNXtQbZinBc0Bg4jGSDVg">
             <span class="font-headline text-2xl font-bold tracking-tight text-primary">iLearn Science</span>
         </a>
         <div class="flex items-center gap-6">
@@ -147,7 +147,7 @@
                     <p class="font-label text-[10px] text-on-surface-variant">CHIEF EXPLORER</p>
                 </div>
                 <div class="h-10 w-10 overflow-hidden rounded-full border border-primary-container/30">
-                    <img alt="Profile" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3XNKjUJ7YMCovYbY9ONdXA4LRDTjeEpLYTkl1xLQsVawE48iHsZFhGCIqzz10uXm8mhrWX8hjM_yp_U4pyAFsVK3Xv3csT4gy0fLx6lXr8U8EB0J-yBj2FCFF5Q-BcVb-T64N6atCbVUW4BFiKxzr3Ix2bptXvH1qjsaa86ROrU2VXToku2_oX8PtfC3TNDLOBUX-tOYN9furyFw27MbTbvQ8fLzMx9V9sw-2rChwzbvt2n5UKlw1XKGIfwuWO6wsIMfTUcZ2O2g">
+                    <img loading="lazy" decoding="async" alt="Profile" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3XNKjUJ7YMCovYbY9ONdXA4LRDTjeEpLYTkl1xLQsVawE48iHsZFhGCIqzz10uXm8mhrWX8hjM_yp_U4pyAFsVK3Xv3csT4gy0fLx6lXr8U8EB0J-yBj2FCFF5Q-BcVb-T64N6atCbVUW4BFiKxzr3Ix2bptXvH1qjsaa86ROrU2VXToku2_oX8PtfC3TNDLOBUX-tOYN9furyFw27MbTbvQ8fLzMx9V9sw-2rChwzbvt2n5UKlw1XKGIfwuWO6wsIMfTUcZ2O2g">
                 </div>
             </div>
         </div>
@@ -273,7 +273,7 @@
                         <div class="group mt-8 cursor-pointer rounded-2xl border-2 border-dashed border-white/10 bg-white/5 p-8 text-center transition-all hover:border-primary-container/50" id="blog-visual-dropzone">
                             <input class="hidden" id="blog-visual-file" type="file" accept="image/png,image/jpeg,image/gif,image/webp">
                             <div class="hidden overflow-hidden rounded-xl border border-primary/20 bg-surface-container-high" id="blog-visual-preview-wrap">
-                                <img alt="Selected mission visual preview" class="h-56 w-full object-cover" id="blog-visual-preview" src="">
+                                <img loading="lazy" decoding="async" alt="Selected mission visual preview" class="h-56 w-full object-cover" id="blog-visual-preview" src="">
                             </div>
                             <div id="blog-visual-empty">
                                 <span class="material-symbols-outlined mb-4 text-4xl text-on-surface-variant transition-colors group-hover:text-primary">cloud_upload</span>
@@ -608,7 +608,7 @@
                 return `
                     <article class="group flex items-center gap-4 rounded-xl border p-4 transition-all ${activeClass}">
                         <div class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-surface-container-high">
-                            <img alt="${escapeHtml(post.title)}" class="h-full w-full object-cover" src="${escapeHtml(post.image || defaultBlogImage)}">
+                            <img loading="lazy" decoding="async" alt="${escapeHtml(post.title)}" class="h-full w-full object-cover" src="${escapeHtml(post.image || defaultBlogImage)}">
                         </div>
                         <div class="min-w-0 flex-1">
                             <h4 class="truncate font-headline text-lg text-on-surface transition-colors group-hover:text-primary">${escapeHtml(post.title || 'Untitled Post')}</h4>

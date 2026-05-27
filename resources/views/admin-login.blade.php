@@ -114,7 +114,7 @@
 
     <header class="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-5 py-5 md:px-8">
         <a class="flex items-center gap-3" href="{{ route('home') }}">
-            <img alt="iLearn Science Logo" class="h-11 w-11 rounded-full border border-primary/25 object-contain shadow-[0_0_18px_rgba(60,215,255,.24)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRlFDOjxkn2sD8rhXX_C9oZtkMTA0F2zIbuZyG9wIVQvasApaG3RmYgyG2Pvp2jL5OiIRqxkIx75Tsq4ci10yb8-EExxTPy1tjBBGxv1_B3mcIr9zJxx3s_rlbkerqWnrBAlY0nMbog5hJGyrtHKkEW2ogz66o1R7h0OAPWRoU3Y4Dy9K6RZJItpyPL-ZXT9Xn5m73Ru9ye9BaZqOLXhg7JJvqaSDws24wBFWt5ncypHJMLUZ0mtJgObLNXtQbZinBc0Bg4jGSDVg">
+            <img loading="lazy" decoding="async" alt="iLearn Science Logo" class="h-11 w-11 rounded-full border border-primary/25 object-contain shadow-[0_0_18px_rgba(60,215,255,.24)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRlFDOjxkn2sD8rhXX_C9oZtkMTA0F2zIbuZyG9wIVQvasApaG3RmYgyG2Pvp2jL5OiIRqxkIx75Tsq4ci10yb8-EExxTPy1tjBBGxv1_B3mcIr9zJxx3s_rlbkerqWnrBAlY0nMbog5hJGyrtHKkEW2ogz66o1R7h0OAPWRoU3Y4Dy9K6RZJItpyPL-ZXT9Xn5m73Ru9ye9BaZqOLXhg7JJvqaSDws24wBFWt5ncypHJMLUZ0mtJgObLNXtQbZinBc0Bg4jGSDVg">
             <span class="font-headline text-xl font-bold text-primary md:text-2xl">iLearn Science</span>
         </a>
         <a class="rounded-full border border-primary/20 bg-primary-container/10 px-4 py-2 font-label text-xs uppercase tracking-widest text-primary transition hover:border-primary/50 hover:bg-primary-container/15" href="{{ route('home') }}">Home</a>

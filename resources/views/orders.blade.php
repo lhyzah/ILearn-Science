@@ -68,7 +68,7 @@
     <aside class="fixed left-0 top-0 z-40 hidden h-screen w-64 flex-col rounded-r-xl border-r border-outline-variant/10 bg-surface-container-low/70 pt-20 shadow-2xl shadow-primary/5 backdrop-blur-md lg:flex">
         <div class="mb-8 px-6">
             <a class="flex items-center gap-3" href="{{ route('home') }}">
-                <img alt="iLearn Logo" class="h-12 w-12 rounded-full object-cover shadow-[0_0_14px_rgba(60,215,255,0.35)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSBO56sJas6rQHK4VWyVv9zYvpVKsJP9aGm9I-zZ4Xp8RSH3TgIUxiNSFgYgSOEW-AD7ysC9slLFlObe30xoXRuZ2usUrzLaCr6C4UGL_A6_skVaPmwRJCOSWXxTz1ZZ5j3Ozg8zvZyd26aw1EyQvtPJzzb40BcFMiHArG9g9pAoV2NRyQC968hCEkCk1-k29rGdPmYK0TRKmKUkWUDd2gMt8XPS0sbLsyz2ySSzbMTEVa9zmrFuXcOziQjR6_EdazHqPNl2A2iRk">
+                <img loading="lazy" decoding="async" alt="iLearn Logo" class="h-12 w-12 rounded-full object-cover shadow-[0_0_14px_rgba(60,215,255,0.35)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSBO56sJas6rQHK4VWyVv9zYvpVKsJP9aGm9I-zZ4Xp8RSH3TgIUxiNSFgYgSOEW-AD7ysC9slLFlObe30xoXRuZ2usUrzLaCr6C4UGL_A6_skVaPmwRJCOSWXxTz1ZZ5j3Ozg8zvZyd26aw1EyQvtPJzzb40BcFMiHArG9g9pAoV2NRyQC968hCEkCk1-k29rGdPmYK0TRKmKUkWUDd2gMt8XPS0sbLsyz2ySSzbMTEVa9zmrFuXcOziQjR6_EdazHqPNl2A2iRk">
                 <div>
                     <h1 class="font-headline text-xl font-bold tracking-tight text-primary">iLearn Science</h1>
                     <p class="font-label text-xs text-on-surface-variant">Science Lab Alpha</p>
@@ -94,7 +94,7 @@
 
     <header class="sticky top-0 z-50 flex w-full items-center justify-between border-b border-outline-variant/20 bg-surface/70 px-4 py-4 shadow-[0_0_15px_rgba(60,215,255,0.1)] backdrop-blur-xl md:px-gutter lg:pl-72">
         <a class="flex items-center gap-3" href="{{ route('home') }}">
-            <img alt="iLearn Logo" class="h-10 w-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSBO56sJas6rQHK4VWyVv9zYvpVKsJP9aGm9I-zZ4Xp8RSH3TgIUxiNSFgYgSOEW-AD7ysC9slLFlObe30xoXRuZ2usUrzLaCr6C4UGL_A6_skVaPmwRJCOSWXxTz1ZZ5j3Ozg8zvZyd26aw1EyQvtPJzzb40BcFMiHArG9g9pAoV2NRyQC968hCEkCk1-k29rGdPmYK0TRKmKUkWUDd2gMt8XPS0sbLsyz2ySSzbMTEVa9zmrFuXcOziQjR6_EdazHqPNl2A2iRk">
+            <img loading="lazy" decoding="async" alt="iLearn Logo" class="h-10 w-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSBO56sJas6rQHK4VWyVv9zYvpVKsJP9aGm9I-zZ4Xp8RSH3TgIUxiNSFgYgSOEW-AD7ysC9slLFlObe30xoXRuZ2usUrzLaCr6C4UGL_A6_skVaPmwRJCOSWXxTz1ZZ5j3Ozg8zvZyd26aw1EyQvtPJzzb40BcFMiHArG9g9pAoV2NRyQC968hCEkCk1-k29rGdPmYK0TRKmKUkWUDd2gMt8XPS0sbLsyz2ySSzbMTEVa9zmrFuXcOziQjR6_EdazHqPNl2A2iRk">
             <span class="font-headline text-2xl font-bold text-primary">iLearn Science</span>
         </a>
         <div class="flex items-center gap-4">
@@ -350,7 +350,7 @@
             document.querySelector('[data-receipt-download]').dataset.order = order.number;
             document.querySelector('[data-receipt-items]').innerHTML = order.items.length ? order.items.map((item) => `
                 <div class="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-3">
-                    <img class="h-14 w-14 rounded-lg object-cover" src="${item.image}" alt="${item.title}">
+                    <img loading="lazy" decoding="async" class="h-14 w-14 rounded-lg object-cover" src="${item.image}" alt="${item.title}">
                     <div class="min-w-0 flex-1">
                         <p class="truncate font-label text-sm text-on-surface">${item.title}</p>
                         <p class="text-xs text-on-surface-variant">${item.meta} • Qty ${item.quantity || 1}</p>

@@ -206,7 +206,7 @@
     <aside id="admin-sidebar" class="fixed left-0 top-0 z-50 flex h-screen w-72 flex-col border-r border-primary/10 bg-surface-container-low/80 p-4 shadow-[12px_0_40px_rgba(0,0,0,0.32)] backdrop-blur-2xl transition-all duration-300">
         <div class="mb-7 flex items-center gap-3 px-2 pt-2">
             <a class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-primary/30 bg-primary-container/10 shadow-[0_0_20px_rgba(60,215,255,0.22)]" href="{{ route('home') }}" aria-label="Go to home">
-                <img class="h-9 w-9 rounded-full object-contain" alt="iLearn Science Logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRlFDOjxkn2sD8rhXX_C9oZtkMTA0F2zIbuZyG9wIVQvasApaG3RmYgyG2Pvp2jL5OiIRqxkIx75Tsq4ci10yb8-EExxTPy1tjBBGxv1_B3mcIr9zJxx3s_rlbkerqWnrBAlY0nMbog5hJGyrtHKkEW2ogz66o1R7h0OAPWRoU3Y4Dy9K6RZJItpyPL-ZXT9Xn5m73Ru9ye9BaZqOLXhg7JJvqaSDws24wBFWt5ncypHJMLUZ0mtJgObLNXtQbZinBc0Bg4jGSDVg">
+                <img loading="lazy" decoding="async" class="h-9 w-9 rounded-full object-contain" alt="iLearn Science Logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRlFDOjxkn2sD8rhXX_C9oZtkMTA0F2zIbuZyG9wIVQvasApaG3RmYgyG2Pvp2jL5OiIRqxkIx75Tsq4ci10yb8-EExxTPy1tjBBGxv1_B3mcIr9zJxx3s_rlbkerqWnrBAlY0nMbog5hJGyrtHKkEW2ogz66o1R7h0OAPWRoU3Y4Dy9K6RZJItpyPL-ZXT9Xn5m73Ru9ye9BaZqOLXhg7JJvqaSDws24wBFWt5ncypHJMLUZ0mtJgObLNXtQbZinBc0Bg4jGSDVg">
             </a>
             <div class="sidebar-logo-text">
                 <h1 class="font-headline text-xl font-bold tracking-tight text-primary">iLearn Science</h1>
@@ -282,7 +282,7 @@
                 Quick Add
             </button>
             <button class="flex items-center gap-3 rounded-full border border-primary/20 bg-surface-container/70 p-1 pr-3 transition-all hover:border-primary/50">
-                <img class="h-9 w-9 rounded-full border border-primary/30 object-cover" alt="Admin profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3XNKjUJ7YMCovYbY9ONdXA4LRDTjeEpLYTkl1xLQsVawE48iHsZFhGCIqzz10uXm8mhrWX8hjM_yp_U4pyAFsVK3Xv3csT4gy0fLx6lXr8U8EB0J-yBj2FCFF5Q-BcVb-T64N6atCbVUW4BFiKxzr3Ix2bptXvH1qjsaa86ROrU2VXToku2_oX8PtfC3TNDLOBUX-tOYN9furyFw27MbTbvQ8fLzMx9V9sw-2rChwzbvt2n5UKlw1XKGIfwuWO6wsIMfTUcZ2O2g">
+                <img loading="lazy" decoding="async" class="h-9 w-9 rounded-full border border-primary/30 object-cover" alt="Admin profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3XNKjUJ7YMCovYbY9ONdXA4LRDTjeEpLYTkl1xLQsVawE48iHsZFhGCIqzz10uXm8mhrWX8hjM_yp_U4pyAFsVK3Xv3csT4gy0fLx6lXr8U8EB0J-yBj2FCFF5Q-BcVb-T64N6atCbVUW4BFiKxzr3Ix2bptXvH1qjsaa86ROrU2VXToku2_oX8PtfC3TNDLOBUX-tOYN9furyFw27MbTbvQ8fLzMx9V9sw-2rChwzbvt2n5UKlw1XKGIfwuWO6wsIMfTUcZ2O2g">
                 <span class="hidden font-label text-sm text-primary md:inline">Admin Nova</span>
                 <span class="material-symbols-outlined hidden text-[18px] text-on-surface-variant md:inline">expand_more</span>
             </button>
@@ -1131,7 +1131,7 @@
                 <tr class="transition-colors hover:bg-white/[0.03]" data-inventory-row="${escapeHTML(product.id)}">
                     <td class="py-4">
                         <div class="flex items-center gap-3">
-                            ${product.image ? `<img class="h-14 w-14 rounded-xl object-cover" src="${escapeHTML(product.image)}" alt="${escapeHTML(product.title)}">` : `<span class="material-symbols-outlined flex h-14 w-14 items-center justify-center rounded-xl bg-primary-container/10 text-primary">image</span>`}
+                            ${product.image ? `<img loading="lazy" decoding="async" class="h-14 w-14 rounded-xl object-cover" src="${escapeHTML(product.image)}" alt="${escapeHTML(product.title)}">` : `<span class="material-symbols-outlined flex h-14 w-14 items-center justify-center rounded-xl bg-primary-container/10 text-primary">image</span>`}
                             <div class="min-w-0">
                                 <p class="truncate font-semibold text-on-surface">${escapeHTML(product.title)}</p>
                                 <p class="mt-1 line-clamp-1 max-w-md text-sm text-on-surface-variant">${escapeHTML(product.description)}</p>
@@ -1369,7 +1369,7 @@
 
             list.innerHTML = items.slice(0, 5).map((item) => `
                 <div class="flex items-center gap-3 rounded-2xl border border-white/5 bg-surface-container-low/50 p-3">
-                    ${item.image ? `<img class="h-12 w-12 rounded-xl object-cover" src="${item.image}" alt="${item.title}">` : `<span class="material-symbols-outlined flex h-12 w-12 items-center justify-center rounded-xl bg-primary-container/10 text-primary">description</span>`}
+                    ${item.image ? `<img loading="lazy" decoding="async" class="h-12 w-12 rounded-xl object-cover" src="${item.image}" alt="${item.title}">` : `<span class="material-symbols-outlined flex h-12 w-12 items-center justify-center rounded-xl bg-primary-container/10 text-primary">description</span>`}
                     <div class="min-w-0 flex-1">
                         <p class="truncate text-sm font-semibold text-on-surface">${item.title}</p>
                         <p class="truncate font-label text-[11px] text-on-surface-variant">${item.meta}</p>

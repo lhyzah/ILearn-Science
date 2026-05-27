@@ -61,7 +61,7 @@
 </head>
 <body class="min-h-screen overflow-x-hidden bg-background font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container">
     <div class="fixed inset-0 z-0 opacity-60 blur-xl">
-        <img class="h-full w-full object-cover" alt="Science dashboard background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD30svFHUzMW_wLvdMJ-sO-AJC8PiCm63d2I_KW4Ao9r3eO5Oy2bTPAMUtAKp-cFonPGtSSvlEa40MhMrqmJRpomyBWjuHjbJjDIEiig0oPo_FMIqGpSV1SJPlW90_thYmFWVPxFUob-deIxl26buCuwAbRU1bxISylNUoJb1Ymw9OugEWkq2z8AzlQF7aqcGMYDzpwb6ubNHrzJUMH0mc-k2Tc-btib6kNLNKjnukeEcdIkwmJvemFUxKtvwzhelFxYAHTOvsJMTM">
+        <img loading="lazy" decoding="async" class="h-full w-full object-cover" alt="Science dashboard background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD30svFHUzMW_wLvdMJ-sO-AJC8PiCm63d2I_KW4Ao9r3eO5Oy2bTPAMUtAKp-cFonPGtSSvlEa40MhMrqmJRpomyBWjuHjbJjDIEiig0oPo_FMIqGpSV1SJPlW90_thYmFWVPxFUob-deIxl26buCuwAbRU1bxISylNUoJb1Ymw9OugEWkq2z8AzlQF7aqcGMYDzpwb6ubNHrzJUMH0mc-k2Tc-btib6kNLNKjnukeEcdIkwmJvemFUxKtvwzhelFxYAHTOvsJMTM">
     </div>
 
     <aside class="fixed left-0 top-0 z-10 hidden h-screen w-64 flex-col gap-2 border-r border-white/10 bg-surface-container-low/60 p-4 pt-20 opacity-40 shadow-xl backdrop-blur-lg md:flex">
@@ -148,7 +148,7 @@
                             <h3 class="mb-3 px-2 font-label text-xs text-on-surface-variant">YOU MAY ALSO LIKE</h3>
                             <a class="group flex cursor-pointer items-center gap-3 rounded-xl border border-white/5 bg-surface-container-high/20 p-3 transition-all hover:border-primary/40" href="{{ route('shop') }}">
                                 <div class="h-10 w-10 overflow-hidden rounded-lg bg-surface-container-highest">
-                                    <img class="h-full w-full object-cover" alt="Organic Chemistry Toolkit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDum9Srxma3lj3t6kETeLqiDStAHp1g38m-u_ruqkLBdOE4E-OYKZuYEZqVWydu1-zx1T-xBXbYju_xTpFAPYDW8pZrk62vlgaoxB5A3n8hq2D6nqo_m5Izz3syNUCmzoKBWiodSQBJibe_mURUdzERizJJ28C8dOSkph-4R4g5UwnhaecWj6umT3B8ES1C9oyJwgohKOZwwWKI_QL3B-7Gr-79ERe6g2hVOINxFIKW0AR5htC7JyhEkBJDwR9WAU20tTsOneY8jwg">
+                                    <img loading="lazy" decoding="async" class="h-full w-full object-cover" alt="Organic Chemistry Toolkit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDum9Srxma3lj3t6kETeLqiDStAHp1g38m-u_ruqkLBdOE4E-OYKZuYEZqVWydu1-zx1T-xBXbYju_xTpFAPYDW8pZrk62vlgaoxB5A3n8hq2D6nqo_m5Izz3syNUCmzoKBWiodSQBJibe_mURUdzERizJJ28C8dOSkph-4R4g5UwnhaecWj6umT3B8ES1C9oyJwgohKOZwwWKI_QL3B-7Gr-79ERe6g2hVOINxFIKW0AR5htC7JyhEkBJDwR9WAU20tTsOneY8jwg">
                                 </div>
                                 <div class="flex-1 overflow-hidden">
                                     <p class="truncate font-label text-sm text-on-surface">Organic Chemistry Toolkit</p>
@@ -263,7 +263,7 @@
                 itemList.innerHTML = items.length ? items.map((item) => `
                     <article class="group flex items-center gap-4 rounded-2xl border border-white/5 bg-surface-container-high/40 p-4 transition-colors hover:bg-surface-container-high/60">
                         <div class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-surface-container-highest">
-                            ${item.image ? `<img class="h-full w-full object-cover" alt="${item.title}" src="${item.image}">` : '<span class="material-symbols-outlined flex h-full w-full items-center justify-center text-primary">description</span>'}
+                            ${item.image ? `<img loading="lazy" decoding="async" class="h-full w-full object-cover" alt="${item.title}" src="${item.image}">` : '<span class="material-symbols-outlined flex h-full w-full items-center justify-center text-primary">description</span>'}
                         </div>
                         <div class="min-w-0 flex-1">
                             <div class="flex items-start justify-between gap-4">
