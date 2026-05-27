@@ -199,7 +199,7 @@
                             <span class="text-xs font-bold uppercase tracking-[0.2em] text-neon-cyan">About Us</span>
                             <h1 class="mb-6 mt-4 text-4xl font-bold">About <span class="gradient-text">iLearn Science</span></h1>
                             <p class="mx-auto text-sm leading-relaxed text-slate-400">
-                                iLearn Science is your trusted partner in education. We create engaging, curriculum-aligned learning materials to make science simple, interactive, and fun for teachers and students.
+                                iLearn Science Resources is an online educational marketplace offering high-quality science teaching materials for teachers, students, and homeschool educators. Discover engaging PowerPoint presentations, worksheets, lesson plans, quizzes, infographics, activity sheets, and digital science resources designed to make teaching easier and learning more interactive. From biology and chemistry to physics and earth science topics, iLearn Science Resources provides ready-to-use classroom materials that help educators teach more and prepare less.
                             </p>
                             <div class="group relative mx-auto mt-12 w-full max-w-3xl">
                                 <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-neon-cyan/20 to-neon-purple/20 opacity-25 blur transition duration-1000 group-hover:opacity-50 group-hover:duration-200"></div>
