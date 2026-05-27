@@ -434,10 +434,17 @@
         const inventoryStorageKey = 'ilearnScienceInventoryProducts';
         const productsEndpoint = '{{ route('products.index') }}';
         const productDetailBaseUrl = '{{ url('/resources') }}';
+        const fallbackResourceImage = '{{ asset('images/shop/photosynthesis-process-topic.svg') }}';
         const productSyncChannel = 'BroadcastChannel' in window ? new BroadcastChannel('ilearn-products-sync') : null;
         let previewProduct = null;
         let lastInventorySnapshot = '';
         const shopResourceGrid = document.getElementById('shop-resource-grid');
+
+        function safeResourceImage(image) {
+            const value = String(image || '').trim();
+            return value && !value.startsWith('data:') ? value : fallbackResourceImage;
+        }
+
         const serverRenderedProducts = Array.from(document.querySelectorAll('.shop-resource-card')).map((card) => {
             const preview = card.querySelector('.shop-resource-preview');
             const add = card.querySelector('.shop-resource-add');
@@ -454,7 +461,7 @@
                 format: preview?.dataset.productFormat || 'Digital File',
                 focus: preview?.dataset.productFocus || '',
                 includes: preview?.dataset.productIncludes || 'Editable product information|Digital download|Teacher-ready resource',
-                image: preview?.dataset.productImage || '',
+                image: safeResourceImage(preview?.dataset.productImage || ''),
                 field: card.dataset.field || 'biology',
                 status: 'Published',
             };
@@ -524,7 +531,7 @@
                 format: product.format || 'Digital File',
                 focus: product.topic || product.focus || product.subject || 'Science learning resource',
                 includes: product.details || product.includes || 'Editable product information|Digital resource access|Teacher-ready classroom material',
-                image: product.image || '',
+                image: safeResourceImage(product.image || ''),
                 downloadLink: product.downloadLink || '',
                 field: slugify(subject),
                 status: product.status || 'Published',

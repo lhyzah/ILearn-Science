@@ -587,11 +587,17 @@
         const inventoryStorageKey = 'ilearnScienceInventoryProducts';
         const productsEndpoint = '{{ route('products.index') }}';
         const productDetailBaseUrl = '{{ url('/resources') }}';
+        const fallbackResourceImage = '{{ asset('images/shop/photosynthesis-process-topic.svg') }}';
         const productSyncChannel = 'BroadcastChannel' in window ? new BroadcastChannel('ilearn-products-sync') : null;
         const homeResourceGrid = document.getElementById('home-resource-grid');
         const resourceCategoryButtons = document.querySelectorAll('.resource-category-filter');
         let currentHomeProducts = [];
         let currentHomeCategory = 'All';
+
+        function safeResourceImage(image) {
+            const value = String(image || '').trim();
+            return value && !value.startsWith('data:') ? value : fallbackResourceImage;
+        }
 
         function getCartItems() {
             if (window.iLearnAuth?.getCartItems) return window.iLearnAuth.getCartItems();
@@ -674,7 +680,7 @@
                 format: product.format || 'Digital File',
                 description: product.description || product.copy || product.shortDescription || 'Teacher-ready science learning material.',
                 includes: product.includes || 'Editable resource|Digital download|Classroom-ready activity',
-                image: product.image || product.imageUrl || '',
+                image: safeResourceImage(product.image || product.imageUrl || ''),
             };
         }
 

@@ -3,12 +3,21 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    @php
+        $fallbackResourceImage = asset('images/shop/photosynthesis-process-topic.svg');
+        $cleanResourceImage = function ($image) use ($fallbackResourceImage) {
+            return is_string($image ?? null) && filled($image) && ! str_starts_with($image, 'data:')
+                ? $image
+                : $fallbackResourceImage;
+        };
+        $resourceImage = $cleanResourceImage($product['image'] ?? null);
+    @endphp
     @include('partials.seo', [
         'seoTitle' => ($product['title'] ?? 'Science Teaching Resource') . ' | iLearn Science Resources',
         'seoDescription' => $product['description'] ?? 'Download a classroom-ready digital science teaching resource for teachers and students.',
         'seoCanonical' => route('resources.show', $product['id']),
         'seoType' => 'product',
-        'seoImage' => $product['image'] ?? asset('images/shop/photosynthesis-process-topic.svg'),
+        'seoImage' => $resourceImage,
         'structuredData' => [
             [
                 ('@' . 'context') => 'https://schema.org',
@@ -24,7 +33,7 @@
                 '@type' => 'Product',
                 'name' => $product['title'],
                 'description' => $product['description'],
-                'image' => $product['image'] ?? asset('images/shop/photosynthesis-process-topic.svg'),
+                'image' => $resourceImage,
                 'category' => $product['category'] ?? 'Science Teaching Resources',
                 'brand' => ['@type' => 'Brand', 'name' => 'iLearn Science Resources'],
                 'offers' => [
@@ -101,7 +110,7 @@
             <div class="rounded-3xl border border-primary/20 bg-surface-container/70 p-4 shadow-[0_0_35px_rgba(60,215,255,.16)]">
                 <img
                     class="h-auto max-h-[620px] w-full rounded-2xl object-contain"
-                    src="{{ $product['image'] ?? asset('images/shop/photosynthesis-process-topic.svg') }}"
+                    src="{{ $resourceImage }}"
                     alt="{{ $product['title'] }} preview image for science teaching resources"
                     loading="eager"
                     decoding="async"
@@ -150,7 +159,7 @@
                 <div class="mt-6 grid gap-5 md:grid-cols-3">
                     @foreach ($relatedProducts as $related)
                         <a class="rounded-2xl border border-white/10 bg-surface-container/70 p-4 transition hover:border-primary/40" href="{{ route('resources.show', $related['id']) }}">
-                            <img class="h-36 w-full rounded-xl object-cover" src="{{ $related['image'] ?? asset('images/shop/photosynthesis-process-topic.svg') }}" alt="{{ $related['title'] }} digital science teaching resource" loading="lazy" decoding="async">
+                            <img class="h-36 w-full rounded-xl object-cover" src="{{ $cleanResourceImage($related['image'] ?? null) }}" alt="{{ $related['title'] }} digital science teaching resource" loading="lazy" decoding="async">
                             <h3 class="mt-4 font-headline text-lg font-semibold">{{ $related['title'] }}</h3>
                             <p class="mt-2 text-sm text-on-surface-variant">{{ $related['category'] ?? 'Science Resource' }}</p>
                         </a>
