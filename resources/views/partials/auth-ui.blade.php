@@ -531,7 +531,7 @@
     };
 
     const syncProductsToCatalogue = (products = []) => {
-        if (!Array.isArray(products) || !products.length) return;
+        if (!Array.isArray(products)) return;
         const activeProducts = new Map(products
             .filter((product) => !['inactive', 'deleted', 'draft'].includes(String(product.status || 'Published').toLowerCase()))
             .map((product) => {

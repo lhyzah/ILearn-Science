@@ -816,7 +816,10 @@
 
         async function refreshHomeProductsFromServer() {
             try {
-                const response = await fetch(productsEndpoint, { headers: { Accept: 'application/json' } });
+                const response = await fetch(`${productsEndpoint}?t=${Date.now()}`, {
+                    cache: 'no-store',
+                    headers: { Accept: 'application/json' },
+                });
                 if (!response.ok) throw new Error('Unable to load products.');
                 const data = await response.json();
                 if (Array.isArray(data.products)) {

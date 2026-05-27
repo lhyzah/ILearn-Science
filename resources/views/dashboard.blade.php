@@ -357,6 +357,7 @@
         const dashboardBlogInitializedKey = 'ilearnScienceBlogPostsInitialized';
         const dashboardProductsEndpoint = '{{ route('products.index') }}';
         const dashboardBlogsEndpoint = '{{ route('blogs.index') }}';
+        const dashboardProductSyncChannel = 'BroadcastChannel' in window ? new BroadcastChannel('ilearn-products-sync') : null;
         const dashboardBlogSyncChannel = 'BroadcastChannel' in window ? new BroadcastChannel('ilearn-blog-sync') : null;
         let lastDashboardInventorySnapshot = '';
         let lastDashboardBlogSnapshot = '';
@@ -453,7 +454,10 @@
 
         async function refreshDashboardInventoryFromServer() {
             try {
-                const response = await fetch(dashboardProductsEndpoint, { headers: { Accept: 'application/json' } });
+                const response = await fetch(`${dashboardProductsEndpoint}?t=${Date.now()}`, {
+                    cache: 'no-store',
+                    headers: { Accept: 'application/json' },
+                });
                 if (!response.ok) throw new Error('Unable to load live products.');
                 const data = await response.json();
                 if (Array.isArray(data.products)) {
@@ -718,6 +722,20 @@
             if (event.key === dashboardBlogStorageKey || event.key === dashboardBlogInitializedKey) renderDashboardBlogs(true);
         });
         window.addEventListener('ilearn:cart-updated', renderDashboardCart);
+        window.addEventListener('ilearn:products-updated', (event) => {
+            if (Array.isArray(event.detail?.products)) {
+                localStorage.setItem(dashboardInventoryStorageKey, JSON.stringify(event.detail.products));
+                localStorage.setItem(`${dashboardInventoryStorageKey}Initialized`, 'true');
+            }
+            renderDashboardProducts(true);
+        });
+        dashboardProductSyncChannel?.addEventListener('message', (event) => {
+            if (event.data?.type === 'products-updated' && Array.isArray(event.data.products)) {
+                localStorage.setItem(dashboardInventoryStorageKey, JSON.stringify(event.data.products));
+                localStorage.setItem(`${dashboardInventoryStorageKey}Initialized`, 'true');
+                renderDashboardProducts(true);
+            }
+        });
         window.addEventListener('ilearn:blogs-updated', (event) => {
             if (Array.isArray(event.detail?.posts)) saveDashboardBlogs(event.detail.posts);
             else renderDashboardBlogs(true);

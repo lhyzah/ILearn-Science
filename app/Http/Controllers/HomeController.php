@@ -389,7 +389,8 @@ class HomeController extends Controller
     {
         return response()->json([
             'products' => $this->readProducts(),
-        ]);
+            'updatedAt' => now()->toIso8601String(),
+        ])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     }
 
     public function blogsIndex()
@@ -416,7 +417,8 @@ class HomeController extends Controller
         return response()->json([
             'product' => $product,
             'products' => $products,
-        ]);
+            'updatedAt' => now()->toIso8601String(),
+        ])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     }
 
     public function deleteProduct(string $id)
@@ -426,7 +428,8 @@ class HomeController extends Controller
 
         return response()->json([
             'products' => $products,
-        ]);
+            'updatedAt' => now()->toIso8601String(),
+        ])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     }
 
     public function saveBlogPost(Request $request)
