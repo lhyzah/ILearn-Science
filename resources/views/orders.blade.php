@@ -206,6 +206,7 @@
     <script>
         const cartStorageKey = 'ilearnScienceCartItems';
         const downloadedFilesStorageKey = 'ilearnScienceDownloadedFiles';
+        const downloadedProductsStorageKey = 'ilearnScienceDownloadedProducts';
         const taxRate = 0.08;
         const discountAmount = 5;
         const orders = {
@@ -415,6 +416,22 @@
             downloads[email] = downloads[email] || {};
             downloads[email][order.number || orderId] = Math.max(Number(downloads[email][order.number || orderId]) || 0, itemCount);
             localStorage.setItem(downloadedFilesStorageKey, JSON.stringify(downloads));
+
+            const orderNumber = order.number || orderId;
+            const productDownloads = JSON.parse(localStorage.getItem(downloadedProductsStorageKey) || '{}') || {};
+            productDownloads[email] = productDownloads[email] || {};
+            productDownloads[email][orderNumber] = {};
+            order.items.forEach((item) => {
+                productDownloads[email][orderNumber][item.id] = {
+                    id: item.id,
+                    title: item.title,
+                    meta: item.meta,
+                    price: item.price,
+                    image: item.image,
+                    quantity: Number(item.quantity) || 1,
+                };
+            });
+            localStorage.setItem(downloadedProductsStorageKey, JSON.stringify(productDownloads));
         }
 
         document.querySelectorAll('.order-action').forEach((button) => {

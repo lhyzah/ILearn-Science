@@ -372,23 +372,15 @@
             <div class="reveal mx-auto mb-12 max-w-container-max px-4 md:px-gutter">
                 <h2 class="font-headline text-3xl font-semibold md:text-4xl">Best Sellers Showcase</h2>
             </div>
-            <div class="animate-marquee gap-8 px-gutter">
-                @php
-                    $bestSellers = [
-                        ['Climate Change PPT Pack', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCYQO5t97kvjek5vvog9vMecMC_JW5jnSN-IeGnbar__dr8JDR2eejsPrgo_HvOlpBi5JNllOCVM5SxnhJiiReezTB3MaQC4dANL5oUMQwCcxJZMq4gnKmc2XSWNLx3PK-H4tntQ_uG0eTLZsxEo2rQk7bL3pxXDhwu3KqmDagXpOkvDVJPsXh1QBaNn80HdAbGfny92FOz7TInUYQBEKoxJlSfFByWJVvnp6u8bpbUOM_W3f2N_f6l8LNmF6BoKDDiC6zx87s-Nc0'],
-                        ['Interactive Plant Cells Guide', 'https://lh3.googleusercontent.com/aida-public/AB6AXuBMHLu6K-5GuTLkW3Ed_8kQEyUL8AeWNFlE4RGgSr5hIVznT_p6NkUn7RFIRQonIJ3IwlbxmWDkmvR7r8pOoHLvYxtaTxo1Dx5X3de1MMVLngpwJI-JP5veYmOUoIeQYbQFUkftEmyr7Iy8C7jb-HADtlSZ6FDpvDDPaCEGoI0mrqg6XRIhSHHqdh3sFsDUvSqb9e4J1XBmX-Qse-Ug3qy29dW1DjtweUn-shNEGKcsn6KnC92vH-WHKyTnQ7Qduh59k6OJy0pw-ak'],
-                        ['Lab Report Master Template', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCSfzKD7RRzVkwfRQ2pxDXUzqd6HLdT5h3glOca237iuUTdXug8UA_fZ0cxjSMdIPSrJbOq32q_voF1f-SLbLLl3wxhbng_V3JH-s0WDnHy07rTDsX0ozwcv9N1OfozqS-Ghj3x6QabdlP9lVocyCcQuqlGNVVv-FY9GUikUE_VEBhu6lRksVln8piLsw-Oh3yX_xMUNiZyqY-oF2BB_mA-ttzfd6wZqgDxBdXwtLCDUxvY7pGGQlJxvmOMVpxBuUsGc-ZHSiJDfWo'],
-                        ['Interactive Physics Quizzer', 'https://lh3.googleusercontent.com/aida-public/AB6AXuDfxSNvH8jX5l7WzwHJun2F_BWEiXc0-u61ZuKxIrMY7nboi8mOVCzdeTXArF1KZKJ5rwVOaCcWgi5-0lN17Myx2u1PpfSLOnP5ZZfmN5oz95rVYocsE7ejbOlgmyXLaQRzlMtFCjeDYZWYRNDqDcC3M2E1DCU033TcdjOVSWinXLDClFz8meoQyue-FBPDEUGG_acE9QwiTT_z1X6GXQ75ogJjWaRcI2YxvFoVMwlYAHyp82A6nn1PXorCe2iUoqpdc-7KkgBOWu8'],
-                    ];
-                @endphp
-
-                @foreach (array_merge($bestSellers, $bestSellers) as [$title, $image])
-                    <article class="glass-panel shimmer-on-hover relative inline-block w-[320px] shrink-0 rounded-2xl p-6 md:w-[400px]">
-                        <div class="neon-glow absolute -right-3 -top-3 z-10 rounded-full bg-secondary px-3 py-1 font-label text-xs text-on-secondary">Best Seller</div>
-                        <img alt="{{ $title }}" class="mb-4 h-56 w-full rounded-xl object-cover" src="{{ $image }}">
-                        <p class="font-headline text-lg font-semibold text-on-surface">{{ $title }}</p>
-                    </article>
-                @endforeach
+            <div id="best-sellers-marquee" class="animate-marquee gap-8 px-gutter" aria-live="polite">
+                <article class="glass-panel shimmer-on-hover relative inline-block w-[320px] shrink-0 rounded-2xl p-6 md:w-[400px]">
+                    <div class="neon-glow absolute -right-3 -top-3 z-10 rounded-full bg-secondary px-3 py-1 font-label text-xs text-on-secondary">Best Seller</div>
+                    <div class="mb-4 flex h-56 w-full items-center justify-center rounded-xl bg-surface-container-high text-primary">
+                        <span class="material-symbols-outlined text-5xl">trending_up</span>
+                    </div>
+                    <p class="font-headline text-lg font-semibold text-on-surface">Loading customer favorites...</p>
+                    <p class="mt-2 text-sm text-on-surface-variant">Best sellers update after checkout and downloads.</p>
+                </article>
             </div>
         </section>
 
@@ -556,9 +548,11 @@
         const inventoryStorageKey = 'ilearnScienceInventoryProducts';
         const checkoutStorageKey = 'ilearnScienceLastCheckout';
         const downloadedFilesStorageKey = 'ilearnScienceDownloadedFiles';
+        const downloadedProductsStorageKey = 'ilearnScienceDownloadedProducts';
         const productsEndpoint = '{{ route('products.index') }}';
         const productSyncChannel = 'BroadcastChannel' in window ? new BroadcastChannel('ilearn-products-sync') : null;
         const homeResourceGrid = document.getElementById('home-resource-grid');
+        const bestSellersMarquee = document.getElementById('best-sellers-marquee');
         const resourceCategoryButtons = document.querySelectorAll('.resource-category-filter');
         let currentHomeProducts = [];
         let currentHomeCategory = 'All';
@@ -697,6 +691,123 @@
                 .filter((item) => ['published', 'active'].includes(String(item.status || 'Published').toLowerCase()));
         }
 
+        function readStoredProducts() {
+            try {
+                return activeInventoryProducts(JSON.parse(localStorage.getItem(inventoryStorageKey) || '[]') || []);
+            } catch {
+                return [];
+            }
+        }
+
+        function normalizeBestSellerProduct(product, score = 0, source = 'Recommended pick') {
+            const category = canonicalResourceCategory(product);
+            const priceValue = product.priceLabel || product.price || '₱0.00';
+            const normalized = normalizeProductForSearch({
+                id: product.id,
+                title: product.title,
+                type: category,
+                meta: product.meta || `${category} Resource`,
+                price: String(priceValue).includes('₱') ? priceValue : formatProductPeso(priceValue),
+                reviews: product.reviews || product.downloads || '(New)',
+                grade: product.grade,
+                format: product.format,
+                description: product.description,
+                includes: product.details || product.includes || product.tags,
+                image: product.image || product.imageUrl,
+            });
+
+            return { ...normalized, score, source };
+        }
+
+        function addBestSellerScore(scores, product, score, source) {
+            const normalized = normalizeBestSellerProduct(product, score, source);
+            const existing = scores.get(normalized.id);
+            if (existing) {
+                existing.score += score;
+                existing.source = existing.source === 'Recommended pick' ? source : existing.source;
+                existing.image = existing.image || normalized.image;
+                existing.description = existing.description || normalized.description;
+                return;
+            }
+            scores.set(normalized.id, normalized);
+        }
+
+        function checkoutItemsForBestSellers() {
+            try {
+                const checkout = JSON.parse(localStorage.getItem(checkoutStorageKey) || 'null');
+                return Array.isArray(checkout?.items) ? checkout.items : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function downloadedItemsForBestSellers() {
+            try {
+                const downloads = JSON.parse(localStorage.getItem(downloadedProductsStorageKey) || '{}') || {};
+                return Object.values(downloads).flatMap((customerOrders) =>
+                    Object.values(customerOrders || {}).flatMap((orderItems) => Object.values(orderItems || {}))
+                );
+            } catch {
+                return [];
+            }
+        }
+
+        function bestSellerCard(product) {
+            const activityLabel = product.source !== 'Recommended pick'
+                ? `${Math.round(product.score)} customer activity point${Math.round(product.score) === 1 ? '' : 's'}`
+                : 'Recommended by iLearn Science';
+
+            return `
+                <article class="glass-panel shimmer-on-hover relative inline-block w-[320px] shrink-0 rounded-2xl p-6 md:w-[400px]">
+                    <div class="neon-glow absolute -right-3 -top-3 z-10 rounded-full bg-secondary px-3 py-1 font-label text-xs font-bold text-on-secondary">Best Seller</div>
+                    ${product.image ? `<img alt="${escapeHTML(product.title)}" class="mb-4 h-56 w-full rounded-xl object-cover" src="${escapeHTML(product.image)}">` : `<div class="mb-4 flex h-56 w-full items-center justify-center rounded-xl bg-surface-container-high text-primary"><span class="material-symbols-outlined text-5xl">science</span></div>`}
+                    <p class="font-headline text-lg font-semibold text-on-surface">${escapeHTML(product.title)}</p>
+                    <div class="mt-3 flex items-center justify-between gap-3 text-sm">
+                        <span class="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 font-label text-[11px] text-primary">${escapeHTML(product.type)}</span>
+                        <span class="font-headline text-primary">${escapeHTML(product.price)}</span>
+                    </div>
+                    <p class="mt-3 line-clamp-2 text-sm text-on-surface-variant">${escapeHTML(product.description)}</p>
+                    <p class="mt-3 flex items-center gap-1 font-label text-xs text-secondary">
+                        <span class="material-symbols-outlined text-[16px]">verified</span>
+                        ${escapeHTML(activityLabel)}
+                    </p>
+                </article>
+            `;
+        }
+
+        function renderBestSellers(products = null) {
+            if (!bestSellersMarquee) return;
+            const productSource = activeInventoryProducts(products || currentHomeProducts || readStoredProducts());
+            const scores = new Map();
+
+            productSource.forEach((product, index) => {
+                addBestSellerScore(scores, product, Math.max(0.1, 1 - (index * 0.1)), 'Recommended pick');
+            });
+
+            checkoutItemsForBestSellers().forEach((item) => {
+                addBestSellerScore(scores, item, (Number(item.quantity) || 1) * 2, 'Checked out by customers');
+            });
+
+            downloadedItemsForBestSellers().forEach((item) => {
+                addBestSellerScore(scores, item, (Number(item.quantity) || 1) * 3, 'Downloaded by customers');
+            });
+
+            let bestProducts = Array.from(scores.values())
+                .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title))
+                .slice(0, 4);
+
+            if (!bestProducts.length) {
+                bestProducts = [
+                    normalizeBestSellerProduct({ id: 'cell-biology-powerpoint', title: 'Cell Biology Interactive PowerPoint', type: 'PowerPoint Presentation (PPTX)', price: '₱450.00', description: 'A polished interactive biology presentation for high school classrooms.' }, 0, 'Recommended pick'),
+                    normalizeBestSellerProduct({ id: 'photosynthesis-study-guide', title: 'Photosynthesis Study Guide', type: 'Study Guides', price: '₱180.00', description: 'Clear diagrams and explanations for teaching photosynthesis.' }, 0, 'Recommended pick'),
+                    normalizeBestSellerProduct({ id: 'pedigree-analysis-worksheet', title: 'Pedigree Analysis Worksheet', type: 'Worksheet', price: '₱150.00', description: 'Practice-ready genetics worksheet for inheritance patterns.' }, 0, 'Recommended pick'),
+                    normalizeBestSellerProduct({ id: 'digestive-system-visuals', title: 'Digestive System Visual Resources', type: 'Visual Resources', price: '₱220.00', description: 'Classroom-ready visuals for human digestive system lessons.' }, 0, 'Recommended pick'),
+                ];
+            }
+
+            bestSellersMarquee.innerHTML = [...bestProducts, ...bestProducts].map(bestSellerCard).join('');
+        }
+
         function saveLiveProducts(products) {
             localStorage.setItem(inventoryStorageKey, JSON.stringify(products));
             localStorage.setItem(`${inventoryStorageKey}Initialized`, 'true');
@@ -818,6 +929,7 @@
                 if (Array.isArray(data.products)) {
                     saveLiveProducts(data.products);
                     renderHomeAdminProducts(data.products);
+                    renderBestSellers(data.products);
                     renderProductSearchResults(document.getElementById('product-search-input')?.value || '');
                 }
             } catch (error) {
@@ -1108,27 +1220,35 @@
         window.addEventListener('storage', (event) => {
             if (event.key === cartStorageKey) updateCartCount();
             if (event.key === checkoutStorageKey || event.key === downloadedFilesStorageKey || event.key === 'ilearnScienceCurrentUser' || event.key === 'ilearnScienceRememberedUser') updateDownloadCount();
+            if (event.key === checkoutStorageKey || event.key === downloadedProductsStorageKey) renderBestSellers();
             if (event.key === inventoryStorageKey || event.key === `${inventoryStorageKey}Initialized`) {
                 renderHomeAdminProducts();
+                renderBestSellers();
                 renderProductSearchResults(document.getElementById('product-search-input')?.value || '');
             }
         });
         window.addEventListener('ilearn:cart-updated', updateCartCount);
         window.addEventListener('ilearn:auth-updated', updateDownloadCount);
-        window.addEventListener('ilearn:products-updated', (event) => renderHomeAdminProducts(event.detail?.products || null));
+        window.addEventListener('ilearn:products-updated', (event) => {
+            renderHomeAdminProducts(event.detail?.products || null);
+            renderBestSellers(event.detail?.products || null);
+        });
         productSyncChannel?.addEventListener('message', (event) => {
             if (event.data?.type === 'products-updated') {
                 saveLiveProducts(event.data.products || []);
                 renderHomeAdminProducts(event.data.products || []);
+                renderBestSellers(event.data.products || []);
             }
         });
 
         refreshHomeProductsFromServer();
         setInterval(refreshHomeProductsFromServer, 5000);
         updateDownloadCount();
+        renderBestSellers();
         window.addEventListener('pageshow', () => {
             updateCartCount();
             updateDownloadCount();
+            renderBestSellers();
         });
     </script>
     @include('partials.auth-ui')

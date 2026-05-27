@@ -187,6 +187,7 @@
         const cartStorageKey = 'ilearnScienceCartItems';
         const checkoutStorageKey = 'ilearnScienceLastCheckout';
         const downloadedFilesStorageKey = 'ilearnScienceDownloadedFiles';
+        const downloadedProductsStorageKey = 'ilearnScienceDownloadedProducts';
         const taxRate = 0.08;
         const discountAmount = 5;
         function parsePeso(value) {
@@ -235,6 +236,21 @@
             downloads[email] = downloads[email] || {};
             downloads[email][orderNumber] = Math.max(Number(downloads[email][orderNumber]) || 0, count);
             localStorage.setItem(downloadedFilesStorageKey, JSON.stringify(downloads));
+
+            const productDownloads = JSON.parse(localStorage.getItem(downloadedProductsStorageKey) || '{}') || {};
+            productDownloads[email] = productDownloads[email] || {};
+            productDownloads[email][orderNumber] = {};
+            items.forEach((item) => {
+                productDownloads[email][orderNumber][item.id] = {
+                    id: item.id,
+                    title: item.title,
+                    meta: item.meta,
+                    price: item.price,
+                    image: item.image,
+                    quantity: item.quantity,
+                };
+            });
+            localStorage.setItem(downloadedProductsStorageKey, JSON.stringify(productDownloads));
         }
 
         function normalizeCartItem(item) {
