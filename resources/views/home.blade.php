@@ -277,7 +277,7 @@
                         Teach More, <span class="text-primary">Prepare Less!</span>
                     </h1>
                     <p class="max-w-xl text-lg leading-8 text-on-surface-variant">
-                        Download ready-to-use PowerPoint lessons, worksheets, quizzes, and teaching resources designed for modern classrooms.
+                        Download engaging science worksheets, PowerPoint presentations, quizzes, lesson plans, and digital teaching resources for teachers and students.
                     </p>
                     <div class="flex flex-wrap gap-4">
                         <a class="cta-glow-hover rounded-lg bg-primary-container px-8 py-4 font-label text-sm font-medium text-on-primary-container transition-all duration-300 hover:scale-105" href="{{ route('shop') }}">Shop Resources</a>
