@@ -105,7 +105,7 @@
 
     <aside class="fixed left-0 top-0 z-40 hidden h-screen w-64 flex-col border-r border-primary/10 bg-surface-container-low/75 p-4 shadow-[12px_0_40px_rgba(0,0,0,.28)] backdrop-blur-2xl lg:flex">
         <a class="mb-8 flex items-center gap-3 px-2 pt-3" href="{{ route('home') }}">
-            <img loading="lazy" decoding="async" alt="iLearn Science Logo" class="h-12 w-12 rounded-full border border-primary/20 object-contain shadow-[0_0_16px_rgba(60,215,255,.2)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRlFDOjxkn2sD8rhXX_C9oZtkMTA0F2zIbuZyG9wIVQvasApaG3RmYgyG2Pvp2jL5OiIRqxkIx75Tsq4ci10yb8-EExxTPy1tjBBGxv1_B3mcIr9zJxx3s_rlbkerqWnrBAlY0nMbog5hJGyrtHKkEW2ogz66o1R7h0OAPWRoU3Y4Dy9K6RZJItpyPL-ZXT9Xn5m73Ru9ye9BaZqOLXhg7JJvqaSDws24wBFWt5ncypHJMLUZ0mtJgObLNXtQbZinBc0Bg4jGSDVg">
+            <img alt="iLearn Science Logo" class="h-12 w-12 rounded-full border border-primary/20 object-contain shadow-[0_0_16px_rgba(60,215,255,.2)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRlFDOjxkn2sD8rhXX_C9oZtkMTA0F2zIbuZyG9wIVQvasApaG3RmYgyG2Pvp2jL5OiIRqxkIx75Tsq4ci10yb8-EExxTPy1tjBBGxv1_B3mcIr9zJxx3s_rlbkerqWnrBAlY0nMbog5hJGyrtHKkEW2ogz66o1R7h0OAPWRoU3Y4Dy9K6RZJItpyPL-ZXT9Xn5m73Ru9ye9BaZqOLXhg7JJvqaSDws24wBFWt5ncypHJMLUZ0mtJgObLNXtQbZinBc0Bg4jGSDVg">
             <div>
                 <h1 class="font-headline text-xl font-bold text-primary">iLearn Science</h1>
                 <p class="font-label text-[11px] uppercase tracking-widest text-on-surface-variant">Customer Portal</p>
@@ -250,7 +250,7 @@
                             ['Pedigree Analysis Quiz Set', 'Quiz + answer key', 'Heredity', '/images/shop/pedigree-analysis-topic.svg'],
                         ] as [$title, $meta, $tag, $image])
                             <article class="overflow-hidden rounded-2xl border border-white/10 bg-surface-container-low/55 transition-all hover:border-primary/40">
-                                <img loading="lazy" decoding="async" class="h-36 w-full object-cover" alt="{{ $title }}" src="{{ $image }}">
+                                <img class="h-36 w-full object-cover" alt="{{ $title }}" src="{{ $image }}">
                                 <div class="p-4">
                                     <span class="rounded-full bg-primary-container/10 px-2 py-1 font-label text-[10px] text-primary">{{ $tag }}</span>
                                     <h4 class="mt-3 font-headline text-lg font-semibold">{{ $title }}</h4>
@@ -321,7 +321,7 @@
                         <h3 class="font-headline text-2xl font-semibold">Recommended Next</h3>
                         <p class="mt-2 text-sm text-on-surface-variant">Based on your Biology purchases.</p>
                         <a class="mt-5 flex gap-4 rounded-2xl border border-primary/15 bg-primary-container/10 p-4 transition-all hover:border-primary/45" href="{{ route('shop') }}">
-                            <img loading="lazy" decoding="async" class="h-20 w-20 rounded-xl object-cover" alt="Digestive System" src="/images/shop/digestive-system-topic.svg">
+                            <img class="h-20 w-20 rounded-xl object-cover" alt="Digestive System" src="/images/shop/digestive-system-topic.svg">
                             <div>
                                 <p class="font-headline font-semibold">Digestive System Bundle</p>
                                 <p class="mt-1 text-sm text-on-surface-variant">Presentation, worksheet, visual guide, and quiz.</p>
@@ -560,7 +560,7 @@
             grid.innerHTML = products.length ? products.map((product) => `
                 <article class="overflow-hidden rounded-2xl border border-white/10 bg-surface-container-low/55 transition-all hover:border-primary/40">
                     <div class="relative h-36 overflow-hidden">
-                        ${product.image ? `<img loading="lazy" decoding="async" class="h-full w-full object-cover" alt="${dashboardEscapeHTML(product.title)}" src="${dashboardEscapeHTML(product.image)}">` : `<div class="flex h-full w-full items-center justify-center bg-surface-container-high text-primary"><span class="material-symbols-outlined text-5xl">science</span></div>`}
+                        ${product.image ? `<img class="h-full w-full object-cover" alt="${dashboardEscapeHTML(product.title)}" src="${dashboardEscapeHTML(product.image)}">` : `<div class="flex h-full w-full items-center justify-center bg-surface-container-high text-primary"><span class="material-symbols-outlined text-5xl">science</span></div>`}
                         <span class="absolute left-3 top-3 rounded-full bg-surface/85 px-2 py-1 font-label text-[10px] text-primary">${dashboardEscapeHTML(product.category)}</span>
                     </div>
                     <div class="p-4">
@@ -616,7 +616,7 @@
 
             list.innerHTML = published.map((post) => `
                 <a class="flex gap-4 rounded-2xl border border-white/5 bg-surface-container-low/50 p-3 transition-all hover:border-primary/35" href="{{ route('blog') }}">
-                    <img loading="lazy" decoding="async" class="h-16 w-16 flex-shrink-0 rounded-xl object-cover" alt="${dashboardEscapeHTML(post.title)}" src="${dashboardEscapeHTML(post.image || '/images/shop/photosynthesis-process-topic.svg')}">
+                    <img class="h-16 w-16 flex-shrink-0 rounded-xl object-cover" alt="${dashboardEscapeHTML(post.title)}" src="${dashboardEscapeHTML(post.image || '/images/shop/photosynthesis-process-topic.svg')}">
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-2">
                             <span class="rounded-full bg-primary-container/10 px-2 py-0.5 font-label text-[10px] text-primary">${dashboardEscapeHTML(post.category || 'Science')}</span>
@@ -666,7 +666,7 @@
                 row.href = '{{ route('cart') }}';
                 row.className = 'flex items-center gap-3 rounded-2xl border border-white/5 bg-surface-container-low/50 p-3 transition-all hover:border-primary/35';
                 row.innerHTML = `
-                    <img loading="lazy" decoding="async" class="h-14 w-14 rounded-xl object-cover" alt="${item.title}" src="${item.image}">
+                    <img class="h-14 w-14 rounded-xl object-cover" alt="${item.title}" src="${item.image}">
                     <div class="min-w-0 flex-1">
                         <p class="truncate text-sm font-semibold text-on-surface">${item.title}</p>
                         <p class="truncate font-label text-[11px] text-on-surface-variant">${item.meta}</p>

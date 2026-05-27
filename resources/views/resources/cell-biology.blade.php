@@ -3,61 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    @include('partials.seo', [
-        'seoTitle' => 'Cell Biology Interactive PowerPoint | Editable Biology PPTX for Teachers',
-        'seoDescription' => 'Download an editable Cell Biology Interactive PowerPoint with worksheets, quizzes, teacher notes, and classroom-ready biology teaching materials for Grades 9-12.',
-        'seoCanonical' => route('resources.cell-biology'),
-        'seoType' => 'product',
-        'seoImage' => $seoProduct['image'] ?? asset('images/shop/photosynthesis-process-topic.svg'),
-        'structuredData' => [
-            [
-                ('@' . 'context') => 'https://schema.org',
-                '@type' => 'BreadcrumbList',
-                'itemListElement' => [
-                    ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => route('home')],
-                    ['@type' => 'ListItem', 'position' => 2, 'name' => 'Shop Science Resources', 'item' => route('shop')],
-                    ['@type' => 'ListItem', 'position' => 3, 'name' => 'Cell Biology Interactive PowerPoint', 'item' => route('resources.cell-biology')],
-                ],
-            ],
-            [
-                ('@' . 'context') => 'https://schema.org',
-                '@type' => 'Product',
-                'name' => 'Cell Biology Interactive PowerPoint',
-                'description' => $seoProduct['description'] ?? 'Editable cell biology PowerPoint presentation with worksheets, quizzes, and lesson materials.',
-                'image' => $seoProduct['image'] ?? asset('images/shop/photosynthesis-process-topic.svg'),
-                'category' => 'Biology PowerPoint Presentation',
-                'brand' => ['@type' => 'Brand', 'name' => 'iLearn Science Resources'],
-                'aggregateRating' => [
-                    '@type' => 'AggregateRating',
-                    'ratingValue' => '4.9',
-                    'reviewCount' => '2400',
-                ],
-                'offers' => [
-                    '@type' => 'Offer',
-                    'priceCurrency' => 'PHP',
-                    'price' => (string) ($seoProduct['price'] ?? 450),
-                    'availability' => 'https://schema.org/InStock',
-                    'url' => route('resources.cell-biology'),
-                ],
-            ],
-            [
-                ('@' . 'context') => 'https://schema.org',
-                '@type' => 'FAQPage',
-                'mainEntity' => [
-                    [
-                        '@type' => 'Question',
-                        'name' => 'Is this Cell Biology PowerPoint editable?',
-                        'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'Yes. The PowerPoint file is editable so teachers can adjust text, images, pacing, and activities for their class.'],
-                    ],
-                    [
-                        '@type' => 'Question',
-                        'name' => 'Are worksheets included?',
-                        'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'Yes. The resource includes printable worksheets and supporting digital materials for classroom use.'],
-                    ],
-                ],
-            ],
-        ],
-    ])
+    <title>Cell Biology Interactive PowerPoint | iLearn Science</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <script>
@@ -181,7 +127,7 @@
                             @endif
                         @endforeach
                 <div class="h-10 w-10 overflow-hidden rounded-full border-2 border-primary/30">
-                    <img loading="lazy" decoding="async" alt="Astronaut User Profile" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe2pd2OK0hHa9rPpfLFxiRkt1rqmV36DhERsF8CmqV-kN-DVX1ivItd1_0NwVqOxeAnrMCr6_YoF1s75o_NVE46Q48VyJeKwU0dh2-rqAN7bay3hr9z4uTU00808M0ekW_87yfrJSQDIUSwx-y6di4MjMDpPtIkjs5npAojKTpiXFFsbOT5o4Aat4f7iCRVqRsOmoprA_xrL1Hwo43K7yZJNnRvLy-0Di8wT4_heaPi0ouTtUR0orzOewZscYE2sB5a9vOSzSeduU">
+                    <img alt="Astronaut User Profile" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe2pd2OK0hHa9rPpfLFxiRkt1rqmV36DhERsF8CmqV-kN-DVX1ivItd1_0NwVqOxeAnrMCr6_YoF1s75o_NVE46Q48VyJeKwU0dh2-rqAN7bay3hr9z4uTU00808M0ekW_87yfrJSQDIUSwx-y6di4MjMDpPtIkjs5npAojKTpiXFFsbOT5o4Aat4f7iCRVqRsOmoprA_xrL1Hwo43K7yZJNnRvLy-0Di8wT4_heaPi0ouTtUR0orzOewZscYE2sB5a9vOSzSeduU">
                 </div>
             </div>
         </div>
@@ -220,7 +166,7 @@
             <section class="mb-24 grid grid-cols-1 items-start gap-gutter lg:grid-cols-12">
                 <div class="group lg:col-span-7">
                     <div class="glass-panel glow-border relative aspect-video overflow-hidden rounded-3xl">
-                        <img loading="lazy" decoding="async" alt="Cell Biology Preview" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDB29hlsu6znAHyJwVa-GZ2GEL1qRnewIXPnir5KUIvPk3vY2FFuEYqNxWpbBb_S4i1_9cmj6hfXbbm0wq8LMsxrMXm3otjI_lesrFSTbydTwMWXd2Cgx9zkMYsIX8pugR8DnnL3y8EtZLVBl1HYoCZObeGk9hhHuXl2iqlfEy5qpaQUtNcVcZt18lXM0RWiJZuPFwCoH01n7k71hV_8pOjscUwmXnCjDxQgRKCdPBDeqczACKtuekX2CyfsEtKl8-YdFotM9lhUWc">
+                        <img alt="Cell Biology Preview" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDB29hlsu6znAHyJwVa-GZ2GEL1qRnewIXPnir5KUIvPk3vY2FFuEYqNxWpbBb_S4i1_9cmj6hfXbbm0wq8LMsxrMXm3otjI_lesrFSTbydTwMWXd2Cgx9zkMYsIX8pugR8DnnL3y8EtZLVBl1HYoCZObeGk9hhHuXl2iqlfEy5qpaQUtNcVcZt18lXM0RWiJZuPFwCoH01n7k71hV_8pOjscUwmXnCjDxQgRKCdPBDeqczACKtuekX2CyfsEtKl8-YdFotM9lhUWc">
                         <div class="absolute inset-0 flex items-end bg-gradient-to-t from-background/80 to-transparent p-8">
                             <div class="flex flex-wrap gap-4">
                                 <span class="rounded-full border border-primary/30 bg-primary/20 px-4 py-2 font-label text-sm text-primary backdrop-blur-md">Interactive PPTX</span>
@@ -237,7 +183,7 @@
                             ['Slide 4', 'https://lh3.googleusercontent.com/aida-public/AB6AXuD9TTg1ahDy9dDkWopSkJb3h1JQ-9WGj9ZuPC3HyOy6Nm7Mt1u77lZdmeJ3BJBH6oYrQ2BOuwk6516kfpXW6nw6s4yrDWJZKdH0xX-uCH7oZvspZHhL46_AGFjipk0AemUfTzzEnt_IfB8hqA1nvCtfnPLIoQclJFLP02_AmHGSgLJjBYfXBRxwFbdyBu7k2rNTQITQTmIjiHCbEHc4hzlxi2oyWpzVyzb75_41yM8gqeJPmtp0NVgS2VMrFyY9KNMIyqpdCcrwm0Y'],
                         ] as [$alt, $image])
                             <button class="glass-panel aspect-video cursor-pointer overflow-hidden rounded-xl border border-outline-variant/20 transition-all hover:border-primary">
-                                <img loading="lazy" decoding="async" alt="{{ $alt }}" class="h-full w-full object-cover" src="{{ $image }}">
+                                <img alt="{{ $alt }}" class="h-full w-full object-cover" src="{{ $image }}">
                             </button>
                         @endforeach
                     </div>
@@ -321,7 +267,7 @@
                             @foreach ([['Sarah M.', 'My 10th graders were glued to the screen! The animations explaining the Golgi apparatus are the best I have ever seen.', 'https://lh3.googleusercontent.com/aida-public/AB6AXuC7trVPvfnZr-nYCTElASl10PT6czne3L1Hlm64h9fbbJlOoP3dD8By3u2ADmAlc_OXGjY2eO9mj_cHpaqQW1dt6RmJPXc-oPOARnV_KDBp5vn5hn35VW5A4XeF59O_S8zo4_Lle86uv4sz5G7Ib8prGOPamRPxzLtKPqQ3LwETFbkYEfTympqZAJpyME2UKCmtrA00hxtYT6FM6OXDcfDDfoKYuiaTRUEShjcvdegL5bfHXhWYIxkc1VyKD65Xk6IEWihlDw88MJ8'], ['Prof. James', 'Excellent quality. Highly recommend for any biology curriculum.', 'https://lh3.googleusercontent.com/aida-public/AB6AXuByWb149Cj9nII656BUMIWgg0xCOwnZjiKAxfxC46-WxSRa_-LhA2smX02l51Cyl0Rt3PHvSQJ9gF9do5qGloj5baloOcjgAr81veSUdsdwANdBXE8HGAayp27UAfkdyKDYusFu0tU0VBNPjpf7O4pGRBfhuW6gjE3uhKZHPYFgMf0tyIYUhsYJFDsMuJYBT8i-rZ2mQ_EmcoxJExrgaXWjGhfgkW4VRhsxrA0oP0P0nR7O1rjII9bn0Ri627xxl3q4beciu0dVJgo']] as [$name, $quote, $avatar])
                                 <article class="glass-panel flex gap-6 rounded-2xl p-6">
                                     <div class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full">
-                                        <img loading="lazy" decoding="async" alt="{{ $name }}" class="h-full w-full object-cover" src="{{ $avatar }}">
+                                        <img alt="{{ $name }}" class="h-full w-full object-cover" src="{{ $avatar }}">
                                     </div>
                                     <div class="flex-1">
                                         <div class="mb-2 flex flex-wrap justify-between gap-2">
@@ -344,7 +290,7 @@
                     <article class="glass-panel glow-border rounded-3xl p-8 text-center">
                         <div class="relative mx-auto mb-6 h-32 w-32">
                             <div class="orbit-loader absolute -inset-2"></div>
-                            <img loading="lazy" decoding="async" alt="Lhyzah" class="relative z-10 h-full w-full rounded-full border-4 border-surface-container-high object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVm0ZAVSkBALNXTMUIHrX7NjDRkhQ8v_Rap3VarW3mXB8t4iHUXX70I6SHscQWVw_eK4k0gJ-rXHHDSYa2zBn-4g2CS7Y_giirQAv73rfokdri0U9VLT1Hl0OluGev7B3ziG86A9FW3zxH3MpCHPDwHFQry6QaqhLpIMHnE6eWdv0yWS3cy69D_Ih845hIoyWegyAfzq3oKAaRlxASapeIkW99_0fZv8CyBoCC_azOj2KRYdXG-HoeE87jkhoZj6BDNaqxmOsACqg">
+                            <img alt="Lhyzah" class="relative z-10 h-full w-full rounded-full border-4 border-surface-container-high object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVm0ZAVSkBALNXTMUIHrX7NjDRkhQ8v_Rap3VarW3mXB8t4iHUXX70I6SHscQWVw_eK4k0gJ-rXHHDSYa2zBn-4g2CS7Y_giirQAv73rfokdri0U9VLT1Hl0OluGev7B3ziG86A9FW3zxH3MpCHPDwHFQry6QaqhLpIMHnE6eWdv0yWS3cy69D_Ih845hIoyWegyAfzq3oKAaRlxASapeIkW99_0fZv8CyBoCC_azOj2KRYdXG-HoeE87jkhoZj6BDNaqxmOsACqg">
                         </div>
                         <h4 class="font-headline text-2xl font-semibold">Meet Lhyzah</h4>
                         <p class="mb-4 font-label text-sm text-primary">Scientific Curator</p>
@@ -380,7 +326,7 @@
                     @foreach ([['Quantum Physics Lab Set', 'Worksheets + Virtual Sim', '₱250.00', 'https://lh3.googleusercontent.com/aida-public/AB6AXuBKTBt6pOG_oR9_PrrKIpbcl5bWp3Km6Z9QNHKDnhIU5Qsi4nC-HiqCsvdRmbwXlwS9xysRhI8s-c4Gg-_LtQnBqhghcnSQCbobGiYYD9293s0YrazwPXqNDDon_WTSxliVzR6z0nTmoL5zQCZklDFfNKKRhbjsJrlV7tE4Qu5wQBbTBixZ_awI0rpnkAx7HDP3ezU5PjrKhBnki1FbrcELjPIDb_hkgFIm-tAUJ4oDQyU5GaSk1WJP6nTyndR3RHV0wEMSOWBWnK8'], ['Atomic Bonds Interactive', 'PowerPoint + Flashcards', '₱380.00', 'https://lh3.googleusercontent.com/aida-public/AB6AXuBKcRXUMiK_TgOdMJntc1otCEECFWNJYI9J7NfAdL5ayUn9x8K9SA9vB75Vr6SrMp4ZzGZ6tQtoU2iLMK48n74qAQc459YMKlj5p4l1q3cWYQP15of04Oc2RpCDDql_cUCuhgL2BnyLIU4rI3NfAflBOkxz8k640EeFxE5GkNOud-cxYnit0KXztBY2Vn0aO5OrllK9c8j_nuoYtxdqIJlLHDiqeA5EJbUWBMog3tWepJXynq5MO5vDUnvCWZg91SoFnmtiRY86YYw'], ['Solar System Mission Log', "Teacher's Guide + Kit", '₱450.00', 'https://lh3.googleusercontent.com/aida-public/AB6AXuBDGEyfUa1ArT2lFMR0S2swZkBd3DOMnq-wPwm0LkuoftUxSAoxSJeiPk54OIsw-p7F_P80mr5zzRMKngSFD-WCcUacHM_3ROS1Ghd5RQLOeBvUSbigdcaM835LOrBthCOWUF_nZmm5rSxQAUX1ovnorcPV3fVQETzD4nyySwk-DKSLo9v0ei2a6B9gtgpM-STia7jwt-i9uMyMQPkHJivH4bSbSp7r-doh7mL2JHZvUOKPdXA7hKCT9XUtBko2lJpaMgK3GDLI3Z0']] as [$title, $copy, $price, $image])
                         <article class="glass-panel glow-border group flex flex-col overflow-hidden rounded-3xl">
                             <div class="relative aspect-video overflow-hidden">
-                                <img loading="lazy" decoding="async" alt="{{ $title }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" src="{{ $image }}">
+                                <img alt="{{ $title }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" src="{{ $image }}">
                                 <div class="absolute right-4 top-4 rounded-full border border-outline-variant/20 bg-background/60 px-3 py-1 font-label text-xs backdrop-blur-md">{{ $price }}</div>
                             </div>
                             <div class="space-y-2 p-6">

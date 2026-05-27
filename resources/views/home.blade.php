@@ -4,37 +4,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    @include('partials.seo', [
-        'seoTitle' => 'iLearn Science Resources | Digital Science Teaching Materials for Teachers',
-        'seoDescription' => 'Download engaging science PowerPoint presentations, printable science worksheets, quizzes, lesson plans, and digital teaching resources designed to help teachers prepare less and teach more.',
-        'seoCanonical' => route('home'),
-        'seoImage' => asset('images/shop/photosynthesis-process-topic.svg'),
-        'structuredData' => [
-            [
-                ('@' . 'context') => 'https://schema.org',
-                '@type' => 'ItemList',
-                'name' => 'Featured science teaching resources',
-                'itemListElement' => collect($seoProducts ?? [])->take(8)->values()->map(fn ($product, $index) => [
-                    '@type' => 'ListItem',
-                    'position' => $index + 1,
-                    'item' => [
-                        '@type' => 'Product',
-                        'name' => $product['title'] ?? 'Science Teaching Resource',
-                        'description' => $product['description'] ?? 'Digital science teaching resource for classrooms.',
-                        'image' => $product['image'] ?? asset('images/shop/photosynthesis-process-topic.svg'),
-                        'category' => $product['category'] ?? 'Science Teaching Resources',
-                        'offers' => [
-                            '@type' => 'Offer',
-                            'priceCurrency' => 'PHP',
-                            'price' => (string) ($product['price'] ?? 0),
-                            'availability' => 'https://schema.org/InStock',
-                            'url' => route('shop'),
-                        ],
-                    ],
-                ])->all(),
-            ],
-        ],
-    ])
+    <title>iLearn Science Resources | Teach More, Prepare Less</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@500&family=Plus+Jakarta+Sans:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -262,7 +232,7 @@
     <header class="fixed top-0 z-50 w-full border-b border-white/20 bg-surface/20 backdrop-blur-md">
         <nav class="mx-auto flex max-w-container-max items-center justify-between gap-5 px-4 py-4 md:px-gutter">
             <a class="flex min-w-0 items-center gap-3" href="{{ route('home') }}" aria-label="iLearn Science home">
-                <img loading="eager" fetchpriority="high" decoding="async" alt="iLearn Science Resources logo for digital science teaching materials" class="h-12 w-12 shrink-0 object-contain md:h-14 md:w-14" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRlFDOjxkn2sD8rhXX_C9oZtkMTA0F2zIbuZyG9wIVQvasApaG3RmYgyG2Pvp2jL5OiIRqxkIx75Tsq4ci10yb8-EExxTPy1tjBBGxv1_B3mcIr9zJxx3s_rlbkerqWnrBAlY0nMbog5hJGyrtHKkEW2ogz66o1R7h0OAPWRoU3Y4Dy9K6RZJItpyPL-ZXT9Xn5m73Ru9ye9BaZqOLXhg7JJvqaSDws24wBFWt5ncypHJMLUZ0mtJgObLNXtQbZinBc0Bg4jGSDVg">
+                <img alt="iLearn Science Logo" class="h-12 w-12 shrink-0 object-contain md:h-14 md:w-14" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRlFDOjxkn2sD8rhXX_C9oZtkMTA0F2zIbuZyG9wIVQvasApaG3RmYgyG2Pvp2jL5OiIRqxkIx75Tsq4ci10yb8-EExxTPy1tjBBGxv1_B3mcIr9zJxx3s_rlbkerqWnrBAlY0nMbog5hJGyrtHKkEW2ogz66o1R7h0OAPWRoU3Y4Dy9K6RZJItpyPL-ZXT9Xn5m73Ru9ye9BaZqOLXhg7JJvqaSDws24wBFWt5ncypHJMLUZ0mtJgObLNXtQbZinBc0Bg4jGSDVg">
                 <span class="truncate font-headline text-xl font-bold tracking-tight text-primary md:text-2xl">iLearn Science</span>
             </a>
 
@@ -332,7 +302,7 @@
                 <div class="relative flex h-[500px] w-full items-center justify-center lg:h-[600px]">
                     <div class="animate-zero-gravity relative z-10 w-full max-w-[500px] lg:max-w-none">
                         <div class="absolute inset-0 scale-75 animate-pulse rounded-full bg-primary/20 blur-[60px]"></div>
-                        <img loading="eager" fetchpriority="high" decoding="async" alt="Science learning materials and digital teaching resources for teachers and students" class="relative z-10 h-full w-full object-contain drop-shadow-[0_0_50px_rgba(0,212,255,0.5)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDO3DIYODKmd27gYYPHEyaXRAxiHRQgv-u6k697ETbW8JaUPcp7z4LtWNToa1_QL7KPKgOmcBWro6s5Q97XxFezj3NL8m-F5QgaPKOnajfK1rsW8AE0CN8qpEmQwvWB5sw4wanURc_O6bRElwPqs7VRZgDyzjoEPGPhEecmijzXASyeJQ6i5ZdBZYpDmRGi9hRI4r6wk-866ck3zCUXaTCoBaGqKJWM-61VIv5WI-lRhjRAwPLoxsSq_6IDwfbWIBlK94wD3wBCpw">
+                        <img alt="iLearn Science Astronaut" class="relative z-10 h-full w-full object-contain drop-shadow-[0_0_50px_rgba(0,212,255,0.5)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDO3DIYODKmd27gYYPHEyaXRAxiHRQgv-u6k697ETbW8JaUPcp7z4LtWNToa1_QL7KPKgOmcBWro6s5Q97XxFezj3NL8m-F5QgaPKOnajfK1rsW8AE0CN8qpEmQwvWB5sw4wanURc_O6bRElwPqs7VRZgDyzjoEPGPhEecmijzXASyeJQ6i5ZdBZYpDmRGi9hRI4r6wk-866ck3zCUXaTCoBaGqKJWM-61VIv5WI-lRhjRAwPLoxsSq_6IDwfbWIBlK94wD3wBCpw">
                     </div>
                 </div>
             </div>
@@ -416,7 +386,7 @@
                 @foreach (array_merge($bestSellers, $bestSellers) as [$title, $image])
                     <article class="glass-panel shimmer-on-hover relative inline-block w-[320px] shrink-0 rounded-2xl p-6 md:w-[400px]">
                         <div class="neon-glow absolute -right-3 -top-3 z-10 rounded-full bg-secondary px-3 py-1 font-label text-xs text-on-secondary">Best Seller</div>
-                        <img loading="lazy" decoding="async" alt="{{ $title }}" class="mb-4 h-56 w-full rounded-xl object-cover" src="{{ $image }}">
+                        <img alt="{{ $title }}" class="mb-4 h-56 w-full rounded-xl object-cover" src="{{ $image }}">
                         <p class="font-headline text-lg font-semibold text-on-surface">{{ $title }}</p>
                     </article>
                 @endforeach
@@ -439,7 +409,7 @@
                 @foreach ($testimonials as [$name, $role, $quote, $color, $avatar])
                     <article class="glass-panel reveal rounded-2xl p-8 {{ $loop->index === 1 ? 'border border-primary/30 md:scale-105' : '' }}">
                         <div class="mb-6 flex items-center gap-4">
-                            <img loading="lazy" decoding="async" alt="{{ $name }}" class="h-12 w-12 rounded-full border-2 border-{{ $color }}" src="{{ $avatar }}">
+                            <img alt="{{ $name }}" class="h-12 w-12 rounded-full border-2 border-{{ $color }}" src="{{ $avatar }}">
                             <div>
                                 <p class="font-headline font-semibold">{{ $name }}</p>
                                 <p class="font-label text-xs text-on-surface-variant">{{ $role }}</p>
@@ -525,7 +495,7 @@
             </button>
             <div class="grid min-h-0 grid-cols-1 md:grid-cols-2">
                 <div class="relative flex min-h-[260px] items-center justify-center overflow-hidden bg-surface-container-lowest/70 p-4 md:min-h-[520px]">
-                    <img loading="lazy" decoding="async" id="resource-preview-image" class="max-h-[42vh] w-full object-contain md:max-h-[calc(100vh-8rem)]" alt="Preview image for digital science teaching resource">
+                    <img id="resource-preview-image" class="max-h-[42vh] w-full object-contain md:max-h-[calc(100vh-8rem)]" alt="">
                     <div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent md:bg-gradient-to-r"></div>
                 </div>
                 <div class="flex flex-col justify-center p-6 md:p-8">
@@ -586,18 +556,11 @@
         const cartStorageKey = 'ilearnScienceCartItems';
         const inventoryStorageKey = 'ilearnScienceInventoryProducts';
         const productsEndpoint = '{{ route('products.index') }}';
-        const productDetailBaseUrl = '{{ url('/resources') }}';
-        const fallbackResourceImage = '{{ asset('images/shop/photosynthesis-process-topic.svg') }}';
         const productSyncChannel = 'BroadcastChannel' in window ? new BroadcastChannel('ilearn-products-sync') : null;
         const homeResourceGrid = document.getElementById('home-resource-grid');
         const resourceCategoryButtons = document.querySelectorAll('.resource-category-filter');
         let currentHomeProducts = [];
         let currentHomeCategory = 'All';
-
-        function safeResourceImage(image) {
-            const value = String(image || '').trim();
-            return value && !value.startsWith('data:') ? value : fallbackResourceImage;
-        }
 
         function getCartItems() {
             if (window.iLearnAuth?.getCartItems) return window.iLearnAuth.getCartItems();
@@ -680,7 +643,7 @@
                 format: product.format || 'Digital File',
                 description: product.description || product.copy || product.shortDescription || 'Teacher-ready science learning material.',
                 includes: product.includes || 'Editable resource|Digital download|Classroom-ready activity',
-                image: safeResourceImage(product.image || product.imageUrl || ''),
+                image: product.image || product.imageUrl || '',
             };
         }
 
@@ -771,11 +734,11 @@
             return `
                 <article class="glass-panel reveal shimmer-on-hover group overflow-hidden rounded-xl transition-all duration-300 hover:scale-[1.02]" data-admin-product-card="${escapeHTML(normalized.id)}">
                     <div class="relative h-48 overflow-hidden">
-                        ${normalized.image ? `<img loading="lazy" decoding="async" alt="${escapeHTML(normalized.title)}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" src="${escapeHTML(normalized.image)}">` : `<div class="flex h-full w-full items-center justify-center bg-surface-container-high text-primary"><span class="material-symbols-outlined text-5xl">science</span></div>`}
+                        ${normalized.image ? `<img alt="${escapeHTML(normalized.title)}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" src="${escapeHTML(normalized.image)}">` : `<div class="flex h-full w-full items-center justify-center bg-surface-container-high text-primary"><span class="material-symbols-outlined text-5xl">science</span></div>`}
                         <div class="absolute right-2 top-2 rounded bg-primary-container px-2 py-1 font-label text-xs font-bold text-on-primary-container shadow-[0_0_12px_rgba(0,212,255,0.35)]">${escapeHTML(normalized.type)}</div>
                     </div>
                     <div class="p-6">
-                        <a class="mb-2 block font-headline text-lg font-semibold transition-colors hover:text-primary" href="${productDetailBaseUrl}/${encodeURIComponent(normalized.id)}">${escapeHTML(normalized.title)}</a>
+                        <h3 class="mb-2 font-headline text-lg font-semibold">${escapeHTML(normalized.title)}</h3>
                         <p class="mb-4 line-clamp-2 text-sm text-on-surface-variant">${escapeHTML(normalized.description)}</p>
                         <div class="flex items-center justify-between gap-3">
                             <span class="font-headline text-2xl font-semibold text-primary">${escapeHTML(normalized.price)}</span>
@@ -917,7 +880,7 @@
 
             results.innerHTML = matches.map((product) => `
                 <article class="mb-3 flex gap-4 rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-primary/40 hover:bg-primary-container/10">
-                    <img loading="lazy" decoding="async" class="h-20 w-20 rounded-xl object-cover" src="${product.image}" alt="${product.title}">
+                    <img class="h-20 w-20 rounded-xl object-cover" src="${product.image}" alt="${product.title}">
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-start justify-between gap-3">
                             <div>

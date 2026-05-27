@@ -3,12 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    @include('partials.seo', [
-        'seoTitle' => 'Cart | iLearn Science Digital Teaching Resources',
-        'seoDescription' => 'Review selected science PowerPoint presentations, worksheets, quizzes, and digital teaching resources before secure checkout.',
-        'seoCanonical' => route('cart'),
-        'seoRobots' => 'noindex, nofollow',
-    ])
+    <title>iLearn Science - Your Cart</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -101,7 +96,7 @@
     <nav class="fixed left-0 top-0 z-50 hidden h-screen w-64 flex-col border-r border-white/10 bg-surface-container/80 py-8 shadow-[0_0_15px_rgba(0,212,255,0.1)] backdrop-blur-xl md:flex">
         <div class="mb-10 px-6">
             <a class="flex items-center gap-3" href="{{ route('home') }}">
-                <img loading="lazy" decoding="async" alt="iLearn Logo" class="h-10 w-10 rounded-full object-cover neon-glow-cyan" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSBO56sJas6rQHK4VWyVv9zYvpVKsJP9aGm9I-zZ4Xp8RSH3TgIUxiNSFgYgSOEW-AD7ysC9slLFlObe30xoXRuZ2usUrzLaCr6C4UGL_A6_skVaPmwRJCOSWXxTz1ZZ5j3Ozg8zvZyd26aw1EyQvtPJzzb40BcFMiHArG9g9pAoV2NRyQC968hCEkCk1-k29rGdPmYK0TRKmKUkWUDd2gMt8XPS0sbLsyz2ySSzbMTEVa9zmrFuXcOziQjR6_EdazHqPNl2A2iRk">
+                <img alt="iLearn Logo" class="h-10 w-10 rounded-full object-cover neon-glow-cyan" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSBO56sJas6rQHK4VWyVv9zYvpVKsJP9aGm9I-zZ4Xp8RSH3TgIUxiNSFgYgSOEW-AD7ysC9slLFlObe30xoXRuZ2usUrzLaCr6C4UGL_A6_skVaPmwRJCOSWXxTz1ZZ5j3Ozg8zvZyd26aw1EyQvtPJzzb40BcFMiHArG9g9pAoV2NRyQC968hCEkCk1-k29rGdPmYK0TRKmKUkWUDd2gMt8XPS0sbLsyz2ySSzbMTEVa9zmrFuXcOziQjR6_EdazHqPNl2A2iRk">
                 <div>
                     <h1 class="font-headline text-2xl font-semibold tracking-tight text-primary">iLearn Science</h1>
                     <p class="font-label text-xs text-on-surface-variant/60">Cadet #4029</p>
@@ -178,7 +173,7 @@
                 @foreach ($items as [$title, $meta, $price, $image])
                     <article class="glass-panel group flex flex-col gap-6 rounded-xl p-4 transition-all hover:border-primary/20 sm:flex-row" data-cart-line data-unit-price="{{ str_replace(['₱', ','], '', $price) }}" data-base-cart-item>
                         <div class="h-32 w-full flex-shrink-0 overflow-hidden rounded-lg bg-surface-container-highest sm:w-32">
-                            <img loading="lazy" decoding="async" alt="{{ $title }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" src="{{ $image }}">
+                            <img alt="{{ $title }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" src="{{ $image }}">
                         </div>
                         <div class="flex flex-1 flex-col justify-between">
                             <div class="flex items-start justify-between gap-4">
@@ -254,7 +249,7 @@
                 @foreach ($recommendations as [$title, $copy, $tag, $price, $bg, $fg, $image])
                     <article class="glass-panel group min-w-[280px] overflow-hidden rounded-xl">
                         <div class="relative h-40 overflow-hidden">
-                            <img loading="lazy" decoding="async" alt="{{ $title }}" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" src="{{ $image }}">
+                            <img alt="{{ $title }}" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" src="{{ $image }}">
                             <div class="absolute inset-0 bg-gradient-to-t from-background to-transparent opacity-60"></div>
                             <span class="absolute left-3 top-3 rounded bg-{{ $bg }}/80 px-2 py-1 font-label text-[10px] text-{{ $fg }}">{{ $tag }}</span>
                         </div>
@@ -412,7 +407,7 @@
                 article.dataset.unitPrice = item.price;
                 article.innerHTML = `
                     <div class="h-32 w-full flex-shrink-0 overflow-hidden rounded-lg bg-surface-container-highest sm:w-32">
-                        <img loading="lazy" decoding="async" alt="${item.title}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" src="${item.image}">
+                        <img alt="${item.title}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" src="${item.image}">
                     </div>
                     <div class="flex flex-1 flex-col justify-between">
                         <div class="flex items-start justify-between gap-4">

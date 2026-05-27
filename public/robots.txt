@@ -1,14 +1,2 @@
 User-agent: *
 Disallow:
-Allow: /
-
-Disallow: /admin-dashboard
-Disallow: /admin-login
-Disallow: /blog-admin
-Disallow: /checkout
-Disallow: /cart
-Disallow: /orders
-Disallow: /order-success
-Disallow: /dashboard
-
-Sitemap: https://ilearnscienceresources.dreamhosters.com/sitemap.xml

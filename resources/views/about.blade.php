@@ -3,12 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    @include('partials.seo', [
-        'seoTitle' => 'About iLearn Science Resources | Digital Teaching Materials for Science Teachers',
-        'seoDescription' => 'Meet iLearn Science Resources, a modern educational platform creating digital science teaching materials, worksheets, presentations, quizzes, and classroom-ready resources.',
-        'seoCanonical' => route('about'),
-        'seoImage' => asset('images/shop/taxonomy-human-topic.svg'),
-    ])
+    <title>iLearn Science - About Us</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -65,7 +60,7 @@
         <div class="flex items-center gap-6 lg:gap-12">
             <a class="flex items-center gap-2" href="{{ route('home') }}">
                 <div class="flex h-10 w-10 items-center justify-center overflow-hidden">
-                    <img loading="lazy" decoding="async" alt="iLearn Science Logo" class="h-full w-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYysu5egbuG-gryoVtH8a96uRh-Pzw60t95UJt-H_jjkvZ1J2sxmIFURQlSILz2wEigR4qXCMNAOeDB-dd-rf4-kslFGdKHXNqlLIU0mpdMwwylsifZS9NWX3yeQXrXp6SWbNrexmO8nbtfrIS0jv-MNQsWdfBzkQU7p3R8PospQmrSsZU7u853pp3ubTjTcja1CVKJcH0rENP18mW5FVKh6DMB6A4xO3hGTBm-HWYAFUSr9X-4c9YuJT_GGqbAKB_dCDZxKQL3bc">
+                    <img alt="iLearn Science Logo" class="h-full w-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYysu5egbuG-gryoVtH8a96uRh-Pzw60t95UJt-H_jjkvZ1J2sxmIFURQlSILz2wEigR4qXCMNAOeDB-dd-rf4-kslFGdKHXNqlLIU0mpdMwwylsifZS9NWX3yeQXrXp6SWbNrexmO8nbtfrIS0jv-MNQsWdfBzkQU7p3R8PospQmrSsZU7u853pp3ubTjTcja1CVKJcH0rENP18mW5FVKh6DMB6A4xO3hGTBm-HWYAFUSr9X-4c9YuJT_GGqbAKB_dCDZxKQL3bc">
                 </div>
                 <div class="flex flex-col leading-none">
                     <span class="text-xl font-bold tracking-tight">iLearn</span>
@@ -113,7 +108,7 @@
                             ['Chemistry Study Guide', 'Interactive E-Book', '₱12.99', 1, 'https://lh3.googleusercontent.com/aida-public/AB6AXuCPPifHph78pWofuqtVNjb6V-PLYAh0tthoPV29K8qbg1Hv1B-iMoInZd5zkM3IEUG-p70cbjpgCovfozMZv5CRK-WCHZbyV9qSJARc43tSFj5y0Zy7gIRSHAeHUrbTXYsHGfC1JUD7z0HVOmVRxQ0YLyG5ot_ckNO2l2D3y4RKVsGMl2Vc-96aVEuTetl-Fl96i8qBsHzyRsS5UB7I7_B1lhFS8Z1JW-Fp6LE5l1CDj9BJmh0ha-yaEL7VtNDyl3Dvy25kJZO_dy0'],
                         ] as [$title, $meta, $price, $quantity, $image])
                             <div class="flex items-center gap-3 px-4 py-3">
-                                <img loading="lazy" decoding="async" alt="{{ $title }}" class="h-12 w-12 rounded-lg object-cover" src="{{ $image }}">
+                                <img alt="{{ $title }}" class="h-12 w-12 rounded-lg object-cover" src="{{ $image }}">
                                 <div class="min-w-0 flex-1">
                                     <p class="truncate text-sm font-semibold text-white">{{ $title }}</p>
                                     <p class="text-xs text-slate-400">{{ $meta }} • Qty {{ $quantity }}</p>
@@ -141,7 +136,7 @@
                 <span class="material-symbols-outlined text-slate-300">notifications</span>
                 <span class="absolute -right-2 -top-1 rounded-full bg-neon-cyan px-1 text-[10px] font-bold text-space-dark">5</span>
             </div>
-            <img loading="lazy" decoding="async" alt="Elena Smith Profile" class="h-9 w-9 cursor-pointer rounded-full border-2 border-neon-purple/50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApNlR87JihXfK4WPC3HicxhPa3zV8N_4DWUAWpVpakf-WPkdVCrVa9pskcgWncYGbGetIH-eZLIddDC2oDUKLlwpt6joJCwCKksd4ZqB8j5fcXMgMfAr2uUPm1QMWpmRINZHod6b54miT_BLpjBOs09Wv1TuJ6gUAEQ6nIuMzre05GQQ9jWQYDQxls1CThb-cB0JHiCQPYwtDnwCFH_KAVD6tm1ziTHkKr-tSFdflnt21RoayHTxjMEyqhjiWqlRjOJoBIP_tjbA8">
+            <img alt="Elena Smith Profile" class="h-9 w-9 cursor-pointer rounded-full border-2 border-neon-purple/50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApNlR87JihXfK4WPC3HicxhPa3zV8N_4DWUAWpVpakf-WPkdVCrVa9pskcgWncYGbGetIH-eZLIddDC2oDUKLlwpt6joJCwCKksd4ZqB8j5fcXMgMfAr2uUPm1QMWpmRINZHod6b54miT_BLpjBOs09Wv1TuJ6gUAEQ6nIuMzre05GQQ9jWQYDQxls1CThb-cB0JHiCQPYwtDnwCFH_KAVD6tm1ziTHkKr-tSFdflnt21RoayHTxjMEyqhjiWqlRjOJoBIP_tjbA8">
         </div>
     </header>
 
@@ -217,7 +212,7 @@
                             <div class="group relative mx-auto mt-12 w-full max-w-3xl">
                                 <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-neon-cyan/20 to-neon-purple/20 opacity-25 blur transition duration-1000 group-hover:opacity-50 group-hover:duration-200"></div>
                                 <div class="glass-card relative overflow-hidden border border-white/10 shadow-2xl">
-                                    <img loading="lazy" decoding="async" alt="Science Visual" class="h-auto w-full rounded-xl object-cover shadow-[0_0_30px_rgba(0,242,255,0.15)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGfYULTALORsArD6md30OB69L0LdkS-ziZYFzy9PkZX6qczCsHgFpFEQjUSpkIUBxcDKdQf3FY4EBN0DBMBVeE_4hsa_POE0thdkyVTL4JJVy4MUhvr510_iVTffHMhzV5uHG7oSORxsUtmRfSYRp8Mou4mGLKmsW33cPHBmt2fUAGL_XCRC04HItEdVr01ra3RJS5uTWZkIvkQzNL4aO5BaDhiD6JUbYBjhMsH4DH5P5AbSG8Ly7rfqo3G7qyFIfBYVIm4BtcUkY">
+                                    <img alt="Science Visual" class="h-auto w-full rounded-xl object-cover shadow-[0_0_30px_rgba(0,242,255,0.15)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGfYULTALORsArD6md30OB69L0LdkS-ziZYFzy9PkZX6qczCsHgFpFEQjUSpkIUBxcDKdQf3FY4EBN0DBMBVeE_4hsa_POE0thdkyVTL4JJVy4MUhvr510_iVTffHMhzV5uHG7oSORxsUtmRfSYRp8Mou4mGLKmsW33cPHBmt2fUAGL_XCRC04HItEdVr01ra3RJS5uTWZkIvkQzNL4aO5BaDhiD6JUbYBjhMsH4DH5P5AbSG8Ly7rfqo3G7qyFIfBYVIm4BtcUkY">
                                 </div>
                             </div>
                         </div>
@@ -263,7 +258,7 @@
 
                     <article class="glass-card flex flex-col gap-6 border-white/10 p-8 md:flex-row md:items-start">
                         <div class="flex h-16 w-16 flex-shrink-0 items-center justify-center">
-                            <img loading="lazy" decoding="async" alt="Telescope" class="h-12 w-12 object-contain drop-shadow-[0_0_8px_rgba(0,242,255,0.4)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFOFpVyPHLEwBkrH4V2dcMuNgLnq8ulzmTeZMC5EqBYLCMqxhXS-rvvGiyxC0L7eZOxDoxRBrhMl9XJj-FgjHZT2wX4kgrl53AMx6V89Rr5CEh7wyWhbWUvcs9kqvZQPDQfjXJQKwHqvhmnlyitevGDASJpqp1HFnpexNmOkQLT4SdQ-aTmdUgsRFviW45Mt7TWxa0pESwkZ39bhnPW16R8cG0pc9fRw9NdsbyOElXaNQ7ljQmwffo0jiUrpWyA7DmBpfrLycvgks">
+                            <img alt="Telescope" class="h-12 w-12 object-contain drop-shadow-[0_0_8px_rgba(0,242,255,0.4)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFOFpVyPHLEwBkrH4V2dcMuNgLnq8ulzmTeZMC5EqBYLCMqxhXS-rvvGiyxC0L7eZOxDoxRBrhMl9XJj-FgjHZT2wX4kgrl53AMx6V89Rr5CEh7wyWhbWUvcs9kqvZQPDQfjXJQKwHqvhmnlyitevGDASJpqp1HFnpexNmOkQLT4SdQ-aTmdUgsRFviW45Mt7TWxa0pESwkZ39bhnPW16R8cG0pc9fRw9NdsbyOElXaNQ7ljQmwffo0jiUrpWyA7DmBpfrLycvgks">
                         </div>
                         <div>
                             <h3 class="mb-3 text-xl font-bold">Our Vision</h3>
@@ -279,7 +274,7 @@
                     <div class="relative z-10 flex flex-col gap-8 xl:flex-row xl:gap-12">
                         <div class="relative flex-shrink-0 self-center xl:self-start">
                             <div class="h-48 w-48 rounded-full border-4 border-neon-cyan/20 p-2">
-                                <img loading="lazy" decoding="async" alt="Meet the Creator" class="h-full w-full rounded-full object-cover grayscale-[30%]" src="https://lh3.googleusercontent.com/aida/ADBb0uhlsQq5l-vPVd7Gs2uVpm_3R-ayP3qr7NPz8ZAqqDeg64nhyIKoX7Tat6WrG9wVvMh5kC1b9n6-o5QXqK3418HTwWilf7JKfIr4Wv-46BJ5IIdVnImFAYLPm_Q89RuJF5bzr--_SOtLAymemB4eNRQDLe3mH8mjajEIWGWxTe_jVTRTIYonvPkzjDSluXhdlIgKkBQD9kJBWSTc6LLBPPcZ9L54Kj6T1igLLb0XK6CiftiXAdc-x93Svaj_YtHDBhgGEupy67TS3A">
+                                <img alt="Meet the Creator" class="h-full w-full rounded-full object-cover grayscale-[30%]" src="https://lh3.googleusercontent.com/aida/ADBb0uhlsQq5l-vPVd7Gs2uVpm_3R-ayP3qr7NPz8ZAqqDeg64nhyIKoX7Tat6WrG9wVvMh5kC1b9n6-o5QXqK3418HTwWilf7JKfIr4Wv-46BJ5IIdVnImFAYLPm_Q89RuJF5bzr--_SOtLAymemB4eNRQDLe3mH8mjajEIWGWxTe_jVTRTIYonvPkzjDSluXhdlIgKkBQD9kJBWSTc6LLBPPcZ9L54Kj6T1igLLb0XK6CiftiXAdc-x93Svaj_YtHDBhgGEupy67TS3A">
                             </div>
                             <div class="absolute -left-4 -top-4 h-4 w-4 animate-pulse rounded-full bg-neon-cyan shadow-[0_0_10px_#00f2ff]"></div>
                             <div class="absolute -right-4 bottom-8 h-3 w-3 animate-pulse rounded-full bg-neon-purple shadow-[0_0_10px_#8a2be2]"></div>

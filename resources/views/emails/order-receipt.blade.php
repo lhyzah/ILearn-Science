@@ -76,7 +76,7 @@
                                     <tr>
                                         <td style="padding:14px;width:70px;">
                                             @if ($emailSafeImage($item['image']))
-                                                <img loading="lazy" decoding="async" src="{{ $item['image'] }}" width="58" height="58" alt="{{ $item['title'] ?? 'Purchased science teaching resource' }}" style="display:block;width:58px;height:58px;border-radius:14px;object-fit:cover;border:1px solid rgba(168,232,255,.22);">
+                                                <img src="{{ $item['image'] }}" width="58" height="58" alt="" style="display:block;width:58px;height:58px;border-radius:14px;object-fit:cover;border:1px solid rgba(168,232,255,.22);">
                                             @else
                                                 <div style="width:58px;height:58px;border-radius:14px;background:#32353c;border:1px solid rgba(168,232,255,.22);"></div>
                                             @endif

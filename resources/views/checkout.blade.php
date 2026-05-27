@@ -4,13 +4,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    @include('partials.seo', [
-        'seoTitle' => 'Secure Checkout | iLearn Science Digital Teaching Resources',
-        'seoDescription' => 'Complete a secure checkout for digital science teaching resources, downloadable classroom materials, worksheets, quizzes, and PowerPoint presentations.',
-        'seoCanonical' => route('checkout'),
-        'seoImage' => asset('images/shop/photosynthesis-process-topic.svg'),
-        'seoRobots' => 'noindex, nofollow',
-    ])
+    <title>iLearn Science - Secure Checkout</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -172,7 +166,7 @@
     <header class="sticky top-0 z-50 border-b border-primary/10 bg-surface/75 backdrop-blur-2xl">
         <nav class="mx-auto flex max-w-container-max items-center justify-between gap-4 px-4 py-4 lg:px-8">
             <a class="flex min-w-0 items-center gap-3" href="{{ route('home') }}">
-                <img loading="lazy" decoding="async" alt="iLearn Science Logo" class="h-11 w-11 rounded-full border border-primary/20 object-contain shadow-[0_0_16px_rgba(60,215,255,.2)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRlFDOjxkn2sD8rhXX_C9oZtkMTA0F2zIbuZyG9wIVQvasApaG3RmYgyG2Pvp2jL5OiIRqxkIx75Tsq4ci10yb8-EExxTPy1tjBBGxv1_B3mcIr9zJxx3s_rlbkerqWnrBAlY0nMbog5hJGyrtHKkEW2ogz66o1R7h0OAPWRoU3Y4Dy9K6RZJItpyPL-ZXT9Xn5m73Ru9ye9BaZqOLXhg7JJvqaSDws24wBFWt5ncypHJMLUZ0mtJgObLNXtQbZinBc0Bg4jGSDVg">
+                <img alt="iLearn Science Logo" class="h-11 w-11 rounded-full border border-primary/20 object-contain shadow-[0_0_16px_rgba(60,215,255,.2)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRlFDOjxkn2sD8rhXX_C9oZtkMTA0F2zIbuZyG9wIVQvasApaG3RmYgyG2Pvp2jL5OiIRqxkIx75Tsq4ci10yb8-EExxTPy1tjBBGxv1_B3mcIr9zJxx3s_rlbkerqWnrBAlY0nMbog5hJGyrtHKkEW2ogz66o1R7h0OAPWRoU3Y4Dy9K6RZJItpyPL-ZXT9Xn5m73Ru9ye9BaZqOLXhg7JJvqaSDws24wBFWt5ncypHJMLUZ0mtJgObLNXtQbZinBc0Bg4jGSDVg">
                 <span class="truncate font-headline text-xl font-bold text-primary md:text-2xl">iLearn Science</span>
             </a>
             <div class="flex items-center gap-2 rounded-full border border-primary/20 bg-primary-container/10 px-3 py-2 font-label text-xs uppercase tracking-widest text-primary md:px-4">
@@ -522,7 +516,7 @@
                 list.innerHTML = items.length ? items.map((item) => `
                     <div class="flex items-start justify-between gap-3 rounded-2xl border border-white/5 bg-surface-container-low/50 p-3">
                         <div class="flex min-w-0 gap-3">
-                            <img loading="lazy" decoding="async" class="h-14 w-14 flex-shrink-0 rounded-xl object-cover" src="${item.image}" alt="${item.title}">
+                            <img class="h-14 w-14 flex-shrink-0 rounded-xl object-cover" src="${item.image}" alt="${item.title}">
                             <div class="min-w-0">
                                 <p class="truncate font-semibold text-on-surface">${item.title}</p>
                                 <div class="mt-1 flex flex-wrap items-center gap-2">

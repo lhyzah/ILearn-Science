@@ -3,45 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    @include('partials.seo', [
-        'seoTitle' => 'Shop Science Teaching Resources | PPTX, Worksheets, Quizzes and Study Guides',
-        'seoDescription' => 'Browse digital science teaching resources including editable PowerPoint presentations, printable worksheets, visual resources, study guides, lesson materials, and quizzes.',
-        'seoCanonical' => route('shop'),
-        'seoImage' => asset('images/shop/photosynthesis-process-topic.svg'),
-        'structuredData' => [
-            [
-                ('@' . 'context') => 'https://schema.org',
-                '@type' => 'BreadcrumbList',
-                'itemListElement' => [
-                    ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => route('home')],
-                    ['@type' => 'ListItem', 'position' => 2, 'name' => 'Shop Science Resources', 'item' => route('shop')],
-                ],
-            ],
-            [
-                ('@' . 'context') => 'https://schema.org',
-                '@type' => 'ItemList',
-                'name' => 'Science teaching resources catalog',
-                'itemListElement' => collect($seoProducts ?? [])->take(20)->values()->map(fn ($product, $index) => [
-                    '@type' => 'ListItem',
-                    'position' => $index + 1,
-                    'item' => [
-                        '@type' => 'Product',
-                        'name' => $product['title'] ?? 'Science Resource',
-                        'description' => $product['description'] ?? 'Downloadable science classroom material.',
-                        'image' => $product['image'] ?? asset('images/shop/photosynthesis-process-topic.svg'),
-                        'category' => $product['category'] ?? 'Science Teaching Resources',
-                        'offers' => [
-                            '@type' => 'Offer',
-                            'priceCurrency' => 'PHP',
-                            'price' => (string) ($product['price'] ?? 0),
-                            'availability' => 'https://schema.org/InStock',
-                            'url' => route('shop'),
-                        ],
-                    ],
-                ])->all(),
-            ],
-        ],
-    ])
+    <title>iLearn Science - Shop Resources</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -156,7 +118,7 @@
     <header class="sticky top-0 z-50 flex w-full items-center justify-between border-b border-outline-variant/20 bg-surface/60 px-4 py-4 shadow-[0_0_15px_rgba(60,215,255,0.1)] backdrop-blur-xl md:px-gutter lg:pl-72">
         <div class="flex items-center gap-8">
             <a class="flex items-center gap-3" href="{{ route('home') }}">
-                <img loading="lazy" decoding="async" alt="iLearn Logo" class="h-14 w-14 rounded-full border border-primary/20 object-contain shadow-[0_0_10px_rgba(60,215,255,0.2)] md:h-16 md:w-16" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbHFKfKDtj0BBH49qj_tApU0lpPj0j_TCYogY6YMxIkmPRa2Xb5u1BgbUgu-WoIefTkhof-JeTy9F7OhqJ6B6wzSm71mD5PGUL2qYPqjk6Q7MGev-HdCLwRsmq_u3y_cRW84jQ-GUMaoOG8eNudckobNDAHc3yfhM3_9pv_dNecKcIMy7Y8_F02Am3U0V_JSejjLi8sANEMe9ZDwr5tmOhMBt_CvT01_EstcFl1EX_exZVcAXiQiyBKDfx_MGOfEbcddUPhNgnMwQ">
+                <img alt="iLearn Logo" class="h-14 w-14 rounded-full border border-primary/20 object-contain shadow-[0_0_10px_rgba(60,215,255,0.2)] md:h-16 md:w-16" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbHFKfKDtj0BBH49qj_tApU0lpPj0j_TCYogY6YMxIkmPRa2Xb5u1BgbUgu-WoIefTkhof-JeTy9F7OhqJ6B6wzSm71mD5PGUL2qYPqjk6Q7MGev-HdCLwRsmq_u3y_cRW84jQ-GUMaoOG8eNudckobNDAHc3yfhM3_9pv_dNecKcIMy7Y8_F02Am3U0V_JSejjLi8sANEMe9ZDwr5tmOhMBt_CvT01_EstcFl1EX_exZVcAXiQiyBKDfx_MGOfEbcddUPhNgnMwQ">
                 <h1 class="font-display text-3xl font-bold tracking-tight text-primary md:text-5xl">iLearn Science</h1>
             </a>
             <div class="hidden w-96 items-center rounded-full border border-outline-variant/30 bg-surface-container-high/50 px-4 py-2 md:flex">
@@ -196,7 +158,7 @@
 
             <article class="glass-panel group relative min-h-[280px] overflow-hidden rounded-xl lg:col-span-8">
                 <div class="absolute inset-0 z-10 bg-gradient-to-r from-background via-background/40 to-transparent"></div>
-                <img loading="lazy" decoding="async" alt="Futuristic laboratory" class="absolute inset-0 h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeA7aDCt1BhhNA6WQB-EGoUJittQ_zWiHMhgO7UPQFu7ewJlQywHQ2i9svSlMorENGTB4OXPPtG55T78teaOLzwgFzwc-rXcBlrY9S7EriKVyoAMS_0W1w8Bm-UMKPwrjdaX4C3T5Y8jMLETbi5n1naMUsffVmwTf3I2gaYr3_wzuw5_glmvYgGz7MSRbhMdOTObD3QzMyx02dZ4UVVpX67_pEhFd3iPZcf5NVpVESqINm3KdWCrlz5nViUL_8oe1G-y2p3r4ur3I">
+                <img alt="Futuristic laboratory" class="absolute inset-0 h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeA7aDCt1BhhNA6WQB-EGoUJittQ_zWiHMhgO7UPQFu7ewJlQywHQ2i9svSlMorENGTB4OXPPtG55T78teaOLzwgFzwc-rXcBlrY9S7EriKVyoAMS_0W1w8Bm-UMKPwrjdaX4C3T5Y8jMLETbi5n1naMUsffVmwTf3I2gaYr3_wzuw5_glmvYgGz7MSRbhMdOTObD3QzMyx02dZ4UVVpX67_pEhFd3iPZcf5NVpVESqINm3KdWCrlz5nViUL_8oe1G-y2p3r4ur3I">
                 <div class="relative z-20 flex h-full flex-col justify-center p-8 md:p-12">
                     <span class="mb-4 inline-block w-fit rounded-full border border-primary/30 bg-primary/20 px-3 py-1 font-label text-xs text-primary">MISSION CRITICAL</span>
                     <h2 class="mb-4 font-display text-4xl font-bold leading-tight text-white md:text-5xl">Teaching Materials <br><span class="text-primary">Ready for Launch</span></h2>
@@ -280,7 +242,7 @@
                 @endphp
                 <article class="shop-resource-card glass-panel glow-hover group overflow-hidden rounded-xl transition-all duration-500" data-field="{{ \Illuminate\Support\Str::slug($field) }}">
                     <div class="relative h-48 overflow-hidden">
-                        <img loading="lazy" decoding="async" alt="{{ $title }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" src="{{ $displayImage }}">
+                        <img alt="{{ $title }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" src="{{ $displayImage }}">
                         <div class="absolute left-3 top-3 rounded border border-{{ $color }}/30 bg-background/80 px-2 py-1 font-label text-[10px] uppercase text-{{ $color }} backdrop-blur-md">{{ $type }}</div>
                     </div>
                     <div class="space-y-4 p-6">
@@ -378,7 +340,7 @@
             </button>
             <div class="grid min-h-0 grid-cols-1 lg:grid-cols-2">
                 <div class="relative flex min-h-[260px] items-center justify-center overflow-hidden bg-surface-container-lowest/70 p-4 lg:min-h-[560px]">
-                    <img loading="lazy" decoding="async" id="shop-preview-image" class="max-h-[42vh] w-full object-contain lg:max-h-[calc(100vh-8rem)]" alt="Preview image for downloadable science teaching resource">
+                    <img id="shop-preview-image" class="max-h-[42vh] w-full object-contain lg:max-h-[calc(100vh-8rem)]" alt="">
                     <div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent lg:bg-gradient-to-r"></div>
                 </div>
                 <div class="p-6 md:p-8">
@@ -433,18 +395,10 @@
         const cartStorageKey = 'ilearnScienceCartItems';
         const inventoryStorageKey = 'ilearnScienceInventoryProducts';
         const productsEndpoint = '{{ route('products.index') }}';
-        const productDetailBaseUrl = '{{ url('/resources') }}';
-        const fallbackResourceImage = '{{ asset('images/shop/photosynthesis-process-topic.svg') }}';
         const productSyncChannel = 'BroadcastChannel' in window ? new BroadcastChannel('ilearn-products-sync') : null;
         let previewProduct = null;
         let lastInventorySnapshot = '';
         const shopResourceGrid = document.getElementById('shop-resource-grid');
-
-        function safeResourceImage(image) {
-            const value = String(image || '').trim();
-            return value && !value.startsWith('data:') ? value : fallbackResourceImage;
-        }
-
         const serverRenderedProducts = Array.from(document.querySelectorAll('.shop-resource-card')).map((card) => {
             const preview = card.querySelector('.shop-resource-preview');
             const add = card.querySelector('.shop-resource-add');
@@ -461,7 +415,7 @@
                 format: preview?.dataset.productFormat || 'Digital File',
                 focus: preview?.dataset.productFocus || '',
                 includes: preview?.dataset.productIncludes || 'Editable product information|Digital download|Teacher-ready resource',
-                image: safeResourceImage(preview?.dataset.productImage || ''),
+                image: preview?.dataset.productImage || '',
                 field: card.dataset.field || 'biology',
                 status: 'Published',
             };
@@ -534,7 +488,7 @@
                 format: product.format || 'Digital File',
                 focus: product.topic || product.focus || product.subject || 'Science learning resource',
                 includes: product.details || product.includes || 'Editable product information|Digital resource access|Teacher-ready classroom material',
-                image: safeResourceImage(product.image || ''),
+                image: product.image || '',
                 downloadLink: product.downloadLink || '',
                 field: slugify(subject),
                 status: product.status || 'Published',
@@ -655,12 +609,12 @@
             return `
                 <article class="shop-resource-card glass-panel glow-hover group overflow-hidden rounded-xl transition-all duration-500" data-field="${escapeHTML(product.field)}">
                     <div class="relative h-48 overflow-hidden">
-                        ${product.image ? `<img loading="lazy" decoding="async" alt="${escapeHTML(product.title)}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" src="${escapeHTML(product.image)}">` : `<div class="flex h-full w-full items-center justify-center bg-surface-container-high text-primary"><span class="material-symbols-outlined text-5xl">science</span></div>`}
+                        ${product.image ? `<img alt="${escapeHTML(product.title)}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" src="${escapeHTML(product.image)}">` : `<div class="flex h-full w-full items-center justify-center bg-surface-container-high text-primary"><span class="material-symbols-outlined text-5xl">science</span></div>`}
                         <div class="absolute left-3 top-3 rounded border border-${color}/30 bg-background/80 px-2 py-1 font-label text-[10px] uppercase text-${color} backdrop-blur-md">${escapeHTML(product.type)}</div>
                     </div>
                     <div class="space-y-4 p-6">
                         <div class="flex items-start justify-between gap-3">
-                            <a class="line-clamp-1 font-headline text-2xl font-semibold text-white transition-colors hover:text-primary" href="${productDetailBaseUrl}/${encodeURIComponent(product.id)}">${escapeHTML(product.title)}</a>
+                            <h4 class="line-clamp-1 font-headline text-2xl font-semibold text-white">${escapeHTML(product.title)}</h4>
                             <span class="font-label text-sm font-bold text-primary">${escapeHTML(product.price)}</span>
                         </div>
                         <p class="line-clamp-2 text-on-surface-variant">${escapeHTML(product.copy)}</p>
