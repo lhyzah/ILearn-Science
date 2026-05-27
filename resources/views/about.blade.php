@@ -203,8 +203,8 @@
                             </p>
                             <div class="group relative mx-auto mt-12 w-full max-w-3xl">
                                 <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-neon-cyan/20 to-neon-purple/20 opacity-25 blur transition duration-1000 group-hover:opacity-50 group-hover:duration-200"></div>
-                                <div class="glass-card relative overflow-hidden border border-white/10 shadow-2xl">
-                                    <img alt="Science Visual" class="h-auto w-full rounded-xl object-cover shadow-[0_0_30px_rgba(0,242,255,0.15)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGfYULTALORsArD6md30OB69L0LdkS-ziZYFzy9PkZX6qczCsHgFpFEQjUSpkIUBxcDKdQf3FY4EBN0DBMBVeE_4hsa_POE0thdkyVTL4JJVy4MUhvr510_iVTffHMhzV5uHG7oSORxsUtmRfSYRp8Mou4mGLKmsW33cPHBmt2fUAGL_XCRC04HItEdVr01ra3RJS5uTWZkIvkQzNL4aO5BaDhiD6JUbYBjhMsH4DH5P5AbSG8Ly7rfqo3G7qyFIfBYVIm4BtcUkY">
+                                <div class="glass-card relative flex min-h-[260px] items-center justify-center overflow-hidden border border-white/10 bg-white/[0.02] p-10 shadow-2xl">
+                                    <img alt="iLearn Science Logo" class="h-48 w-48 rounded-3xl object-contain drop-shadow-[0_0_35px_rgba(0,242,255,0.32)] md:h-64 md:w-64" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYysu5egbuG-gryoVtH8a96uRh-Pzw60t95UJt-H_jjkvZ1J2sxmIFURQlSILz2wEigR4qXCMNAOeDB-dd-rf4-kslFGdKHXNqlLIU0mpdMwwylsifZS9NWX3yeQXrXp6SWbNrexmO8nbtfrIS0jv-MNQsWdfBzkQU7p3R8PospQmrSsZU7u853pp3ubTjTcja1CVKJcH0rENP18mW5FVKh6DMB6A4xO3hGTBm-HWYAFUSr9X-4c9YuJT_GGqbAKB_dCDZxKQL3bc">
                                 </div>
                             </div>
                         </div>
@@ -266,7 +266,7 @@
                     <div class="relative z-10 flex flex-col gap-8 xl:flex-row xl:gap-12">
                         <div class="relative flex-shrink-0 self-center xl:self-start">
                             <div class="h-48 w-48 rounded-full border-4 border-neon-cyan/20 p-2">
-                                <img alt="Meet the Creator" class="h-full w-full rounded-full object-cover grayscale-[30%]" src="https://lh3.googleusercontent.com/aida/ADBb0uhlsQq5l-vPVd7Gs2uVpm_3R-ayP3qr7NPz8ZAqqDeg64nhyIKoX7Tat6WrG9wVvMh5kC1b9n6-o5QXqK3418HTwWilf7JKfIr4Wv-46BJ5IIdVnImFAYLPm_Q89RuJF5bzr--_SOtLAymemB4eNRQDLe3mH8mjajEIWGWxTe_jVTRTIYonvPkzjDSluXhdlIgKkBQD9kJBWSTc6LLBPPcZ9L54Kj6T1igLLb0XK6CiftiXAdc-x93Svaj_YtHDBhgGEupy67TS3A">
+                                <img alt="Meet Lhyzah, creator of iLearn Science" class="h-full w-full rounded-full object-cover grayscale-[30%]" src="{{ asset('images/lhyzah-creator.jpeg') }}">
                             </div>
                             <div class="absolute -left-4 -top-4 h-4 w-4 animate-pulse rounded-full bg-neon-cyan shadow-[0_0_10px_#00f2ff]"></div>
                             <div class="absolute -right-4 bottom-8 h-3 w-3 animate-pulse rounded-full bg-neon-purple shadow-[0_0_10px_#8a2be2]"></div>
