@@ -5,7 +5,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>iLearn Science - About Us</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -21,6 +21,9 @@
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
+                        brand: ['Sora', 'sans-serif'],
+                        body: ['Plus Jakarta Sans', 'sans-serif'],
+                        label: ['JetBrains Mono', 'monospace'],
                     },
                 },
             },
@@ -261,28 +264,30 @@
                     </article>
                 </section>
 
-                <section class="glass-card relative overflow-hidden p-6 md:p-10">
+                <section class="glass-card relative overflow-hidden border-neon-cyan/20 bg-[#10131a]/70 p-6 shadow-[0_0_30px_rgba(0,242,255,0.08)] md:p-10">
                     <div class="absolute -right-20 -top-20 h-80 w-80 rounded-full bg-neon-purple/10 blur-3xl"></div>
+                    <div class="absolute -bottom-24 left-10 h-72 w-72 rounded-full bg-neon-cyan/10 blur-3xl"></div>
                     <div class="relative z-10 flex flex-col gap-8 xl:flex-row xl:gap-12">
                         <div class="relative flex-shrink-0 self-center xl:self-start">
-                            <div class="h-48 w-48 rounded-full border-4 border-neon-cyan/20 p-2">
-                                <img alt="Meet Lhyzah, creator of iLearn Science" class="h-full w-full rounded-full object-cover grayscale-[30%]" src="{{ asset('images/lhyzah-creator.jpeg') }}">
+                            <div class="h-48 w-48 rounded-full border-4 border-neon-cyan/30 bg-white/5 p-2 shadow-[0_0_28px_rgba(0,242,255,0.22)]">
+                                <img alt="Meet Lhyzah, creator of iLearn Science" class="h-full w-full rounded-full object-cover grayscale-[18%]" src="{{ asset('images/lhyzah-creator.jpeg') }}">
                             </div>
                             <div class="absolute -left-4 -top-4 h-4 w-4 animate-pulse rounded-full bg-neon-cyan shadow-[0_0_10px_#00f2ff]"></div>
                             <div class="absolute -right-4 bottom-8 h-3 w-3 animate-pulse rounded-full bg-neon-purple shadow-[0_0_10px_#8a2be2]"></div>
                         </div>
 
                         <div class="flex-1">
-                            <div class="mb-2 flex items-center gap-2">
-                                <h2 class="text-2xl font-bold">Meet the Creator</h2>
+                            <div class="mb-3 flex items-center gap-3">
+                                <span class="font-label text-xs uppercase tracking-[0.22em] text-neon-cyan">Creator Profile</span>
                                 <div class="flex gap-1">
-                                    <div class="h-1 w-1 rounded-full bg-slate-500"></div>
-                                    <div class="h-1 w-1 rounded-full bg-slate-500"></div>
-                                    <div class="h-1 w-1 rounded-full bg-slate-500"></div>
+                                    <div class="h-1.5 w-1.5 rounded-full bg-neon-cyan shadow-[0_0_8px_rgba(0,242,255,0.8)]"></div>
+                                    <div class="h-1.5 w-1.5 rounded-full bg-neon-purple shadow-[0_0_8px_rgba(138,43,226,0.8)]"></div>
+                                    <div class="h-1.5 w-1.5 rounded-full bg-neon-cyan/60"></div>
                                 </div>
                             </div>
-                            <h3 class="mb-2 text-2xl font-bold text-white">Hi I'm Lhyzah the creator of iLearn Science</h3>
-                            <p class="mb-4 text-lg leading-relaxed text-slate-200">
+                            <h2 class="font-brand text-3xl font-bold leading-tight text-white md:text-4xl">Meet the <span class="gradient-text">Creator</span></h2>
+                            <h3 class="mb-4 mt-2 font-brand text-xl font-semibold text-neon-cyan">Hi, I'm Lhyzah, the creator of iLearn Science Resources</h3>
+                            <p class="mb-6 font-body text-base leading-8 text-slate-200 md:text-lg">
                                 Passionate about science education and creative digital learning, the creator of iLearn Science Resources develops engaging, high-quality teaching materials designed to help educators save time and inspire students. With experience in creating interactive PowerPoint presentations, worksheets, quizzes, infographics, and science learning resources, the goal is to make science lessons more effective, visually engaging, and easy to teach for classrooms, homeschooling, and online learning.
                             </p>
 
@@ -292,13 +297,13 @@
                                     ['star', 'Experience', '8+ Years', 'bg-yellow-500/20 text-yellow-500'],
                                     ['favorite', 'Passion', 'Teaching & Innovation', 'bg-pink-500/20 text-pink-500'],
                                 ] as [$icon, $eyebrow, $value, $classes])
-                                    <div class="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3">
-                                        <div class="flex h-8 w-8 items-center justify-center rounded-lg {{ $classes }}">
+                                    <div class="flex items-center gap-3 rounded-xl border border-neon-cyan/15 bg-white/[0.04] px-4 py-3 shadow-[0_0_18px_rgba(0,242,255,0.05)] transition-all hover:border-neon-cyan/35 hover:bg-neon-cyan/5">
+                                        <div class="flex h-9 w-9 items-center justify-center rounded-lg {{ $classes }}">
                                             <span class="material-symbols-outlined text-xl">{{ $icon }}</span>
                                         </div>
                                         <div>
-                                            <div class="text-[10px] uppercase tracking-wider text-slate-500">{{ $eyebrow }}</div>
-                                            <div class="text-xs font-semibold">{{ $value }}</div>
+                                            <div class="font-label text-[10px] uppercase tracking-wider text-slate-500">{{ $eyebrow }}</div>
+                                            <div class="font-body text-sm font-semibold text-slate-100">{{ $value }}</div>
                                         </div>
                                     </div>
                                 @endforeach
