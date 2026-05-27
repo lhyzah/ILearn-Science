@@ -281,13 +281,12 @@
                     </p>
                     <div class="flex flex-wrap gap-4">
                         <a class="cta-glow-hover rounded-lg bg-primary-container px-8 py-4 font-label text-sm font-medium text-on-primary-container transition-all duration-300 hover:scale-105" href="{{ route('shop') }}">Shop Resources</a>
-                        <a class="rounded-lg border border-primary px-8 py-4 font-label text-sm font-medium text-primary transition-all hover:bg-primary/10" href="#resources">Browse Worksheets</a>
                     </div>
                     <div class="flex flex-wrap items-center gap-3 border-t border-white/10 pt-8 md:gap-6">
-                        <div class="flex items-center gap-2 rounded-lg border border-white/10 bg-surface-container-low px-4 py-2 transition-colors hover:border-primary/50">
+                        <a class="flex items-center gap-2 rounded-lg border border-white/10 bg-surface-container-low px-4 py-2 transition-colors hover:border-primary/50 hover:text-primary" href="{{ route('orders') }}" aria-label="Open your downloadable science resources">
                             <span class="material-symbols-outlined text-sm text-primary">download</span>
-                            <span class="font-label text-xs uppercase tracking-wider text-on-surface-variant">2,400+ downloads</span>
-                        </div>
+                            <span class="font-label text-xs uppercase tracking-wider text-on-surface-variant"><span data-customer-download-count>0</span> downloads</span>
+                        </a>
                         <div class="flex items-center gap-2 rounded-lg border border-white/10 bg-surface-container-low px-4 py-2 transition-colors hover:border-primary/50">
                             <span class="material-symbols-outlined text-sm text-primary">edit</span>
                             <span class="font-label text-xs uppercase tracking-wider text-on-surface-variant">Editable files</span>
@@ -555,6 +554,8 @@
     <script>
         const cartStorageKey = 'ilearnScienceCartItems';
         const inventoryStorageKey = 'ilearnScienceInventoryProducts';
+        const checkoutStorageKey = 'ilearnScienceLastCheckout';
+        const downloadedFilesStorageKey = 'ilearnScienceDownloadedFiles';
         const productsEndpoint = '{{ route('products.index') }}';
         const productSyncChannel = 'BroadcastChannel' in window ? new BroadcastChannel('ilearn-products-sync') : null;
         const homeResourceGrid = document.getElementById('home-resource-grid');
@@ -589,6 +590,35 @@
             });
             document.querySelectorAll('[data-cart-link]').forEach((link) => {
                 link.setAttribute('aria-label', `Cart with ${actualCount} item${actualCount === 1 ? '' : 's'}`);
+            });
+        }
+
+        function currentCustomerEmail() {
+            try {
+                const session = JSON.parse(sessionStorage.getItem('ilearnScienceAuthSession') || localStorage.getItem('ilearnScienceCurrentUser') || localStorage.getItem('ilearnScienceRememberedUser') || 'null');
+                return String(session?.email || '').toLowerCase();
+            } catch {
+                return '';
+            }
+        }
+
+        function getCustomerDownloadCount() {
+            const signedIn = window.iLearnAuth?.isSignedIn ? window.iLearnAuth.isSignedIn() : Boolean(currentCustomerEmail());
+            if (!signedIn) return 0;
+
+            try {
+                const downloads = JSON.parse(localStorage.getItem(downloadedFilesStorageKey) || '{}') || {};
+                const customerDownloads = downloads[currentCustomerEmail()] || {};
+                return Object.values(customerDownloads).reduce((sum, count) => sum + (Number(count) || 0), 0);
+            } catch {
+                return 0;
+            }
+        }
+
+        function updateDownloadCount() {
+            const count = getCustomerDownloadCount();
+            document.querySelectorAll('[data-customer-download-count]').forEach((target) => {
+                target.textContent = count;
             });
         }
 
@@ -1077,12 +1107,14 @@
 
         window.addEventListener('storage', (event) => {
             if (event.key === cartStorageKey) updateCartCount();
+            if (event.key === checkoutStorageKey || event.key === downloadedFilesStorageKey || event.key === 'ilearnScienceCurrentUser' || event.key === 'ilearnScienceRememberedUser') updateDownloadCount();
             if (event.key === inventoryStorageKey || event.key === `${inventoryStorageKey}Initialized`) {
                 renderHomeAdminProducts();
                 renderProductSearchResults(document.getElementById('product-search-input')?.value || '');
             }
         });
         window.addEventListener('ilearn:cart-updated', updateCartCount);
+        window.addEventListener('ilearn:auth-updated', updateDownloadCount);
         window.addEventListener('ilearn:products-updated', (event) => renderHomeAdminProducts(event.detail?.products || null));
         productSyncChannel?.addEventListener('message', (event) => {
             if (event.data?.type === 'products-updated') {
@@ -1093,7 +1125,11 @@
 
         refreshHomeProductsFromServer();
         setInterval(refreshHomeProductsFromServer, 5000);
-        window.addEventListener('pageshow', updateCartCount);
+        updateDownloadCount();
+        window.addEventListener('pageshow', () => {
+            updateCartCount();
+            updateDownloadCount();
+        });
     </script>
     @include('partials.auth-ui')
 </body>

@@ -203,7 +203,7 @@
             </section>
 
             <section class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-                @foreach ([['Purchased Resources', '18', 'inventory_2', '+3 this month'], ['Available Downloads', '24', 'cloud_download', 'Ready anytime'], ['Items in Cart', '0', 'shopping_cart', 'Current cart'], ['Orders Completed', '12', 'receipt_long', 'All paid']] as [$label, $value, $icon, $meta])
+                @foreach ([['Purchased Resources', '0', 'inventory_2', 'Purchased files'], ['Downloaded Files', '0', 'cloud_download', 'Customer downloads'], ['Items in Cart', '0', 'shopping_cart', 'Current cart'], ['Orders Completed', '0', 'receipt_long', 'Completed checkout']] as [$label, $value, $icon, $meta])
                     <article class="glass-panel glow-hover rounded-2xl p-5">
                         <div class="flex items-center justify-between">
                             <span class="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary-container/10 text-primary">
@@ -212,7 +212,13 @@
                             <span class="font-label text-xs text-primary" @if ($label === 'Items in Cart') data-dashboard-cart-meta @endif>{{ $meta }}</span>
                         </div>
                         <p class="mt-5 font-label text-xs uppercase tracking-widest text-on-surface-variant">{{ $label }}</p>
-                        <p class="mt-2 font-headline text-4xl font-bold text-on-surface" @if ($label === 'Items in Cart') data-cart-count data-dashboard-cart-count @endif>{{ $value }}</p>
+                        <p
+                            class="mt-2 font-headline text-4xl font-bold text-on-surface"
+                            @if ($label === 'Items in Cart') data-cart-count data-dashboard-cart-count @endif
+                            @if ($label === 'Purchased Resources') data-dashboard-purchased-count @endif
+                            @if ($label === 'Downloaded Files') data-dashboard-download-count @endif
+                            @if ($label === 'Orders Completed') data-dashboard-orders-count @endif
+                        >{{ $value }}</p>
                     </article>
                 @endforeach
             </section>
@@ -352,6 +358,8 @@
 
     <script>
         const dashboardCartStorageKey = 'ilearnScienceCartItems';
+        const dashboardCheckoutStorageKey = 'ilearnScienceLastCheckout';
+        const dashboardDownloadedFilesStorageKey = 'ilearnScienceDownloadedFiles';
         const dashboardInventoryStorageKey = 'ilearnScienceInventoryProducts';
         const dashboardBlogStorageKey = 'ilearnScienceBlogPosts';
         const dashboardBlogInitializedKey = 'ilearnScienceBlogPostsInitialized';
@@ -432,6 +440,59 @@
             } catch {
                 return [];
             }
+        }
+
+        function getDashboardSessionEmail() {
+            try {
+                const session = JSON.parse(sessionStorage.getItem('ilearnScienceAuthSession') || localStorage.getItem('ilearnScienceCurrentUser') || localStorage.getItem('ilearnScienceRememberedUser') || 'null');
+                return String(session?.email || '').toLowerCase();
+            } catch {
+                return '';
+            }
+        }
+
+        function getDashboardLastCheckout() {
+            try {
+                return JSON.parse(localStorage.getItem(dashboardCheckoutStorageKey) || 'null');
+            } catch {
+                return null;
+            }
+        }
+
+        function getDashboardDownloadCount() {
+            const currentEmail = getDashboardSessionEmail();
+            if (!currentEmail) return 0;
+
+            try {
+                const downloads = JSON.parse(localStorage.getItem(dashboardDownloadedFilesStorageKey) || '{}') || {};
+                const customerDownloads = downloads[currentEmail] || {};
+                return Object.values(customerDownloads).reduce((sum, count) => sum + (Number(count) || 0), 0);
+            } catch {
+                return 0;
+            }
+        }
+
+        function getDashboardPurchasedCount() {
+            const checkout = getDashboardLastCheckout();
+            const currentEmail = getDashboardSessionEmail();
+            const checkoutEmail = String(checkout?.customer?.email || '').toLowerCase();
+            if (!checkout?.items?.length || (checkoutEmail && currentEmail && checkoutEmail !== currentEmail)) return 0;
+
+            return checkout.items.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
+        }
+
+        function updateDashboardDownloadStats() {
+            const downloads = getDashboardDownloadCount();
+            const purchased = getDashboardPurchasedCount();
+            document.querySelectorAll('[data-dashboard-purchased-count]').forEach((target) => {
+                target.textContent = purchased;
+            });
+            document.querySelectorAll('[data-dashboard-download-count]').forEach((target) => {
+                target.textContent = downloads;
+            });
+            document.querySelectorAll('[data-dashboard-orders-count]').forEach((target) => {
+                target.textContent = purchased > 0 ? '1' : '0';
+            });
         }
 
         function setDashboardCartItems(items) {
@@ -702,6 +763,7 @@
         }
 
         updateCustomerDashboardTitle();
+        updateDashboardDownloadStats();
         renderDashboardProducts(true);
         refreshDashboardInventoryFromServer();
         renderDashboardBlogs(true);
@@ -718,10 +780,12 @@
         });
         window.addEventListener('storage', (event) => {
             if (event.key === dashboardCartStorageKey) renderDashboardCart();
+            if (event.key === dashboardCheckoutStorageKey || event.key === dashboardDownloadedFilesStorageKey || event.key === 'ilearnScienceCurrentUser' || event.key === 'ilearnScienceRememberedUser') updateDashboardDownloadStats();
             if (event.key === dashboardInventoryStorageKey || event.key === `${dashboardInventoryStorageKey}Initialized`) renderDashboardProducts(true);
             if (event.key === dashboardBlogStorageKey || event.key === dashboardBlogInitializedKey) renderDashboardBlogs(true);
         });
         window.addEventListener('ilearn:cart-updated', renderDashboardCart);
+        window.addEventListener('ilearn:auth-updated', updateDashboardDownloadStats);
         window.addEventListener('ilearn:products-updated', (event) => {
             if (Array.isArray(event.detail?.products)) {
                 localStorage.setItem(dashboardInventoryStorageKey, JSON.stringify(event.detail.products));
@@ -746,6 +810,7 @@
             }
         });
         window.addEventListener('pageshow', () => {
+            updateDashboardDownloadStats();
             renderDashboardProducts(true);
             renderDashboardBlogs(true);
             renderDashboardCart();

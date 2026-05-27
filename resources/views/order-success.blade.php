@@ -162,7 +162,7 @@
             </section>
 
             <footer class="flex flex-col items-center justify-between gap-5 border-t border-white/10 bg-surface-container-lowest/50 px-5 py-5 sm:flex-row sm:px-8 md:px-12 md:py-8">
-                <button class="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 font-headline text-lg font-semibold text-on-primary shadow-[0_0_20px_rgba(168,232,255,0.4)] transition-all hover:scale-105 active:scale-95 sm:w-auto">
+                <button id="success-download-now" class="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 font-headline text-lg font-semibold text-on-primary shadow-[0_0_20px_rgba(168,232,255,0.4)] transition-all hover:scale-105 active:scale-95 sm:w-auto" type="button">
                     <span class="material-symbols-outlined">download</span>
                     Download Now
                 </button>
@@ -186,6 +186,7 @@
     <script>
         const cartStorageKey = 'ilearnScienceCartItems';
         const checkoutStorageKey = 'ilearnScienceLastCheckout';
+        const downloadedFilesStorageKey = 'ilearnScienceDownloadedFiles';
         const taxRate = 0.08;
         const discountAmount = 5;
         function parsePeso(value) {
@@ -211,6 +212,29 @@
             } catch {
                 return null;
             }
+        }
+
+        function currentCustomerEmail() {
+            try {
+                const session = JSON.parse(sessionStorage.getItem('ilearnScienceAuthSession') || localStorage.getItem('ilearnScienceCurrentUser') || localStorage.getItem('ilearnScienceRememberedUser') || 'null');
+                return String(session?.email || getLastCheckout()?.customer?.email || '').toLowerCase();
+            } catch {
+                return String(getLastCheckout()?.customer?.email || '').toLowerCase();
+            }
+        }
+
+        function markOrderDownloaded() {
+            const checkout = getLastCheckout();
+            const email = currentCustomerEmail();
+            const items = getPurchasedItems();
+            const count = items.reduce((sum, item) => sum + item.quantity, 0);
+            if (!email || !count) return;
+
+            const orderNumber = checkout?.orderNumber || buildOrderNumber();
+            const downloads = JSON.parse(localStorage.getItem(downloadedFilesStorageKey) || '{}') || {};
+            downloads[email] = downloads[email] || {};
+            downloads[email][orderNumber] = Math.max(Number(downloads[email][orderNumber]) || 0, count);
+            localStorage.setItem(downloadedFilesStorageKey, JSON.stringify(downloads));
         }
 
         function normalizeCartItem(item) {
@@ -296,6 +320,10 @@
         }
 
         updateSuccessOrder();
+        document.getElementById('success-download-now')?.addEventListener('click', () => {
+            markOrderDownloaded();
+            alert('Your download count has been updated. Open Downloads to access your resources.');
+        });
         window.addEventListener('storage', (event) => {
             if (event.key === cartStorageKey) updateSuccessOrder();
         });

@@ -205,6 +205,7 @@
 
     <script>
         const cartStorageKey = 'ilearnScienceCartItems';
+        const downloadedFilesStorageKey = 'ilearnScienceDownloadedFiles';
         const taxRate = 0.08;
         const discountAmount = 5;
         const orders = {
@@ -246,6 +247,15 @@
                 return JSON.parse(localStorage.getItem(cartStorageKey)) || [];
             } catch (error) {
                 return [];
+            }
+        }
+
+        function currentCustomerEmail() {
+            try {
+                const session = JSON.parse(sessionStorage.getItem('ilearnScienceAuthSession') || localStorage.getItem('ilearnScienceCurrentUser') || localStorage.getItem('ilearnScienceRememberedUser') || 'null');
+                return String(session?.email || '').toLowerCase();
+            } catch {
+                return '';
             }
         }
 
@@ -395,6 +405,18 @@
             showToast(`${order.items.length} item${order.items.length === 1 ? '' : 's'} added back to your cart.`);
         }
 
+        function markOrderDownloaded(orderId) {
+            const email = currentCustomerEmail();
+            const order = orderId === 'ILS-2026-CART' ? getCurrentCartOrder() : orders[orderId];
+            if (!email || !order?.items?.length) return;
+
+            const itemCount = order.items.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
+            const downloads = JSON.parse(localStorage.getItem(downloadedFilesStorageKey) || '{}') || {};
+            downloads[email] = downloads[email] || {};
+            downloads[email][order.number || orderId] = Math.max(Number(downloads[email][order.number || orderId]) || 0, itemCount);
+            localStorage.setItem(downloadedFilesStorageKey, JSON.stringify(downloads));
+        }
+
         document.querySelectorAll('.order-action').forEach((button) => {
             button.addEventListener('click', () => {
                 const orderId = button.dataset.order;
@@ -404,6 +426,7 @@
                 }
                 if (button.dataset.action === 'download') {
                     renderReceipt(orderId);
+                    markOrderDownloaded(orderId);
                     showToast(`Downloads for #${orderId} are ready.`);
                 }
                 if (button.dataset.action === 'reorder') {
