@@ -283,7 +283,7 @@
                             </div>
                             <h3 class="mb-2 text-2xl font-bold text-white">Hi I'm Lhyzah the creator of iLearn Science</h3>
                             <p class="mb-4 text-lg leading-relaxed text-slate-200">
-                                iLearn Science is a platform dedicated to making science learning more engaging, creative, and accessible for both teachers and students. I create educational resources such as worksheets, PowerPoint presentations, lesson plans, quizzes, and interactive learning materials designed to make teaching easier and learning more enjoyable. My passion is combining education with creativity to help inspire curiosity and confidence in science.
+                                Passionate about science education and creative digital learning, the creator of iLearn Science Resources develops engaging, high-quality teaching materials designed to help educators save time and inspire students. With experience in creating interactive PowerPoint presentations, worksheets, quizzes, infographics, and science learning resources, the goal is to make science lessons more effective, visually engaging, and easy to teach for classrooms, homeschooling, and online learning.
                             </p>
 
                             <div class="flex flex-wrap gap-4">
