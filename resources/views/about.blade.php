@@ -287,7 +287,7 @@
                             </div>
                             <h2 class="font-brand text-3xl font-bold leading-tight text-white md:text-4xl">Meet the <span class="gradient-text">Creator</span></h2>
                             <h3 class="mb-4 mt-2 font-brand text-xl font-semibold text-neon-cyan">Hi, I'm Lhyzah, the creator of iLearn Science Resources</h3>
-                            <p class="mb-6 font-body text-base leading-8 text-slate-200 md:text-lg">
+                            <p class="mb-6 font-body text-sm leading-7 text-slate-200 md:text-base">
                                 Passionate about science education and creative digital learning, the creator of iLearn Science Resources develops engaging, high-quality teaching materials designed to help educators save time and inspire students. With experience in creating interactive PowerPoint presentations, worksheets, quizzes, infographics, and science learning resources, the goal is to make science lessons more effective, visually engaging, and easy to teach for classrooms, homeschooling, and online learning.
                             </p>
 
