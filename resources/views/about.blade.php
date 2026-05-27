@@ -150,13 +150,14 @@
 
                 <div class="mt-6 px-4 text-[10px] font-bold uppercase tracking-widest text-slate-500">My Library</div>
                 @foreach ([
-                    ['download', 'Downloads'],
-                    ['local_mall', 'Purchased Materials'],
-                    ['favorite', 'Saved Items'],
-                ] as [$icon, $label])
-                    <a class="flex items-center gap-4 rounded-lg px-4 py-2.5 text-slate-400 transition-all hover:bg-white/5 hover:text-white" href="#">
+                    ['download', 'Downloads', route('orders'), 'data-about-download-count'],
+                    ['local_mall', 'Purchased Materials', route('orders'), 'data-about-purchased-count'],
+                    ['favorite', 'Saved Items', route('shop'), 'data-about-saved-count'],
+                ] as [$icon, $label, $href, $counter])
+                    <a class="flex items-center gap-4 rounded-lg px-4 py-2.5 text-slate-400 transition-all hover:bg-white/5 hover:text-white" href="{{ $href }}">
                         <span class="material-symbols-outlined text-xl">{{ $icon }}</span>
-                        <span class="text-sm">{{ $label }}</span>
+                        <span class="min-w-0 flex-1 text-sm">{{ $label }}</span>
+                        <span class="rounded-full border border-neon-cyan/20 bg-neon-cyan/10 px-2 py-0.5 text-[10px] font-bold text-neon-cyan" {{ $counter }}>0</span>
                     </a>
                 @endforeach
 
@@ -176,10 +177,6 @@
                 @endforeach
 
                 <div class="mx-4 my-4 h-px bg-white/5"></div>
-                <a class="flex items-center gap-4 rounded-lg px-4 py-2.5 text-slate-400 transition-all hover:text-white" href="#">
-                    <span class="material-symbols-outlined">settings</span>
-                    <span class="text-sm">Settings</span>
-                </a>
             </div>
 
             <div class="mt-20 px-6 opacity-60">
@@ -314,6 +311,12 @@
     </div>
     <script>
         const cartStorageKey = 'ilearnScienceCartItems';
+        const checkoutStorageKey = 'ilearnScienceLastCheckout';
+        const downloadedFilesStorageKey = 'ilearnScienceDownloadedFiles';
+        const downloadedProductsStorageKey = 'ilearnScienceDownloadedProducts';
+        const savedItemsStorageKey = 'ilearnScienceSavedItems';
+        const wishlistStorageKey = 'ilearnScienceWishlistItems';
+
         function getCartItems() {
             if (window.iLearnAuth?.getCartItems) return window.iLearnAuth.getCartItems();
             try {
@@ -323,8 +326,85 @@
             }
         }
 
+        function currentCustomerEmail() {
+            try {
+                const session = JSON.parse(sessionStorage.getItem('ilearnScienceAuthSession') || localStorage.getItem('ilearnScienceCurrentUser') || localStorage.getItem('ilearnScienceRememberedUser') || 'null');
+                return String(session?.email || '').toLowerCase();
+            } catch {
+                return '';
+            }
+        }
+
+        function isSignedIn() {
+            return window.iLearnAuth?.isSignedIn ? window.iLearnAuth.isSignedIn() : Boolean(currentCustomerEmail());
+        }
+
+        function safeStoredJSON(key, fallback) {
+            try {
+                const value = JSON.parse(localStorage.getItem(key) || 'null');
+                return value ?? fallback;
+            } catch {
+                return fallback;
+            }
+        }
+
+        function getCustomerDownloadsCount() {
+            const email = currentCustomerEmail();
+            if (!email || !isSignedIn()) return 0;
+            const downloads = safeStoredJSON(downloadedFilesStorageKey, {});
+            const customerDownloads = downloads[email] || {};
+            return Object.values(customerDownloads).reduce((sum, count) => sum + (Number(count) || 0), 0);
+        }
+
+        function getPurchasedMaterialsCount() {
+            const email = currentCustomerEmail();
+            if (!email || !isSignedIn()) return 0;
+
+            const checkout = safeStoredJSON(checkoutStorageKey, null);
+            const checkoutEmail = String(checkout?.customer?.email || '').toLowerCase();
+            if (checkout?.items?.length && (!checkoutEmail || checkoutEmail === email)) {
+                return checkout.items.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
+            }
+
+            const productDownloads = safeStoredJSON(downloadedProductsStorageKey, {});
+            const customerOrders = productDownloads[email] || {};
+            return Object.values(customerOrders).reduce((total, orderItems) => {
+                return total + Object.values(orderItems || {}).reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
+            }, 0);
+        }
+
+        function countSavedCollection(value, email) {
+            if (Array.isArray(value)) return value.length;
+            if (value && typeof value === 'object') {
+                const customerValue = value[email] || value[email?.toLowerCase?.()] || [];
+                if (Array.isArray(customerValue)) return customerValue.length;
+                if (customerValue && typeof customerValue === 'object') return Object.keys(customerValue).length;
+            }
+            return 0;
+        }
+
+        function getSavedItemsCount() {
+            const email = currentCustomerEmail();
+            if (!email || !isSignedIn()) return 0;
+            return countSavedCollection(safeStoredJSON(savedItemsStorageKey, {}), email)
+                + countSavedCollection(safeStoredJSON(wishlistStorageKey, {}), email);
+        }
+
+        function setCounter(selector, value) {
+            document.querySelectorAll(selector).forEach((target) => {
+                target.textContent = value;
+                target.classList.toggle('opacity-60', value === 0);
+            });
+        }
+
+        function updateLibraryActivity() {
+            setCounter('[data-about-download-count]', getCustomerDownloadsCount());
+            setCounter('[data-about-purchased-count]', getPurchasedMaterialsCount());
+            setCounter('[data-about-saved-count]', getSavedItemsCount());
+        }
+
         function updateCartCount() {
-            const signedIn = window.iLearnAuth?.isSignedIn ? window.iLearnAuth.isSignedIn() : false;
+            const signedIn = isSignedIn();
             const actualCount = signedIn ? getCartItems().reduce((sum, item) => sum + (Number(item.quantity) || 1), 0) : 0;
 
             document.querySelectorAll('[data-cart-count]').forEach((badge) => {
@@ -337,11 +417,28 @@
         }
 
         updateCartCount();
+        updateLibraryActivity();
         window.addEventListener('storage', (event) => {
             if (event.key === cartStorageKey) updateCartCount();
+            if ([
+                checkoutStorageKey,
+                downloadedFilesStorageKey,
+                downloadedProductsStorageKey,
+                savedItemsStorageKey,
+                wishlistStorageKey,
+                'ilearnScienceCurrentUser',
+                'ilearnScienceRememberedUser',
+            ].includes(event.key)) updateLibraryActivity();
         });
         window.addEventListener('ilearn:cart-updated', updateCartCount);
-        window.addEventListener('pageshow', updateCartCount);
+        window.addEventListener('ilearn:auth-updated', () => {
+            updateCartCount();
+            updateLibraryActivity();
+        });
+        window.addEventListener('pageshow', () => {
+            updateCartCount();
+            updateLibraryActivity();
+        });
     </script>
     @include('partials.auth-ui')
 </body>
