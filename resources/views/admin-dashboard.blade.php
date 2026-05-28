@@ -281,11 +281,16 @@
                 <span class="material-symbols-outlined text-[20px]">add</span>
                 Quick Add
             </button>
-            <button class="flex items-center gap-3 rounded-full border border-primary/20 bg-surface-container/70 p-1 pr-3 transition-all hover:border-primary/50">
-                <img class="h-9 w-9 rounded-full border border-primary/30 object-cover" alt="Admin profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3XNKjUJ7YMCovYbY9ONdXA4LRDTjeEpLYTkl1xLQsVawE48iHsZFhGCIqzz10uXm8mhrWX8hjM_yp_U4pyAFsVK3Xv3csT4gy0fLx6lXr8U8EB0J-yBj2FCFF5Q-BcVb-T64N6atCbVUW4BFiKxzr3Ix2bptXvH1qjsaa86ROrU2VXToku2_oX8PtfC3TNDLOBUX-tOYN9furyFw27MbTbvQ8fLzMx9V9sw-2rChwzbvt2n5UKlw1XKGIfwuWO6wsIMfTUcZ2O2g">
+            <label class="group flex cursor-pointer items-center gap-3 rounded-full border border-primary/20 bg-surface-container/70 p-1 pr-3 transition-all hover:border-primary/50" title="Upload admin profile picture">
+                <span class="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-primary/30 bg-primary-container/10 text-primary">
+                    <img class="hidden h-full w-full object-cover" alt="Admin profile picture" data-admin-profile-image>
+                    <span class="material-symbols-outlined" data-admin-profile-placeholder>admin_panel_settings</span>
+                    <span class="absolute inset-0 hidden items-center justify-center bg-surface/75 text-[10px] font-bold text-primary group-hover:flex">Edit</span>
+                </span>
                 <span class="hidden font-label text-sm text-primary md:inline">Admin Nova</span>
-                <span class="material-symbols-outlined hidden text-[18px] text-on-surface-variant md:inline">expand_more</span>
-            </button>
+                <span class="material-symbols-outlined hidden text-[18px] text-on-surface-variant md:inline">upload</span>
+                <input class="hidden" type="file" accept="image/*" data-admin-profile-upload>
+            </label>
         </div>
     </header>
 
@@ -1304,6 +1309,8 @@
         const userCartsStorageKey = 'ilearnScienceUserCarts';
         const checkoutStorageKey = 'ilearnScienceLastCheckout';
         const activityStorageKey = 'ilearnScienceCustomerActivity';
+        const profilePhotosStorageKey = 'ilearnScienceProfilePhotos';
+        const adminProfileKey = 'admin:lhyzah@ilearnscience.com';
         const currency = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' });
 
         function safeJSON(key, fallback) {
@@ -1312,6 +1319,29 @@
             } catch {
                 return fallback;
             }
+        }
+
+        function renderAdminProfilePhoto() {
+            const photos = safeJSON(profilePhotosStorageKey, {});
+            const image = document.querySelector('[data-admin-profile-image]');
+            const placeholder = document.querySelector('[data-admin-profile-placeholder]');
+            const source = photos[adminProfileKey];
+            if (!image || !placeholder) return;
+            image.classList.toggle('hidden', !source);
+            placeholder.classList.toggle('hidden', Boolean(source));
+            if (source) image.src = source;
+        }
+
+        function saveAdminProfilePhoto(file) {
+            if (!file?.type?.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                const photos = safeJSON(profilePhotosStorageKey, {});
+                photos[adminProfileKey] = reader.result;
+                localStorage.setItem(profilePhotosStorageKey, JSON.stringify(photos));
+                renderAdminProfilePhoto();
+            };
+            reader.readAsDataURL(file);
         }
 
         function normalizeMoney(value) {
@@ -1498,11 +1528,17 @@
             renderLiveOrderRow(checkout);
         }
 
+        document.querySelector('[data-admin-profile-upload]')?.addEventListener('change', (event) => {
+            saveAdminProfilePhoto(event.target.files?.[0]);
+            event.target.value = '';
+        });
         window.addEventListener('storage', (event) => {
             if ([cartStorageKey, userCartsStorageKey, checkoutStorageKey, activityStorageKey].includes(event.key)) refreshAdminLiveData();
+            if (event.key === profilePhotosStorageKey) renderAdminProfilePhoto();
         });
         window.addEventListener('pageshow', refreshAdminLiveData);
         setInterval(refreshAdminLiveData, 1000);
+        renderAdminProfilePhoto();
         refreshAdminLiveData();
     </script>
 </body>

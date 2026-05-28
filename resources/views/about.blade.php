@@ -79,56 +79,7 @@
             <a class="border-b-2 border-neon-cyan pb-1 text-neon-cyan" href="{{ route('about') }}">About</a>
         </nav>
 
-        <div class="flex items-center gap-4 md:gap-6">
-            <details class="hidden">
-                <summary class="relative flex cursor-pointer list-none items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-2 transition-all hover:border-neon-cyan/50 hover:bg-white/10 [&::-webkit-details-marker]:hidden" aria-label="Open cart preview">
-                    <span class="material-symbols-outlined text-slate-300">shopping_cart</span>
-                    <span class="material-symbols-outlined text-neon-cyan text-[18px]">payments</span>
-                    <span class="absolute -right-2 -top-1 rounded-full bg-neon-cyan px-1 text-[10px] font-bold text-space-dark shadow-[0_0_12px_rgba(0,242,255,0.65)]" data-cart-count>3</span>
-                </summary>
-                <div class="absolute right-0 mt-4 w-[320px] overflow-hidden rounded-2xl border border-neon-cyan/20 bg-space-sidebar/95 shadow-[0_0_30px_rgba(0,242,255,0.18)] backdrop-blur-xl">
-                    <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
-                        <div>
-                            <p class="text-sm font-semibold text-white">Products in Cart</p>
-                            <p class="text-xs text-slate-400" data-cart-ready-label>3 items ready for checkout</p>
-                        </div>
-                        <a class="flex h-9 w-9 items-center justify-center rounded-full bg-neon-cyan text-space-dark transition-transform hover:scale-105 active:scale-95" href="{{ route('checkout') }}" aria-label="Go to checkout">
-                            <span class="material-symbols-outlined text-[20px]">payments</span>
-                        </a>
-                    </div>
-                    <div class="max-h-72 divide-y divide-white/5 overflow-y-auto">
-                        @foreach ([
-                            ['Advanced Biology PPT', 'Digital Resource', '₱12.99', 1, 'https://lh3.googleusercontent.com/aida-public/AB6AXuDAukcxKIeiLZnlciZdGHXQXy4iKMk5x-tGgi6TFF9Sfe2xAbJvYHL-ZC8QnE7ffN8aNYOAezSH0Tj97sk_N4jSWS0Fi-fLIIOe_GEcsQDy-Q3Git7Zsvv9jd-3aksYLZm4n_e9Nwev_zdKaEgIZetNpoYFBQIvs1CsSN9Rj8uZXbmpC3w1SXnltKVlUgxzOY6l7SiVFE5VBWD9mn3M13-GXtO6fWm6DG_Z3oeCsZ474bR-1i29uZ1PURiMSTDrjBNPKGoExuy-MHk'],
-                            ['Physics Lab Worksheets', 'PDF Bundle', '₱12.99', 1, 'https://lh3.googleusercontent.com/aida-public/AB6AXuBojzpBdmxN9PsX8hQhpf-SAKxoOzUasNe7LVwmHLwKmusbXaGCTShjD13RlH4TahuD0TLcy5RDFo_-rk_pIgulmr8vhpELtSAVpvE4-i6GIzL5vqnjan5AsqkKAeeTYV1zcxqh-GwPk224UNAqPXYnbYJ7gv5sHGYd8ta3nrnfvkHDI17Rq9TN0hHgzafutTJMBNMjgDHwopj_jhKZRw8AMPKlpweS9z0mJCinBPQQc-w2M4LAdBCjyVswiTkfNyu14SBEGeuz2A8'],
-                            ['Chemistry Study Guide', 'Interactive E-Book', '₱12.99', 1, 'https://lh3.googleusercontent.com/aida-public/AB6AXuCPPifHph78pWofuqtVNjb6V-PLYAh0tthoPV29K8qbg1Hv1B-iMoInZd5zkM3IEUG-p70cbjpgCovfozMZv5CRK-WCHZbyV9qSJARc43tSFj5y0Zy7gIRSHAeHUrbTXYsHGfC1JUD7z0HVOmVRxQ0YLyG5ot_ckNO2l2D3y4RKVsGMl2Vc-96aVEuTetl-Fl96i8qBsHzyRsS5UB7I7_B1lhFS8Z1JW-Fp6LE5l1CDj9BJmh0ha-yaEL7VtNDyl3Dvy25kJZO_dy0'],
-                        ] as [$title, $meta, $price, $quantity, $image])
-                            <div class="flex items-center gap-3 px-4 py-3">
-                                <img alt="{{ $title }}" class="h-12 w-12 rounded-lg object-cover" src="{{ $image }}">
-                                <div class="min-w-0 flex-1">
-                                    <p class="truncate text-sm font-semibold text-white">{{ $title }}</p>
-                                    <p class="text-xs text-slate-400">{{ $meta }} • Qty {{ $quantity }}</p>
-                                </div>
-                                <span class="text-xs font-semibold text-neon-cyan">{{ $price }}</span>
-                            </div>
-                        @endforeach
-                    </div>
-                    <div class="space-y-3 border-t border-white/10 p-4">
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-slate-400">Total items</span>
-                            <span class="font-semibold text-neon-cyan" data-cart-count>3</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <a class="rounded-lg border border-neon-cyan/30 px-4 py-2 text-center text-xs font-semibold text-neon-cyan transition-colors hover:bg-neon-cyan/10" href="{{ route('cart') }}">View Cart</a>
-                            <a class="flex items-center justify-center gap-2 rounded-lg bg-neon-cyan px-4 py-2 text-xs font-bold text-space-dark transition-transform hover:scale-[1.02] active:scale-95" href="{{ route('checkout') }}">
-                                <span class="material-symbols-outlined text-[16px]">payments</span>
-                                Checkout
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </details>
-            <img alt="Elena Smith Profile" class="h-9 w-9 cursor-pointer rounded-full border-2 border-neon-purple/50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApNlR87JihXfK4WPC3HicxhPa3zV8N_4DWUAWpVpakf-WPkdVCrVa9pskcgWncYGbGetIH-eZLIddDC2oDUKLlwpt6joJCwCKksd4ZqB8j5fcXMgMfAr2uUPm1QMWpmRINZHod6b54miT_BLpjBOs09Wv1TuJ6gUAEQ6nIuMzre05GQQ9jWQYDQxls1CThb-cB0JHiCQPYwtDnwCFH_KAVD6tm1ziTHkKr-tSFdflnt21RoayHTxjMEyqhjiWqlRjOJoBIP_tjbA8">
-        </div>
+        <div class="flex items-center gap-4 md:gap-6"></div>
     </header>
 
     <div class="flex min-h-screen pt-16">
