@@ -887,6 +887,7 @@
                 category,
                 grade: product.grade || 'All Grades',
                 status: product.status || 'Published',
+                updatedAt: product.updatedAt || product.publishedAt || product.createdAt || '',
             };
         }
 
@@ -954,16 +955,41 @@
             });
         }
 
+        function pickDashboardAuthorNextTopic() {
+            const products = dashboardActiveProducts();
+            if (!products.length) return null;
+
+            const ownedIds = new Set(getDashboardCustomerOrders()
+                .flatMap((order) => order.items || [])
+                .map((item) => item.id || dashboardSlugify(item.title)));
+            const savedIds = new Set(getDashboardSavedItems().map((item) => item.id || dashboardSlugify(item.title)));
+
+            return products
+                .map((product, index) => {
+                    const recentTime = new Date(product.updatedAt || 0).getTime();
+                    const recentBoost = Number.isNaN(recentTime) ? 0 : Math.min(2, recentTime / Date.now());
+                    const topicBoost = /biology|photosynthesis|digestive|heredity|pedigree|taxonomy|cell|quiz|worksheet/i.test(`${product.title} ${product.category} ${product.description}`) ? 1 : 0;
+                    const freshForCustomerBoost = ownedIds.has(product.id) ? -3 : 2;
+                    const savedBoost = savedIds.has(product.id) ? -1 : 0;
+                    return {
+                        ...product,
+                        authorScore: Math.max(0.2, 1 - (index * 0.05)) + recentBoost + topicBoost + freshForCustomerBoost + savedBoost,
+                    };
+                })
+                .sort((a, b) => b.authorScore - a.authorScore || a.title.localeCompare(b.title))[0];
+        }
+
         function renderDashboardRecommendation() {
             const container = document.querySelector('[data-dashboard-recommendation]');
             const reason = document.querySelector('[data-dashboard-recommendation-reason]');
             if (!container) return;
 
             const product = pickDashboardRecommendation();
+            const nextTopic = pickDashboardAuthorNextTopic();
             const reasonText = product.reason || 'Recommended from admin products';
             if (reason) reason.textContent = reasonText;
             document.querySelectorAll('[data-dashboard-next-topic]').forEach((target) => {
-                target.textContent = product.title;
+                target.textContent = nextTopic?.title || 'No author-uploaded products yet';
             });
 
             container.innerHTML = `
