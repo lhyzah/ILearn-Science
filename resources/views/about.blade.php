@@ -228,9 +228,9 @@
                             <span class="material-symbols-outlined text-4xl text-neon-cyan" style="text-shadow: rgba(0, 242, 255, 0.4) 0 0 10px;">rocket_launch</span>
                         </div>
                         <div>
-                            <h3 class="mb-3 text-xl font-bold">Our Mission</h3>
+                            <h3 class="mb-3 text-xl font-bold">Mission</h3>
                             <p class="text-sm leading-relaxed text-slate-400">
-                                To empower educators and students with high-quality, engaging, and accessible science learning resources that inspire curiosity, critical thinking, and a love for discovery.
+                                iLearn Science Resources is committed to providing high-quality, engaging, and accessible science learning resources that support effective teaching and interactive learning. Through innovative digital materials such as PowerPoint presentations, worksheets, quizzes, infographics, and activity-based resources, the platform aims to simplify lesson preparation, enhance student understanding, and promote excellence in science education for classrooms, homeschooling, and online learning environments.
                             </p>
                         </div>
                     </article>
