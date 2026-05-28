@@ -473,7 +473,7 @@
         <div class="flex items-center gap-3">
             <span class="material-symbols-outlined text-primary">check_circle</span>
             <div>
-                <p class="font-headline text-sm font-semibold text-on-surface">Added to cart</p>
+                <p id="cart-toast-title" class="font-headline text-sm font-semibold text-on-surface">Added to cart</p>
                 <p id="cart-toast-product" class="font-label text-xs text-on-surface-variant">Science resource</p>
             </div>
         </div>
@@ -513,12 +513,18 @@
                         <p class="mb-3 font-label text-xs uppercase tracking-widest text-primary">What's included</p>
                         <ul id="resource-preview-includes" class="space-y-2 text-sm text-on-surface-variant"></ul>
                     </div>
-                    <div class="mt-8 flex items-center justify-between gap-4">
+                    <div class="mt-8 flex flex-wrap items-center justify-between gap-4">
                         <span id="resource-preview-price" class="font-headline text-3xl font-semibold text-primary"></span>
-                        <button id="resource-preview-add" class="flex items-center gap-2 rounded-lg bg-primary px-5 py-3 font-label text-sm font-bold text-on-primary transition-all hover:scale-[1.02] active:scale-95" type="button">
-                            <span class="material-symbols-outlined">add_shopping_cart</span>
-                            Add to Cart
-                        </button>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <button id="resource-preview-save" class="flex items-center gap-2 rounded-lg border border-primary/35 px-5 py-3 font-label text-sm font-bold text-primary transition-all hover:bg-primary/10 active:scale-95" type="button">
+                                <span class="material-symbols-outlined">favorite</span>
+                                Save
+                            </button>
+                            <button id="resource-preview-add" class="flex items-center gap-2 rounded-lg bg-primary px-5 py-3 font-label text-sm font-bold text-on-primary transition-all hover:scale-[1.02] active:scale-95" type="button">
+                                <span class="material-symbols-outlined">add_shopping_cart</span>
+                                Add to Cart
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -545,6 +551,7 @@
 
     <script>
         const cartStorageKey = 'ilearnScienceCartItems';
+        const savedItemsStorageKey = 'ilearnScienceSavedItems';
         const inventoryStorageKey = 'ilearnScienceInventoryProducts';
         const checkoutStorageKey = 'ilearnScienceLastCheckout';
         const downloadedFilesStorageKey = 'ilearnScienceDownloadedFiles';
@@ -616,17 +623,49 @@
             });
         }
 
-        function showCartToast(productTitle) {
+        function showCartToast(productTitle, title = 'Added to cart') {
             const toast = document.getElementById('cart-toast');
             const label = document.getElementById('cart-toast-product');
+            const heading = document.getElementById('cart-toast-title');
             if (!toast) return;
             if (label) label.innerText = productTitle;
+            if (heading) heading.innerText = title;
             toast.classList.remove('translate-y-2', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
             setTimeout(() => {
                 toast.classList.add('translate-y-2', 'opacity-0');
                 toast.classList.remove('translate-y-0', 'opacity-100');
             }, 1800);
+        }
+
+        function saveProductForCustomer(product) {
+            const signedIn = window.iLearnAuth?.isSignedIn ? window.iLearnAuth.isSignedIn() : Boolean(currentCustomerEmail());
+            if (!signedIn) {
+                window.iLearnAuth?.openSignIn?.('Please sign in or create an account to save resources.');
+                return;
+            }
+
+            const email = currentCustomerEmail();
+            if (!email) return;
+            const item = {
+                id: product.id || product.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                title: product.title || 'Science Resource',
+                meta: product.meta || product.type || 'Digital Resource',
+                price: product.price || '₱0.00',
+                image: product.image || '',
+                quantity: 1,
+            };
+            let saved = {};
+            try {
+                saved = JSON.parse(localStorage.getItem(savedItemsStorageKey) || '{}') || {};
+            } catch {
+                saved = {};
+            }
+            saved[email] = Array.isArray(saved[email]) ? saved[email] : Object.values(saved[email] || {});
+            if (!saved[email].some((savedItem) => savedItem.id === item.id)) saved[email].push(item);
+            localStorage.setItem(savedItemsStorageKey, JSON.stringify(saved));
+            window.dispatchEvent(new CustomEvent('ilearn:saved-updated'));
+            showCartToast(item.title, 'Saved item');
         }
 
         let previewProduct = null;
@@ -887,6 +926,9 @@
                                 <button class="top-resource-preview rounded-lg border border-primary/30 bg-surface-container-high p-2 text-primary transition-colors hover:bg-primary hover:text-on-primary-container" type="button" aria-label="Preview ${escapeHTML(normalized.title)}" data-product-title="${escapeHTML(normalized.title)}" data-product-type="${escapeHTML(normalized.type)}" data-product-price="${escapeHTML(normalized.price)}" data-product-reviews="${escapeHTML(normalized.reviews)}" data-product-grade="${escapeHTML(normalized.grade)}" data-product-format="${escapeHTML(normalized.format)}" data-product-description="${escapeHTML(normalized.description)}" data-product-includes="${escapeHTML(normalized.includes)}" data-product-image="${escapeHTML(normalized.image)}">
                                     <span class="material-symbols-outlined">visibility</span>
                                 </button>
+                                <button class="top-resource-save rounded-lg border border-primary/30 bg-surface-container-high p-2 text-primary transition-colors hover:bg-primary hover:text-on-primary-container" type="button" aria-label="Save ${escapeHTML(normalized.title)}" data-product-id="${escapeHTML(normalized.id)}" data-product-title="${escapeHTML(normalized.title)}" data-product-meta="${escapeHTML(normalized.meta)}" data-product-price="${escapeHTML(normalized.price)}" data-product-image="${escapeHTML(normalized.image)}">
+                                    <span class="material-symbols-outlined">favorite</span>
+                                </button>
                                 <button class="top-resource-add-to-cart rounded-lg bg-surface-container-high p-2 transition-colors hover:bg-primary hover:text-on-primary-container" type="button" aria-label="Add ${escapeHTML(normalized.title)} to cart" data-product-id="${escapeHTML(normalized.id)}" data-product-title="${escapeHTML(normalized.title)}" data-product-meta="${escapeHTML(normalized.meta)}" data-product-price="${escapeHTML(normalized.price)}" data-product-image="${escapeHTML(normalized.image)}">
                                     <span class="material-symbols-outlined">add_shopping_cart</span>
                                 </button>
@@ -1034,6 +1076,7 @@
                         <p class="mt-2 line-clamp-2 text-sm text-on-surface-variant">${product.description}</p>
                         <div class="mt-3 flex flex-wrap gap-2">
                             <button class="search-preview rounded-lg border border-primary/30 px-3 py-2 font-label text-xs text-primary transition hover:bg-primary/10" type="button" data-search-product-id="${product.id}">Preview</button>
+                            <button class="search-save rounded-lg border border-primary/30 px-3 py-2 font-label text-xs text-primary transition hover:bg-primary/10" type="button" data-search-product-id="${product.id}">Save</button>
                             <button class="search-add rounded-lg bg-primary px-3 py-2 font-label text-xs font-bold text-on-primary transition hover:brightness-110" type="button" data-search-product-id="${product.id}">Add to Cart</button>
                         </div>
                     </div>
@@ -1154,6 +1197,18 @@
                     return;
                 }
 
+                const saveButton = event.target.closest('.top-resource-save');
+                if (saveButton) {
+                    saveProductForCustomer({
+                        id: saveButton.dataset.productId,
+                        title: saveButton.dataset.productTitle,
+                        meta: saveButton.dataset.productMeta,
+                        price: saveButton.dataset.productPrice,
+                        image: saveButton.dataset.productImage,
+                    });
+                    return;
+                }
+
                 const previewButton = event.target.closest('.top-resource-preview');
                 if (previewButton) {
                     openResourcePreview({
@@ -1181,6 +1236,11 @@
                 addProductToCart(previewProduct);
                 closeResourcePreview();
             });
+            document.getElementById('resource-preview-save')?.addEventListener('click', () => {
+                if (!previewProduct) return;
+                saveProductForCustomer(previewProduct);
+                closeResourcePreview();
+            });
 
             document.getElementById('product-search-open')?.addEventListener('click', openProductSearch);
             document.getElementById('product-search-close')?.addEventListener('click', closeProductSearch);
@@ -1197,6 +1257,10 @@
                 if (!product) return;
                 if (event.target.closest('.search-preview')) {
                     openResourcePreview(product);
+                    closeProductSearch();
+                }
+                if (event.target.closest('.search-save')) {
+                    saveProductForCustomer(product);
                     closeProductSearch();
                 }
                 if (event.target.closest('.search-add')) {

@@ -213,6 +213,10 @@
                             <span class="material-symbols-outlined">shopping_cart</span>
                             Add to Cart
                         </button>
+                        <button id="save-cell-biology" class="flex h-16 flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-primary font-bold text-primary transition-all hover:bg-primary/10">
+                            <span class="material-symbols-outlined">favorite</span>
+                            Save
+                        </button>
                         <button class="flex h-16 flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-primary font-bold text-primary transition-all hover:bg-primary/10">Buy Now</button>
                     </div>
 
@@ -356,7 +360,7 @@
         <div class="flex items-center gap-3">
             <span class="material-symbols-outlined text-primary">check_circle</span>
             <div>
-                <p class="font-headline text-sm font-semibold text-on-surface">Added to cart</p>
+                <p id="cart-toast-title" class="font-headline text-sm font-semibold text-on-surface">Added to cart</p>
                 <p class="font-label text-xs text-on-surface-variant">Cell Biology Interactive PowerPoint</p>
             </div>
         </div>
@@ -364,6 +368,7 @@
 
     <script>
         const cartStorageKey = 'ilearnScienceCartItems';
+        const savedItemsStorageKey = 'ilearnScienceSavedItems';
         const cellBiologyProduct = {
             id: 'cell-biology-interactive-powerpoint',
             title: 'Cell Biology Interactive PowerPoint',
@@ -402,9 +407,20 @@
             });
         }
 
-        function showCartToast() {
+        function currentCustomerEmail() {
+            try {
+                const session = JSON.parse(sessionStorage.getItem('ilearnScienceAuthSession') || localStorage.getItem('ilearnScienceCurrentUser') || localStorage.getItem('ilearnScienceRememberedUser') || 'null');
+                return String(session?.email || '').toLowerCase();
+            } catch {
+                return '';
+            }
+        }
+
+        function showCartToast(title = 'Added to cart') {
             const toast = document.getElementById('cart-toast');
+            const heading = document.getElementById('cart-toast-title');
             if (!toast) return;
+            if (heading) heading.innerText = title;
             toast.classList.remove('translate-y-2', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
             setTimeout(() => {
@@ -432,6 +448,29 @@
             setCartItems(items);
             updateCartCount();
             showCartToast();
+        });
+
+        document.getElementById('save-cell-biology')?.addEventListener('click', () => {
+            const signedIn = window.iLearnAuth?.isSignedIn ? window.iLearnAuth.isSignedIn() : Boolean(currentCustomerEmail());
+            if (!signedIn) {
+                window.iLearnAuth?.openSignIn?.('Please sign in or create an account to save resources.');
+                return;
+            }
+            const email = currentCustomerEmail();
+            if (!email) return;
+            let saved = {};
+            try {
+                saved = JSON.parse(localStorage.getItem(savedItemsStorageKey) || '{}') || {};
+            } catch {
+                saved = {};
+            }
+            saved[email] = Array.isArray(saved[email]) ? saved[email] : Object.values(saved[email] || {});
+            if (!saved[email].some((item) => item.id === cellBiologyProduct.id)) {
+                saved[email].push({ ...cellBiologyProduct, quantity: 1 });
+            }
+            localStorage.setItem(savedItemsStorageKey, JSON.stringify(saved));
+            window.dispatchEvent(new CustomEvent('ilearn:saved-updated'));
+            showCartToast('Saved item');
         });
 
         updateCartCount();

@@ -261,7 +261,7 @@
                                 <span>{{ $downloads }}</span>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-3 pt-2">
+                        <div class="grid grid-cols-[1fr_auto_1fr] gap-3 pt-2">
                             <button
                                 class="shop-resource-preview rounded-lg border border-primary/30 py-2 text-center font-label text-sm text-primary transition-all hover:bg-primary/10"
                                 type="button"
@@ -369,12 +369,18 @@
                         <p class="mb-3 font-label text-xs uppercase tracking-widest text-primary">Included materials</p>
                         <ul id="shop-preview-includes" class="space-y-2 text-sm text-on-surface-variant"></ul>
                     </div>
-                    <div class="mt-8 flex items-center justify-between gap-4">
+                    <div class="mt-8 flex flex-wrap items-center justify-between gap-4">
                         <span id="shop-preview-price" class="font-headline text-3xl font-semibold text-primary"></span>
-                        <button id="shop-preview-add" class="flex items-center gap-2 rounded-lg bg-primary px-5 py-3 font-label text-sm font-bold text-on-primary transition-all hover:scale-[1.02] active:scale-95" type="button">
-                            <span class="material-symbols-outlined">shopping_cart</span>
-                            Add
-                        </button>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <button id="shop-preview-save" class="flex items-center gap-2 rounded-lg border border-primary/35 px-5 py-3 font-label text-sm font-bold text-primary transition-all hover:bg-primary/10 active:scale-95" type="button">
+                                <span class="material-symbols-outlined">favorite</span>
+                                Save
+                            </button>
+                            <button id="shop-preview-add" class="flex items-center gap-2 rounded-lg bg-primary px-5 py-3 font-label text-sm font-bold text-on-primary transition-all hover:scale-[1.02] active:scale-95" type="button">
+                                <span class="material-symbols-outlined">shopping_cart</span>
+                                Add
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -385,7 +391,7 @@
         <div class="flex items-center gap-3">
             <span class="material-symbols-outlined text-primary">check_circle</span>
             <div>
-                <p class="font-headline text-sm font-semibold text-on-surface">Added to cart</p>
+                <p id="shop-cart-toast-title" class="font-headline text-sm font-semibold text-on-surface">Added to cart</p>
                 <p id="shop-cart-toast-product" class="font-label text-xs text-on-surface-variant">Science resource</p>
             </div>
         </div>
@@ -393,6 +399,7 @@
 
     <script>
         const cartStorageKey = 'ilearnScienceCartItems';
+        const savedItemsStorageKey = 'ilearnScienceSavedItems';
         const inventoryStorageKey = 'ilearnScienceInventoryProducts';
         const productsEndpoint = '{{ route('products.index') }}';
         const productSyncChannel = 'BroadcastChannel' in window ? new BroadcastChannel('ilearn-products-sync') : null;
@@ -537,17 +544,58 @@
             });
         }
 
-        function showCartToast(productTitle) {
+        function currentCustomerEmail() {
+            try {
+                const session = JSON.parse(sessionStorage.getItem('ilearnScienceAuthSession') || localStorage.getItem('ilearnScienceCurrentUser') || localStorage.getItem('ilearnScienceRememberedUser') || 'null');
+                return String(session?.email || '').toLowerCase();
+            } catch {
+                return '';
+            }
+        }
+
+        function showCartToast(productTitle, title = 'Added to cart') {
             const toast = document.getElementById('shop-cart-toast');
             const label = document.getElementById('shop-cart-toast-product');
+            const heading = document.getElementById('shop-cart-toast-title');
             if (!toast) return;
             if (label) label.innerText = productTitle;
+            if (heading) heading.innerText = title;
             toast.classList.remove('translate-y-2', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
             setTimeout(() => {
                 toast.classList.add('translate-y-2', 'opacity-0');
                 toast.classList.remove('translate-y-0', 'opacity-100');
             }, 1800);
+        }
+
+        function saveProductForCustomer(product) {
+            const signedIn = window.iLearnAuth?.isSignedIn ? window.iLearnAuth.isSignedIn() : Boolean(currentCustomerEmail());
+            if (!signedIn) {
+                window.iLearnAuth?.openSignIn?.('Please sign in or create an account to save resources.');
+                return;
+            }
+
+            const email = currentCustomerEmail();
+            if (!email) return;
+            const item = {
+                id: product.id || slugify(product.title),
+                title: product.title || 'Science Resource',
+                meta: product.meta || product.type || 'Digital Resource',
+                price: product.price || '₱0.00',
+                image: product.image || '',
+                quantity: 1,
+            };
+            let saved = {};
+            try {
+                saved = JSON.parse(localStorage.getItem(savedItemsStorageKey) || '{}') || {};
+            } catch {
+                saved = {};
+            }
+            saved[email] = Array.isArray(saved[email]) ? saved[email] : Object.values(saved[email] || {});
+            if (!saved[email].some((savedItem) => savedItem.id === item.id)) saved[email].push(item);
+            localStorage.setItem(savedItemsStorageKey, JSON.stringify(saved));
+            window.dispatchEvent(new CustomEvent('ilearn:saved-updated'));
+            showCartToast(item.title, 'Saved item');
         }
 
         function addProductToCart(product) {
@@ -644,6 +692,9 @@
                                 data-product-includes="${escapeHTML(product.includes)}"
                                 data-product-image="${escapeHTML(product.image)}"
                             >Preview</button>
+                            <button class="shop-resource-save flex items-center justify-center rounded-lg border border-primary/30 px-3 text-primary transition-all hover:bg-primary/10" type="button" aria-label="Save ${escapeHTML(product.title)}" data-product-id="${escapeHTML(product.id)}" data-product-title="${escapeHTML(product.title)}" data-product-meta="${escapeHTML(product.meta)}" data-product-price="${escapeHTML(product.price)}" data-product-image="${escapeHTML(product.image)}">
+                                <span class="material-symbols-outlined text-sm">favorite</span>
+                            </button>
                             <button class="shop-resource-add flex items-center justify-center gap-1 rounded-lg bg-primary py-2 font-label text-sm text-on-primary transition-all hover:shadow-[0_0_15px_rgba(60,215,255,0.4)]" type="button" data-product-id="${escapeHTML(product.id)}" data-product-title="${escapeHTML(product.title)}" data-product-meta="${escapeHTML(product.meta)}" data-product-price="${escapeHTML(product.price)}" data-product-image="${escapeHTML(product.image)}">
                                 <span class="material-symbols-outlined text-sm">shopping_cart</span>
                                 Add
@@ -682,6 +733,7 @@
         shopResourceGrid?.addEventListener('click', (event) => {
             const previewButton = event.target.closest('.shop-resource-preview');
             const addCartButton = event.target.closest('.shop-resource-add');
+            const saveButton = event.target.closest('.shop-resource-save');
             if (previewButton) {
                 const addButton = previewButton.closest('article').querySelector('.shop-resource-add');
                 openShopPreview({
@@ -698,6 +750,16 @@
                     focus: previewButton.dataset.productFocus,
                     includes: previewButton.dataset.productIncludes,
                     image: previewButton.dataset.productImage,
+                });
+            }
+
+            if (saveButton) {
+                saveProductForCustomer({
+                    id: saveButton.dataset.productId,
+                    title: saveButton.dataset.productTitle,
+                    meta: saveButton.dataset.productMeta,
+                    price: saveButton.dataset.productPrice,
+                    image: saveButton.dataset.productImage,
                 });
             }
 
@@ -719,6 +781,11 @@
         document.getElementById('shop-preview-add')?.addEventListener('click', () => {
             if (!previewProduct) return;
             addProductToCart(previewProduct);
+            closeShopPreview();
+        });
+        document.getElementById('shop-preview-save')?.addEventListener('click', () => {
+            if (!previewProduct) return;
+            saveProductForCustomer(previewProduct);
             closeShopPreview();
         });
 
