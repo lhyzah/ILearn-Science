@@ -164,22 +164,6 @@
                     </a>
                 @endforeach
 
-                <div class="mx-4 my-4 h-px bg-white/5"></div>
-                <div class="mb-2 px-4 text-[10px] font-bold uppercase tracking-widest text-slate-500">Categories</div>
-                @foreach ([
-                    ['description', 'Worksheets'],
-                    ['co_present', 'PowerPoints'],
-                    ['quiz', 'Test and Quizzes'],
-                    ['visibility', 'Visual Resources'],
-                    ['menu_book', 'Study Guides'],
-                ] as [$icon, $label])
-                    <a class="flex items-center gap-4 rounded-lg px-4 py-2 text-slate-400 transition-all hover:bg-white/5 hover:text-white" href="#">
-                        <span class="material-symbols-outlined text-lg">{{ $icon }}</span>
-                        <span class="text-xs">{{ $label }}</span>
-                    </a>
-                @endforeach
-
-                <div class="mx-4 my-4 h-px bg-white/5"></div>
             </div>
 
             <div class="mt-20 px-6 opacity-60">
