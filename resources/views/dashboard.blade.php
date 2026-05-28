@@ -114,11 +114,11 @@
         <nav class="flex-1 space-y-1">
             @foreach ([
                 ['space_dashboard', 'Dashboard', route('dashboard'), true],
-                ['cloud_download', 'Downloads', route('orders'), false],
+                ['cloud_download', 'Downloads', '#dashboard-downloads', false],
                 ['shopping_cart', 'Cart', route('cart'), false],
                 ['receipt_long', 'Orders', route('orders'), false],
                 ['article', 'Blog', route('blog'), false],
-                ['favorite', 'Saved Items', route('shop'), false],
+                ['favorite', 'Saved Items', '#dashboard-saved-items', false],
             ] as [$icon, $label, $href, $active])
                 <a class="{{ $active ? 'nav-active' : 'border-transparent text-on-surface-variant hover:border-primary/30 hover:bg-surface-variant/35 hover:text-primary' }} relative flex items-center gap-3 rounded-xl border px-4 py-3 font-label text-sm transition-all" href="{{ $href }}">
                     <span class="material-symbols-outlined">{{ $icon }}</span>
@@ -128,6 +128,12 @@
                     @endif
                     @if ($label === 'Orders')
                         <span class="ml-auto flex h-6 min-w-6 items-center justify-center rounded-full bg-primary-container px-1 font-label text-[11px] font-bold text-on-primary shadow-[0_0_14px_rgba(0,212,255,.55)]" data-dashboard-sidebar-orders-count>0</span>
+                    @endif
+                    @if ($label === 'Downloads')
+                        <span class="ml-auto flex h-6 min-w-6 items-center justify-center rounded-full bg-primary-container px-1 font-label text-[11px] font-bold text-on-primary shadow-[0_0_14px_rgba(0,212,255,.55)]" data-dashboard-sidebar-downloads-count>0</span>
+                    @endif
+                    @if ($label === 'Saved Items')
+                        <span class="ml-auto flex h-6 min-w-6 items-center justify-center rounded-full bg-primary-container px-1 font-label text-[11px] font-bold text-on-primary shadow-[0_0_14px_rgba(0,212,255,.55)]" data-dashboard-sidebar-saved-count>0</span>
                     @endif
                 </a>
             @endforeach
@@ -208,6 +214,42 @@
                         >{{ $value }}</p>
                     </article>
                 @endforeach
+            </section>
+
+            <section class="grid grid-cols-1 gap-gutter xl:grid-cols-2">
+                <article id="dashboard-downloads" class="glass-panel scroll-mt-24 rounded-3xl p-6">
+                    <div class="mb-5 flex items-center justify-between gap-4">
+                        <div>
+                            <p class="font-label text-xs uppercase tracking-[0.3em] text-primary">Customer Activity</p>
+                            <h3 class="mt-2 font-headline text-2xl font-semibold">Downloaded Files</h3>
+                            <p class="mt-1 text-sm text-on-surface-variant">Resources you downloaded from completed orders appear here in real time.</p>
+                        </div>
+                        <a class="rounded-xl border border-primary/30 px-4 py-2 font-label text-xs text-primary transition-all hover:bg-primary/10" href="{{ route('orders') }}">Open Orders</a>
+                    </div>
+                    <div class="space-y-3" data-dashboard-downloads-list>
+                        <div class="rounded-2xl border border-white/5 bg-surface-container-low/50 p-5 text-center text-on-surface-variant">
+                            <span class="material-symbols-outlined text-4xl text-primary">cloud_download</span>
+                            <p class="mt-2">Loading your downloads...</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article id="dashboard-saved-items" class="glass-panel scroll-mt-24 rounded-3xl p-6">
+                    <div class="mb-5 flex items-center justify-between gap-4">
+                        <div>
+                            <p class="font-label text-xs uppercase tracking-[0.3em] text-primary">Customer Activity</p>
+                            <h3 class="mt-2 font-headline text-2xl font-semibold">Saved Items</h3>
+                            <p class="mt-1 text-sm text-on-surface-variant">Products saved from your browsing activity stay here for quick access.</p>
+                        </div>
+                        <a class="rounded-xl border border-primary/30 px-4 py-2 font-label text-xs text-primary transition-all hover:bg-primary/10" href="{{ route('shop') }}">Find More</a>
+                    </div>
+                    <div class="space-y-3" data-dashboard-saved-list>
+                        <div class="rounded-2xl border border-white/5 bg-surface-container-low/50 p-5 text-center text-on-surface-variant">
+                            <span class="material-symbols-outlined text-4xl text-primary">favorite</span>
+                            <p class="mt-2">Loading saved items...</p>
+                        </div>
+                    </div>
+                </article>
             </section>
 
             <section class="glass-panel rounded-3xl p-6">
@@ -332,7 +374,7 @@
     </nav>
 
     <div id="dashboard-cart-toast" class="fixed bottom-20 right-5 z-50 translate-y-2 rounded-2xl border border-primary/25 bg-surface-container/95 px-5 py-4 text-sm text-on-surface opacity-0 shadow-[0_0_24px_rgba(0,212,255,.22)] backdrop-blur-xl transition-all">
-        <span class="font-label text-primary">Added to cart:</span>
+        <span id="dashboard-cart-toast-action" class="font-label text-primary">Added to cart:</span>
         <span id="dashboard-cart-toast-product">Science Resource</span>
     </div>
 
@@ -341,6 +383,8 @@
         const dashboardCheckoutStorageKey = 'ilearnScienceLastCheckout';
         const dashboardDownloadedFilesStorageKey = 'ilearnScienceDownloadedFiles';
         const dashboardDownloadedProductsStorageKey = 'ilearnScienceDownloadedProducts';
+        const dashboardSavedItemsStorageKey = 'ilearnScienceSavedItems';
+        const dashboardWishlistStorageKey = 'ilearnScienceWishlistItems';
         const dashboardInventoryStorageKey = 'ilearnScienceInventoryProducts';
         const dashboardBlogStorageKey = 'ilearnScienceBlogPosts';
         const dashboardBlogInitializedKey = 'ilearnScienceBlogPostsInitialized';
@@ -503,6 +547,73 @@
             }
         }
 
+        function dashboardCollectionItems(collection, email) {
+            if (!email) return [];
+            if (Array.isArray(collection)) return collection.map(normalizeDashboardOrderItem);
+            if (collection && typeof collection === 'object') {
+                const customerValue = collection[email] || collection[email.toLowerCase()] || [];
+                if (Array.isArray(customerValue)) return customerValue.map(normalizeDashboardOrderItem);
+                if (customerValue && typeof customerValue === 'object') {
+                    return Object.values(customerValue).map(normalizeDashboardOrderItem);
+                }
+            }
+            return [];
+        }
+
+        function getDashboardSavedItems() {
+            const email = getDashboardSessionEmail();
+            if (!email) return [];
+            try {
+                const saved = JSON.parse(localStorage.getItem(dashboardSavedItemsStorageKey) || '{}') || {};
+                const wishlist = JSON.parse(localStorage.getItem(dashboardWishlistStorageKey) || '{}') || {};
+                const items = [
+                    ...dashboardCollectionItems(saved, email),
+                    ...dashboardCollectionItems(wishlist, email),
+                ];
+                const uniqueItems = new Map();
+                items.forEach((item) => {
+                    uniqueItems.set(item.id || dashboardSlugify(item.title), item);
+                });
+                return Array.from(uniqueItems.values());
+            } catch {
+                return [];
+            }
+        }
+
+        function saveDashboardItem(product) {
+            const email = getDashboardSessionEmail();
+            if (!email) {
+                if (window.iLearnAuth?.openSignIn) {
+                    window.iLearnAuth.openSignIn('Please sign in or create an account to save resources.');
+                }
+                return;
+            }
+
+            const normalized = normalizeDashboardProduct(product);
+            const item = {
+                id: normalized.id,
+                title: normalized.title,
+                meta: normalized.category,
+                price: normalized.price,
+                image: normalized.image,
+                quantity: 1,
+            };
+            let saved = {};
+            try {
+                saved = JSON.parse(localStorage.getItem(dashboardSavedItemsStorageKey) || '{}') || {};
+            } catch {
+                saved = {};
+            }
+            saved[email] = Array.isArray(saved[email]) ? saved[email] : Object.values(saved[email] || {});
+            if (!saved[email].some((savedItem) => (savedItem.id || dashboardSlugify(savedItem.title)) === item.id)) {
+                saved[email].push(item);
+            }
+            localStorage.setItem(dashboardSavedItemsStorageKey, JSON.stringify(saved));
+            window.dispatchEvent(new CustomEvent('ilearn:saved-updated'));
+            renderDashboardSavedItems();
+            showDashboardCartToast(normalized.title, 'Saved item:');
+        }
+
         function getDashboardCustomerOrders() {
             const currentEmail = getDashboardSessionEmail();
             const checkout = getDashboardLastCheckout();
@@ -544,7 +655,13 @@
                 target.textContent = orders.length;
                 target.classList.toggle('hidden', orders.length === 0);
             });
+            document.querySelectorAll('[data-dashboard-sidebar-downloads-count]').forEach((target) => {
+                target.textContent = downloads;
+                target.classList.toggle('hidden', downloads === 0);
+            });
             renderDashboardRecentOrders(orders);
+            renderDashboardDownloads();
+            renderDashboardSavedItems();
             renderDashboardRecommendation();
         }
 
@@ -572,6 +689,75 @@
                     </div>
                     <p class="mt-2 line-clamp-1 text-sm text-on-surface">${dashboardEscapeHTML(order.title)}</p>
                     <p class="mt-1 font-label text-[11px] text-on-surface-variant">${dashboardEscapeHTML(order.date)} - ${order.items.reduce((sum, item) => sum + item.quantity, 0)} item${order.items.reduce((sum, item) => sum + item.quantity, 0) === 1 ? '' : 's'}</p>
+                </a>
+            `).join('');
+        }
+
+        function renderDashboardDownloads() {
+            const list = document.querySelector('[data-dashboard-downloads-list]');
+            if (!list) return;
+
+            const email = getDashboardSessionEmail();
+            const downloadedOrders = getDashboardDownloadedOrders(email);
+            const downloadedItems = downloadedOrders.flatMap((order) => {
+                return order.items.map((item) => ({ ...item, orderNumber: order.number, date: order.date }));
+            });
+
+            if (!downloadedItems.length) {
+                list.innerHTML = `
+                    <div class="rounded-2xl border border-white/5 bg-surface-container-low/50 p-5 text-center">
+                        <span class="material-symbols-outlined text-4xl text-primary">cloud_download</span>
+                        <p class="mt-2 font-headline text-lg font-semibold">No downloads yet</p>
+                        <p class="mt-1 text-sm text-on-surface-variant">Use the Download action in your Orders page and your files will appear here.</p>
+                        <a class="mt-4 inline-flex rounded-xl border border-primary/30 px-4 py-2 font-label text-xs text-primary transition-all hover:bg-primary/10" href="{{ route('orders') }}">View Orders</a>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = downloadedItems.slice(0, 5).map((item) => `
+                <a class="flex items-center gap-4 rounded-2xl border border-white/5 bg-surface-container-low/50 p-4 transition-all hover:border-primary/35 hover:bg-surface-container/70" href="{{ route('orders') }}">
+                    ${item.image ? `<img class="h-14 w-14 rounded-xl object-cover" alt="${dashboardEscapeHTML(item.title)}" src="${dashboardEscapeHTML(item.image)}">` : `<span class="material-symbols-outlined flex h-14 w-14 items-center justify-center rounded-xl bg-primary-container/10 text-primary">description</span>`}
+                    <div class="min-w-0 flex-1">
+                        <p class="line-clamp-1 font-headline font-semibold">${dashboardEscapeHTML(item.title)}</p>
+                        <p class="mt-1 font-label text-[11px] text-on-surface-variant">${dashboardEscapeHTML(item.orderNumber)} - ${item.quantity} downloaded</p>
+                    </div>
+                    <span class="material-symbols-outlined text-primary">download_done</span>
+                </a>
+            `).join('');
+        }
+
+        function renderDashboardSavedItems() {
+            const list = document.querySelector('[data-dashboard-saved-list]');
+            const savedItems = getDashboardSavedItems();
+
+            document.querySelectorAll('[data-dashboard-sidebar-saved-count]').forEach((target) => {
+                target.textContent = savedItems.length;
+                target.classList.toggle('hidden', savedItems.length === 0);
+            });
+
+            if (!list) return;
+
+            if (!savedItems.length) {
+                list.innerHTML = `
+                    <div class="rounded-2xl border border-white/5 bg-surface-container-low/50 p-5 text-center">
+                        <span class="material-symbols-outlined text-4xl text-primary">favorite</span>
+                        <p class="mt-2 font-headline text-lg font-semibold">No saved items yet</p>
+                        <p class="mt-1 text-sm text-on-surface-variant">Save products from the dashboard inventory to build your quick-access list.</p>
+                        <a class="mt-4 inline-flex rounded-xl border border-primary/30 px-4 py-2 font-label text-xs text-primary transition-all hover:bg-primary/10" href="{{ route('shop') }}">Browse Resources</a>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = savedItems.slice(0, 5).map((item) => `
+                <a class="flex items-center gap-4 rounded-2xl border border-white/5 bg-surface-container-low/50 p-4 transition-all hover:border-primary/35 hover:bg-surface-container/70" href="{{ route('shop') }}">
+                    ${item.image ? `<img class="h-14 w-14 rounded-xl object-cover" alt="${dashboardEscapeHTML(item.title)}" src="${dashboardEscapeHTML(item.image)}">` : `<span class="material-symbols-outlined flex h-14 w-14 items-center justify-center rounded-xl bg-primary-container/10 text-primary">favorite</span>`}
+                    <div class="min-w-0 flex-1">
+                        <p class="line-clamp-1 font-headline font-semibold">${dashboardEscapeHTML(item.title)}</p>
+                        <p class="mt-1 font-label text-[11px] text-on-surface-variant">${dashboardEscapeHTML(item.meta)} - ${dashboardFormatPeso(item.price)}</p>
+                    </div>
+                    <span class="material-symbols-outlined text-primary">arrow_forward</span>
                 </a>
             `).join('');
         }
@@ -746,11 +932,13 @@
             `;
         }
 
-        function showDashboardCartToast(productTitle) {
+        function showDashboardCartToast(productTitle, actionLabel = 'Added to cart:') {
             const toast = document.getElementById('dashboard-cart-toast');
             const label = document.getElementById('dashboard-cart-toast-product');
+            const action = document.getElementById('dashboard-cart-toast-action');
             if (!toast) return;
             if (label) label.textContent = productTitle;
+            if (action) action.textContent = actionLabel;
             toast.classList.remove('translate-y-2', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
             setTimeout(() => {
@@ -801,10 +989,15 @@
                         </div>
                         <p class="mt-2 line-clamp-2 text-sm text-on-surface-variant">${dashboardEscapeHTML(product.description)}</p>
                         <p class="mt-2 font-label text-[11px] text-on-surface-variant">${dashboardEscapeHTML(product.grade)}</p>
-                        <button class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-primary-container py-2.5 font-label text-xs font-bold text-on-primary shadow-[0_0_16px_rgba(0,212,255,.22)] transition-all hover:scale-[1.02]" type="button" data-dashboard-product-add="${dashboardEscapeHTML(product.id)}">
-                            <span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
-                            Add to Cart
-                        </button>
+                        <div class="mt-4 grid grid-cols-[1fr_auto] gap-2">
+                            <button class="flex items-center justify-center gap-2 rounded-xl bg-primary-container py-2.5 font-label text-xs font-bold text-on-primary shadow-[0_0_16px_rgba(0,212,255,.22)] transition-all hover:scale-[1.02]" type="button" data-dashboard-product-add="${dashboardEscapeHTML(product.id)}">
+                                <span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+                                Add to Cart
+                            </button>
+                            <button class="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 text-primary transition-all hover:bg-primary/10" type="button" title="Save item" data-dashboard-product-save="${dashboardEscapeHTML(product.id)}">
+                                <span class="material-symbols-outlined text-[18px]">favorite</span>
+                            </button>
+                        </div>
                     </div>
                 </article>
             `).join('') : `
@@ -943,16 +1136,20 @@
         renderDashboardRecommendation();
         document.querySelector('[data-dashboard-products-grid]')?.addEventListener('click', (event) => {
             const addButton = event.target.closest('[data-dashboard-product-add]');
-            if (!addButton) return;
+            const saveButton = event.target.closest('[data-dashboard-product-save]');
+            if (!addButton && !saveButton) return;
+            const productId = addButton?.dataset.dashboardProductAdd || saveButton?.dataset.dashboardProductSave;
             const product = readDashboardInventory()
                 .filter((item) => (item.status || 'Published') === 'Published')
                 .map(normalizeDashboardProduct)
-                .find((item) => item.id === addButton.dataset.dashboardProductAdd);
-            if (product) addDashboardProductToCart(product);
+                .find((item) => item.id === productId);
+            if (!product) return;
+            if (addButton) addDashboardProductToCart(product);
+            if (saveButton) saveDashboardItem(product);
         });
         window.addEventListener('storage', (event) => {
             if (event.key === dashboardCartStorageKey) renderDashboardCart();
-            if (event.key === dashboardCheckoutStorageKey || event.key === dashboardDownloadedFilesStorageKey || event.key === dashboardDownloadedProductsStorageKey || event.key === 'ilearnScienceCurrentUser' || event.key === 'ilearnScienceRememberedUser') updateDashboardDownloadStats();
+            if (event.key === dashboardCheckoutStorageKey || event.key === dashboardDownloadedFilesStorageKey || event.key === dashboardDownloadedProductsStorageKey || event.key === dashboardSavedItemsStorageKey || event.key === dashboardWishlistStorageKey || event.key === 'ilearnScienceCurrentUser' || event.key === 'ilearnScienceRememberedUser') updateDashboardDownloadStats();
             if (event.key === dashboardInventoryStorageKey || event.key === `${dashboardInventoryStorageKey}Initialized`) {
                 renderDashboardProducts(true);
                 renderDashboardRecommendation();
@@ -961,6 +1158,7 @@
         });
         window.addEventListener('ilearn:cart-updated', renderDashboardCart);
         window.addEventListener('ilearn:auth-updated', updateDashboardDownloadStats);
+        window.addEventListener('ilearn:saved-updated', renderDashboardSavedItems);
         window.addEventListener('ilearn:products-updated', (event) => {
             if (Array.isArray(event.detail?.products)) {
                 localStorage.setItem(dashboardInventoryStorageKey, JSON.stringify(event.detail.products));
@@ -991,6 +1189,7 @@
             renderDashboardProducts(true);
             renderDashboardBlogs(true);
             renderDashboardCart();
+            renderDashboardSavedItems();
             renderDashboardRecommendation();
         });
         setInterval(() => renderDashboardProducts(false), 1000);
