@@ -114,13 +114,11 @@
         <nav class="flex-1 space-y-1">
             @foreach ([
                 ['space_dashboard', 'Dashboard', route('dashboard'), true],
-                ['inventory_2', 'My Resources', route('resources.cell-biology'), false],
                 ['cloud_download', 'Downloads', route('orders'), false],
                 ['shopping_cart', 'Cart', route('cart'), false],
                 ['receipt_long', 'Orders', route('orders'), false],
                 ['article', 'Blog', route('blog'), false],
                 ['favorite', 'Saved Items', route('shop'), false],
-                ['settings', 'Settings', route('about'), false],
             ] as [$icon, $label, $href, $active])
                 <a class="{{ $active ? 'nav-active' : 'border-transparent text-on-surface-variant hover:border-primary/30 hover:bg-surface-variant/35 hover:text-primary' }} relative flex items-center gap-3 rounded-xl border px-4 py-3 font-label text-sm transition-all" href="{{ $href }}">
                     <span class="material-symbols-outlined">{{ $icon }}</span>
@@ -156,7 +154,7 @@
     <main class="relative z-10 px-4 py-8 lg:ml-64 lg:px-8">
         <div class="mx-auto max-w-container-max space-y-8">
             <section class="grid grid-cols-1 gap-gutter xl:grid-cols-12">
-                <article class="glass-panel overflow-hidden rounded-3xl p-6 md:p-8 xl:col-span-8">
+                <article class="glass-panel overflow-hidden rounded-3xl p-6 md:p-8 xl:col-span-12">
                     <div class="grid gap-8 lg:grid-cols-[1.2fr_.8fr] lg:items-center">
                         <div>
                             <span class="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary-container/10 px-3 py-1 font-label text-xs text-primary">
@@ -186,20 +184,6 @@
                     </div>
                 </article>
 
-                <aside class="glass-panel rounded-3xl p-6 xl:col-span-4">
-                    <h3 class="font-headline text-2xl font-semibold">Quick Actions</h3>
-                    <div class="mt-5 grid grid-cols-2 gap-3">
-                        @foreach ([['download', 'Downloads', route('orders')], ['shopping_cart', 'Cart', route('cart')], ['article', 'Blog', route('blog')], ['support_agent', 'Support', route('about')]] as [$icon, $label, $href])
-                            <a class="glow-hover relative flex min-h-[92px] flex-col items-center justify-center gap-2 rounded-2xl border border-white/10 bg-surface-container-low/55 p-3 text-center" href="{{ $href }}">
-                                <span class="material-symbols-outlined text-primary">{{ $icon }}</span>
-                                <span class="font-label text-xs text-on-surface">{{ $label }}</span>
-                                @if ($label === 'Cart')
-                                    <span class="absolute right-3 top-3 flex h-6 min-w-6 items-center justify-center rounded-full bg-primary-container px-1 font-label text-[11px] font-bold text-on-primary shadow-[0_0_14px_rgba(0,212,255,.55)]" data-cart-count data-dashboard-cart-count>0</span>
-                                @endif
-                            </a>
-                        @endforeach
-                    </div>
-                </aside>
             </section>
 
             <section class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
