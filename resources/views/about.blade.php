@@ -80,7 +80,7 @@
         </nav>
 
         <div class="flex items-center gap-4 md:gap-6">
-            <details class="group relative">
+            <details class="hidden">
                 <summary class="relative flex cursor-pointer list-none items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-2 transition-all hover:border-neon-cyan/50 hover:bg-white/10 [&::-webkit-details-marker]:hidden" aria-label="Open cart preview">
                     <span class="material-symbols-outlined text-slate-300">shopping_cart</span>
                     <span class="material-symbols-outlined text-neon-cyan text-[18px]">payments</span>
@@ -127,10 +127,6 @@
                     </div>
                 </div>
             </details>
-            <div class="relative hidden cursor-pointer sm:block">
-                <span class="material-symbols-outlined text-slate-300">notifications</span>
-                <span class="absolute -right-2 -top-1 rounded-full bg-neon-cyan px-1 text-[10px] font-bold text-space-dark">5</span>
-            </div>
             <img alt="Elena Smith Profile" class="h-9 w-9 cursor-pointer rounded-full border-2 border-neon-purple/50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApNlR87JihXfK4WPC3HicxhPa3zV8N_4DWUAWpVpakf-WPkdVCrVa9pskcgWncYGbGetIH-eZLIddDC2oDUKLlwpt6joJCwCKksd4ZqB8j5fcXMgMfAr2uUPm1QMWpmRINZHod6b54miT_BLpjBOs09Wv1TuJ6gUAEQ6nIuMzre05GQQ9jWQYDQxls1CThb-cB0JHiCQPYwtDnwCFH_KAVD6tm1ziTHkKr-tSFdflnt21RoayHTxjMEyqhjiWqlRjOJoBIP_tjbA8">
         </div>
     </header>
