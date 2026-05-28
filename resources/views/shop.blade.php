@@ -692,8 +692,9 @@
                                 data-product-includes="${escapeHTML(product.includes)}"
                                 data-product-image="${escapeHTML(product.image)}"
                             >Preview</button>
-                            <button class="shop-resource-save flex items-center justify-center rounded-lg border border-primary/30 px-3 text-primary transition-all hover:bg-primary/10" type="button" aria-label="Save ${escapeHTML(product.title)}" data-product-id="${escapeHTML(product.id)}" data-product-title="${escapeHTML(product.title)}" data-product-meta="${escapeHTML(product.meta)}" data-product-price="${escapeHTML(product.price)}" data-product-image="${escapeHTML(product.image)}">
+                            <button class="shop-resource-save flex items-center justify-center gap-1 rounded-lg border border-primary/30 px-3 font-label text-xs text-primary transition-all hover:bg-primary/10" type="button" aria-label="Save ${escapeHTML(product.title)}" data-product-id="${escapeHTML(product.id)}" data-product-title="${escapeHTML(product.title)}" data-product-meta="${escapeHTML(product.meta)}" data-product-price="${escapeHTML(product.price)}" data-product-image="${escapeHTML(product.image)}">
                                 <span class="material-symbols-outlined text-sm">favorite</span>
+                                Save
                             </button>
                             <button class="shop-resource-add flex items-center justify-center gap-1 rounded-lg bg-primary py-2 font-label text-sm text-on-primary transition-all hover:shadow-[0_0_15px_rgba(60,215,255,0.4)]" type="button" data-product-id="${escapeHTML(product.id)}" data-product-title="${escapeHTML(product.title)}" data-product-meta="${escapeHTML(product.meta)}" data-product-price="${escapeHTML(product.price)}" data-product-image="${escapeHTML(product.image)}">
                                 <span class="material-symbols-outlined text-sm">shopping_cart</span>

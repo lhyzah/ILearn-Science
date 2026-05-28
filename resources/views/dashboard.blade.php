@@ -989,13 +989,14 @@
                         </div>
                         <p class="mt-2 line-clamp-2 text-sm text-on-surface-variant">${dashboardEscapeHTML(product.description)}</p>
                         <p class="mt-2 font-label text-[11px] text-on-surface-variant">${dashboardEscapeHTML(product.grade)}</p>
-                        <div class="mt-4 grid grid-cols-[1fr_auto] gap-2">
+                        <div class="mt-4 grid grid-cols-2 gap-2">
                             <button class="flex items-center justify-center gap-2 rounded-xl bg-primary-container py-2.5 font-label text-xs font-bold text-on-primary shadow-[0_0_16px_rgba(0,212,255,.22)] transition-all hover:scale-[1.02]" type="button" data-dashboard-product-add="${dashboardEscapeHTML(product.id)}">
                                 <span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
                                 Add to Cart
                             </button>
-                            <button class="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 text-primary transition-all hover:bg-primary/10" type="button" title="Save item" data-dashboard-product-save="${dashboardEscapeHTML(product.id)}">
+                            <button class="flex items-center justify-center gap-2 rounded-xl border border-primary/25 px-3 py-2.5 font-label text-xs font-bold text-primary transition-all hover:bg-primary/10" type="button" title="Save item" data-dashboard-product-save="${dashboardEscapeHTML(product.id)}">
                                 <span class="material-symbols-outlined text-[18px]">favorite</span>
+                                Save
                             </button>
                         </div>
                     </div>
