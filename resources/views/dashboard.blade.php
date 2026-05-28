@@ -138,10 +138,6 @@
                 </a>
             @endforeach
         </nav>
-        <a class="mt-4 flex items-center justify-center gap-2 rounded-xl bg-primary-container px-4 py-3 font-label text-sm font-bold text-on-primary shadow-[0_0_20px_rgba(0,212,255,.32)] transition-all hover:scale-[1.02]" href="{{ route('shop') }}">
-            <span class="material-symbols-outlined">science</span>
-            Browse Resources
-        </a>
     </aside>
 
     <header class="sticky top-0 z-30 border-b border-primary/10 bg-surface/70 px-4 py-4 backdrop-blur-2xl lg:ml-64 lg:px-8">
@@ -149,12 +145,6 @@
             <div>
                 <p class="font-label text-xs uppercase tracking-[0.3em] text-primary">Learner Command Center</p>
                 <h2 class="font-headline text-2xl font-bold text-on-surface md:text-3xl" data-customer-dashboard-title>Customer Dashboard</h2>
-            </div>
-            <div class="hidden flex-1 justify-center md:flex">
-                <div class="flex w-full max-w-md items-center gap-3 rounded-full border border-primary/15 bg-surface-container-low/80 px-4 py-2.5">
-                    <span class="material-symbols-outlined text-on-surface-variant">search</span>
-                    <input class="w-full border-0 bg-transparent p-0 font-label text-sm text-on-surface placeholder:text-on-surface-variant focus:ring-0" placeholder="Search your resources...">
-                </div>
             </div>
             <div class="flex items-center gap-3">
                 <label class="group flex cursor-pointer items-center rounded-full border border-primary/20 bg-surface-container/70 p-1 transition-all hover:border-primary/50" title="Upload profile picture">
@@ -288,27 +278,11 @@
                         </div>
                         <a class="font-label text-sm text-primary hover:underline" href="{{ route('shop') }}">Browse More</a>
                     </div>
-                    <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
-                        @foreach ([
-                            ['Cell Biology Interactive PowerPoint', 'PPTX + PDF', 'Biology', 'https://lh3.googleusercontent.com/aida-public/AB6AXuDB29hlsu6znAHyJwVa-GZ2GEL1qRnewIXPnir5KUIvPk3vY2FFuEYqNxWpbBb_S4i1_9cmj6hfXbbm0wq8LMsxrMXm3otjI_lesrFSTbydTwMWXd2Cgx9zkMYsIX8pugR8DnnL3y8EtZLVBl1HYoCZObeGk9hhHuXl2iqlfEy5qpaQUtNcVcZt18lXM0RWiJZuPFwCoH01n7k71hV_8pOjscUwmXnCjDxQgRKCdPBDeqczACKtuekX2CyfsEtKl8-YdFotM9lhUWc'],
-                            ['Photosynthesis Visual Pack', 'Slides + activity', 'Biology', '/images/shop/photosynthesis-process-topic.svg'],
-                            ['Pedigree Analysis Quiz Set', 'Quiz + answer key', 'Heredity', '/images/shop/pedigree-analysis-topic.svg'],
-                        ] as [$title, $meta, $tag, $image])
-                            <article class="overflow-hidden rounded-2xl border border-white/10 bg-surface-container-low/55 transition-all hover:border-primary/40">
-                                <img class="h-36 w-full object-cover" alt="{{ $title }}" src="{{ $image }}">
-                                <div class="p-4">
-                                    <span class="rounded-full bg-primary-container/10 px-2 py-1 font-label text-[10px] text-primary">{{ $tag }}</span>
-                                    <h4 class="mt-3 font-headline text-lg font-semibold">{{ $title }}</h4>
-                                    <p class="mt-1 text-sm text-on-surface-variant">{{ $meta }}</p>
-                                    <div class="mt-4 flex gap-2">
-                                        <a class="flex-1 rounded-lg bg-primary-container py-2 text-center font-label text-xs font-bold text-on-primary" href="{{ route('resources.cell-biology') }}">Open</a>
-                                        <button class="rounded-lg border border-primary/25 px-3 py-2 text-primary">
-                                            <span class="material-symbols-outlined text-[18px]">download</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </article>
-                        @endforeach
+                    <div class="grid grid-cols-1 gap-5 md:grid-cols-3" data-dashboard-learning-resources>
+                        <div class="rounded-2xl border border-white/10 bg-surface-container-low/55 p-6 text-center text-on-surface-variant md:col-span-3">
+                            <span class="material-symbols-outlined mb-2 text-4xl text-primary">inventory_2</span>
+                            <p>Loading your purchased resources...</p>
+                        </div>
                     </div>
                 </article>
 
@@ -729,6 +703,71 @@
             return orders;
         }
 
+        function getDashboardPurchasedItems() {
+            const uniqueItems = new Map();
+            getDashboardCustomerOrders().forEach((order, orderIndex) => {
+                order.items.forEach((item) => {
+                    const id = item.id || dashboardSlugify(item.title);
+                    const existing = uniqueItems.get(id);
+                    if (existing) {
+                        existing.quantity += Number(item.quantity) || 1;
+                        existing.orderNumbers.add(order.number);
+                    } else {
+                        uniqueItems.set(id, {
+                            ...item,
+                            orderDate: order.date,
+                            orderNumber: order.number,
+                            orderIndex,
+                            orderNumbers: new Set([order.number]),
+                        });
+                    }
+                });
+            });
+
+            return Array.from(uniqueItems.values())
+                .sort((a, b) => a.orderIndex - b.orderIndex)
+                .map((item) => ({
+                    ...item,
+                    orderNumbers: Array.from(item.orderNumbers),
+                }));
+        }
+
+        function renderDashboardLearningResources() {
+            const grid = document.querySelector('[data-dashboard-learning-resources]');
+            if (!grid) return;
+            const items = getDashboardPurchasedItems();
+
+            if (!items.length) {
+                grid.innerHTML = `
+                    <div class="rounded-2xl border border-white/10 bg-surface-container-low/55 p-6 text-center text-on-surface-variant md:col-span-3">
+                        <span class="material-symbols-outlined mb-2 text-4xl text-primary">inventory_2</span>
+                        <p class="font-headline text-lg text-on-surface">No purchased resources yet</p>
+                        <p class="mt-1 text-sm">Products will appear here after the customer successfully checks out.</p>
+                        <a class="mt-4 inline-flex rounded-xl border border-primary/30 px-4 py-2 font-label text-xs text-primary transition-all hover:bg-primary/10" href="{{ route('shop') }}">Shop Resources</a>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = items.slice(0, 6).map((item) => `
+                <article class="overflow-hidden rounded-2xl border border-white/10 bg-surface-container-low/55 transition-all hover:border-primary/40">
+                    ${item.image ? `<img class="h-36 w-full object-cover" alt="${dashboardEscapeHTML(item.title)}" src="${dashboardEscapeHTML(item.image)}">` : `<div class="flex h-36 w-full items-center justify-center bg-surface-container-high text-primary"><span class="material-symbols-outlined text-5xl">description</span></div>`}
+                    <div class="p-4">
+                        <span class="rounded-full bg-primary-container/10 px-2 py-1 font-label text-[10px] text-primary">${dashboardEscapeHTML(item.meta)}</span>
+                        <h4 class="mt-3 line-clamp-2 font-headline text-lg font-semibold">${dashboardEscapeHTML(item.title)}</h4>
+                        <p class="mt-1 text-sm text-on-surface-variant">Qty ${item.quantity} - ${dashboardEscapeHTML(item.orderDate || 'Purchased')}</p>
+                        <p class="mt-1 truncate font-label text-[11px] text-on-surface-variant">${dashboardEscapeHTML(item.orderNumbers.join(', '))}</p>
+                        <div class="mt-4 flex gap-2">
+                            <a class="flex-1 rounded-lg bg-primary-container py-2 text-center font-label text-xs font-bold text-on-primary" href="{{ route('orders') }}">Open</a>
+                            <a class="rounded-lg border border-primary/25 px-3 py-2 text-primary" href="{{ route('orders') }}" title="Download from orders">
+                                <span class="material-symbols-outlined text-[18px]">download</span>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+        }
+
         function updateDashboardDownloadStats() {
             const downloads = getDashboardDownloadCount();
             const purchased = getDashboardPurchasedCount();
@@ -753,6 +792,7 @@
                 target.classList.toggle('hidden', downloads === 0);
             });
             renderDashboardRecentOrders(orders);
+            renderDashboardLearningResources();
             renderDashboardDownloads();
             renderDashboardSavedItems();
             updateDashboardMissionProgress({ downloads, purchased, orders, savedItems, cartItems });
