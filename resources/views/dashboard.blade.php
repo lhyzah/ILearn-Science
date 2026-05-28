@@ -181,14 +181,14 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Mission Progress</p>
-                                    <p class="mt-2 font-headline text-4xl font-bold text-primary">78%</p>
+                                    <p class="mt-2 font-headline text-4xl font-bold text-primary" data-dashboard-mission-progress>0%</p>
                                 </div>
                                 <div class="relative flex h-24 w-24 items-center justify-center rounded-full border-4 border-primary/20">
                                     <div class="absolute inset-0 rounded-full border-t-4 border-primary-container animate-spin"></div>
                                     <span class="material-symbols-outlined text-primary">rocket_launch</span>
                                 </div>
                             </div>
-                            <p class="mt-4 text-sm text-on-surface-variant">You opened 6 of 8 recent resources. Next recommended topic: <span data-dashboard-next-topic>Finding best match...</span></p>
+                            <p class="mt-4 text-sm text-on-surface-variant"><span data-dashboard-mission-summary>Loading your activity progress...</span> Next recommended topic: <span data-dashboard-next-topic>Finding best match...</span></p>
                         </div>
                     </div>
                 </article>
@@ -385,6 +385,7 @@
         const dashboardDownloadedProductsStorageKey = 'ilearnScienceDownloadedProducts';
         const dashboardSavedItemsStorageKey = 'ilearnScienceSavedItems';
         const dashboardWishlistStorageKey = 'ilearnScienceWishlistItems';
+        const dashboardActivityStorageKey = 'ilearnScienceCustomerActivity';
         const dashboardInventoryStorageKey = 'ilearnScienceInventoryProducts';
         const dashboardBlogStorageKey = 'ilearnScienceBlogPosts';
         const dashboardBlogInitializedKey = 'ilearnScienceBlogPostsInitialized';
@@ -580,6 +581,50 @@
             }
         }
 
+        function getDashboardCustomerActivities() {
+            const email = getDashboardSessionEmail();
+            if (!email) return [];
+            try {
+                const activities = JSON.parse(localStorage.getItem(dashboardActivityStorageKey) || '[]') || [];
+                return activities.filter((activity) => String(activity?.user?.email || '').toLowerCase() === email);
+            } catch {
+                return [];
+            }
+        }
+
+        function updateDashboardMissionProgress({ downloads = getDashboardDownloadCount(), purchased = getDashboardPurchasedCount(), orders = getDashboardCustomerOrders(), savedItems = getDashboardSavedItems(), cartItems = getDashboardCartItems() } = {}) {
+            const activities = getDashboardCustomerActivities();
+            const exploredPages = new Set(activities.map((activity) => activity.path).filter(Boolean));
+            const blogReads = activities.filter((activity) => /blog/i.test(`${activity.type} ${activity.label} ${activity.path}`)).length;
+            const cartCount = cartItems.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
+
+            const points = Math.min(cartCount * 5, 15)
+                + Math.min(savedItems.length * 5, 15)
+                + Math.min(orders.length * 15, 25)
+                + Math.min(downloads * 8, 25)
+                + Math.min(exploredPages.size * 3 + blogReads * 2, 20);
+            const progress = Math.min(100, Math.round(points));
+
+            const completedActions = [
+                cartCount > 0,
+                savedItems.length > 0,
+                purchased > 0 || orders.length > 0,
+                downloads > 0,
+                exploredPages.size > 1 || blogReads > 0,
+            ].filter(Boolean).length;
+
+            const summary = completedActions
+                ? `Completed ${completedActions} of 5 learning actions from your real activity.`
+                : 'Start by browsing, saving, carting, purchasing, or downloading resources.';
+
+            document.querySelectorAll('[data-dashboard-mission-progress]').forEach((target) => {
+                target.textContent = `${progress}%`;
+            });
+            document.querySelectorAll('[data-dashboard-mission-summary]').forEach((target) => {
+                target.textContent = summary;
+            });
+        }
+
         function saveDashboardItem(product) {
             const email = getDashboardSessionEmail();
             if (!email) {
@@ -642,6 +687,8 @@
             const downloads = getDashboardDownloadCount();
             const purchased = getDashboardPurchasedCount();
             const orders = getDashboardCustomerOrders();
+            const savedItems = getDashboardSavedItems();
+            const cartItems = getDashboardCartItems();
             document.querySelectorAll('[data-dashboard-purchased-count]').forEach((target) => {
                 target.textContent = purchased;
             });
@@ -662,6 +709,7 @@
             renderDashboardRecentOrders(orders);
             renderDashboardDownloads();
             renderDashboardSavedItems();
+            updateDashboardMissionProgress({ downloads, purchased, orders, savedItems, cartItems });
             renderDashboardRecommendation();
         }
 
@@ -735,6 +783,7 @@
                 target.textContent = savedItems.length;
                 target.classList.toggle('hidden', savedItems.length === 0);
             });
+            updateDashboardMissionProgress({ savedItems });
 
             if (!list) return;
 
@@ -1072,6 +1121,7 @@
             if (meta) meta.textContent = count === 1 ? '1 item waiting' : `${count} items waiting`;
             if (total) total.textContent = dashboardFormatPeso(subtotal);
             if (summary) summary.textContent = count ? `${count} item${count === 1 ? '' : 's'} ready for checkout.` : 'Your cart is empty.';
+            updateDashboardMissionProgress({ cartItems: items });
 
             if (!list) return;
             list.innerHTML = '';
@@ -1150,7 +1200,7 @@
         });
         window.addEventListener('storage', (event) => {
             if (event.key === dashboardCartStorageKey) renderDashboardCart();
-            if (event.key === dashboardCheckoutStorageKey || event.key === dashboardDownloadedFilesStorageKey || event.key === dashboardDownloadedProductsStorageKey || event.key === dashboardSavedItemsStorageKey || event.key === dashboardWishlistStorageKey || event.key === 'ilearnScienceCurrentUser' || event.key === 'ilearnScienceRememberedUser') updateDashboardDownloadStats();
+            if (event.key === dashboardCheckoutStorageKey || event.key === dashboardDownloadedFilesStorageKey || event.key === dashboardDownloadedProductsStorageKey || event.key === dashboardSavedItemsStorageKey || event.key === dashboardWishlistStorageKey || event.key === dashboardActivityStorageKey || event.key === 'ilearnScienceCurrentUser' || event.key === 'ilearnScienceRememberedUser') updateDashboardDownloadStats();
             if (event.key === dashboardInventoryStorageKey || event.key === `${dashboardInventoryStorageKey}Initialized`) {
                 renderDashboardProducts(true);
                 renderDashboardRecommendation();
@@ -1200,6 +1250,7 @@
             renderDashboardProducts(false);
             refreshDashboardBlogsFromServer();
             renderDashboardBlogs(false);
+            updateDashboardMissionProgress();
         }, 3000);
     </script>
     @include('partials.auth-ui')
