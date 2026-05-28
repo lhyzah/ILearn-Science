@@ -182,7 +182,7 @@
                                     <span class="material-symbols-outlined text-primary">rocket_launch</span>
                                 </div>
                             </div>
-                            <p class="mt-4 text-sm text-on-surface-variant">You opened 6 of 8 recent resources. Next recommended topic: Photosynthesis.</p>
+                            <p class="mt-4 text-sm text-on-surface-variant">You opened 6 of 8 recent resources. Next recommended topic: <span data-dashboard-next-topic>Finding best match...</span></p>
                         </div>
                     </div>
                 </article>
@@ -307,15 +307,13 @@
 
                     <section class="glass-panel rounded-3xl p-6">
                         <h3 class="font-headline text-2xl font-semibold">Recommended Next</h3>
-                        <p class="mt-2 text-sm text-on-surface-variant">Based on your Biology purchases.</p>
-                        <a class="mt-5 flex gap-4 rounded-2xl border border-primary/15 bg-primary-container/10 p-4 transition-all hover:border-primary/45" href="{{ route('shop') }}">
-                            <img class="h-20 w-20 rounded-xl object-cover" alt="Digestive System" src="/images/shop/digestive-system-topic.svg">
-                            <div>
-                                <p class="font-headline font-semibold">Digestive System Bundle</p>
-                                <p class="mt-1 text-sm text-on-surface-variant">Presentation, worksheet, visual guide, and quiz.</p>
-                                <p class="mt-2 font-label text-sm text-primary">View resource</p>
+                        <p class="mt-2 text-sm text-on-surface-variant" data-dashboard-recommendation-reason>Based on customer purchases and admin-published products.</p>
+                        <div class="mt-5" data-dashboard-recommendation>
+                            <div class="rounded-2xl border border-white/5 bg-surface-container-low/50 p-5 text-center text-on-surface-variant">
+                                <span class="material-symbols-outlined text-4xl text-primary">auto_awesome</span>
+                                <p class="mt-2">Finding your next best resource...</p>
                             </div>
-                        </a>
+                        </div>
                     </section>
                 </aside>
             </section>
@@ -547,6 +545,7 @@
                 target.classList.toggle('hidden', orders.length === 0);
             });
             renderDashboardRecentOrders(orders);
+            renderDashboardRecommendation();
         }
 
         function renderDashboardRecentOrders(orders = getDashboardCustomerOrders()) {
@@ -656,6 +655,97 @@
             };
         }
 
+        function dashboardActiveProducts() {
+            return readDashboardInventory()
+                .filter((product) => (product.status || 'Published') === 'Published')
+                .map(normalizeDashboardProduct);
+        }
+
+        function dashboardFlattenDownloadedProducts() {
+            try {
+                const downloads = JSON.parse(localStorage.getItem(dashboardDownloadedProductsStorageKey) || '{}') || {};
+                return Object.values(downloads).flatMap((customerOrders) =>
+                    Object.values(customerOrders || {}).flatMap((orderItems) => Object.values(orderItems || {}))
+                );
+            } catch {
+                return [];
+            }
+        }
+
+        function scoreRecommendedProduct(scores, product, score, reason) {
+            const normalized = normalizeDashboardProduct(product);
+            const existing = scores.get(normalized.id);
+            if (existing) {
+                existing.score += score;
+                existing.reason = existing.reason === 'Recommended from admin products' ? reason : existing.reason;
+                existing.image = existing.image || normalized.image;
+                existing.description = existing.description || normalized.description;
+                return;
+            }
+            scores.set(normalized.id, { ...normalized, score, reason });
+        }
+
+        function pickDashboardRecommendation() {
+            const products = dashboardActiveProducts();
+            const scores = new Map();
+
+            products.forEach((product, index) => {
+                const topicBoost = /biology|photosynthesis|digestive|heredity|pedigree|taxonomy|cell/i.test(`${product.title} ${product.category} ${product.description}`) ? 1 : 0;
+                scoreRecommendedProduct(scores, product, Math.max(0.2, 1 - (index * 0.05)) + topicBoost, 'Recommended from admin products');
+            });
+
+            const checkout = getDashboardLastCheckout();
+            if (checkout?.items?.length) {
+                checkout.items.forEach((item) => {
+                    scoreRecommendedProduct(scores, item, (Number(item.quantity) || 1) * 4, 'Recommended from purchased products');
+                });
+            }
+
+            dashboardFlattenDownloadedProducts().forEach((item) => {
+                scoreRecommendedProduct(scores, item, (Number(item.quantity) || 1) * 5, 'Recommended from downloaded best sellers');
+            });
+
+            const recommendations = Array.from(scores.values()).sort((a, b) => b.score - a.score || a.title.localeCompare(b.title));
+            if (recommendations.length) return recommendations[0];
+
+            return normalizeDashboardProduct({
+                id: 'photosynthesis-study-guide',
+                title: 'Photosynthesis Study Guide',
+                category: 'Study Guides',
+                price: 180,
+                image: '/images/shop/photosynthesis-process-topic.svg',
+                description: 'A clear, visual guide for teaching photosynthesis concepts with classroom-ready activities.',
+                status: 'Published',
+            });
+        }
+
+        function renderDashboardRecommendation() {
+            const container = document.querySelector('[data-dashboard-recommendation]');
+            const reason = document.querySelector('[data-dashboard-recommendation-reason]');
+            if (!container) return;
+
+            const product = pickDashboardRecommendation();
+            const reasonText = product.reason || 'Recommended from admin products';
+            if (reason) reason.textContent = reasonText;
+            document.querySelectorAll('[data-dashboard-next-topic]').forEach((target) => {
+                target.textContent = product.title;
+            });
+
+            container.innerHTML = `
+                <a class="flex gap-4 rounded-2xl border border-primary/15 bg-primary-container/10 p-4 transition-all hover:border-primary/45 hover:bg-primary-container/15" href="{{ route('shop') }}">
+                    ${product.image ? `<img class="h-20 w-20 rounded-xl object-cover" alt="${dashboardEscapeHTML(product.title)}" src="${dashboardEscapeHTML(product.image)}">` : `<div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-surface-container-high text-primary"><span class="material-symbols-outlined text-4xl">science</span></div>`}
+                    <div class="min-w-0 flex-1">
+                        <p class="line-clamp-2 font-headline font-semibold">${dashboardEscapeHTML(product.title)}</p>
+                        <p class="mt-1 line-clamp-2 text-sm text-on-surface-variant">${dashboardEscapeHTML(product.description)}</p>
+                        <div class="mt-3 flex items-center justify-between gap-3">
+                            <span class="rounded-full border border-primary/20 bg-surface-container-low px-2 py-1 font-label text-[10px] text-primary">${dashboardEscapeHTML(product.category)}</span>
+                            <span class="font-label text-sm text-primary">${dashboardEscapeHTML(product.priceLabel)}</span>
+                        </div>
+                    </div>
+                </a>
+            `;
+        }
+
         function showDashboardCartToast(productTitle) {
             const toast = document.getElementById('dashboard-cart-toast');
             const label = document.getElementById('dashboard-cart-toast-product');
@@ -694,9 +784,7 @@
             const snapshot = JSON.stringify(inventory);
             if (!force && snapshot === lastDashboardInventorySnapshot) return;
             lastDashboardInventorySnapshot = snapshot;
-            const products = inventory
-                .filter((product) => (product.status || 'Published') === 'Published')
-                .map(normalizeDashboardProduct);
+            const products = dashboardActiveProducts();
             const grid = document.querySelector('[data-dashboard-products-grid]');
             if (!grid) return;
 
@@ -726,6 +814,7 @@
                     <p class="mt-1 text-sm">Products saved as Published in the admin inventory will appear here.</p>
                 </div>
             `;
+            renderDashboardRecommendation();
         }
 
         function dashboardReadMinutes(post) {
@@ -851,6 +940,7 @@
         renderDashboardBlogs(true);
         refreshDashboardBlogsFromServer();
         renderDashboardCart();
+        renderDashboardRecommendation();
         document.querySelector('[data-dashboard-products-grid]')?.addEventListener('click', (event) => {
             const addButton = event.target.closest('[data-dashboard-product-add]');
             if (!addButton) return;
@@ -863,7 +953,10 @@
         window.addEventListener('storage', (event) => {
             if (event.key === dashboardCartStorageKey) renderDashboardCart();
             if (event.key === dashboardCheckoutStorageKey || event.key === dashboardDownloadedFilesStorageKey || event.key === dashboardDownloadedProductsStorageKey || event.key === 'ilearnScienceCurrentUser' || event.key === 'ilearnScienceRememberedUser') updateDashboardDownloadStats();
-            if (event.key === dashboardInventoryStorageKey || event.key === `${dashboardInventoryStorageKey}Initialized`) renderDashboardProducts(true);
+            if (event.key === dashboardInventoryStorageKey || event.key === `${dashboardInventoryStorageKey}Initialized`) {
+                renderDashboardProducts(true);
+                renderDashboardRecommendation();
+            }
             if (event.key === dashboardBlogStorageKey || event.key === dashboardBlogInitializedKey) renderDashboardBlogs(true);
         });
         window.addEventListener('ilearn:cart-updated', renderDashboardCart);
@@ -874,12 +967,14 @@
                 localStorage.setItem(`${dashboardInventoryStorageKey}Initialized`, 'true');
             }
             renderDashboardProducts(true);
+            renderDashboardRecommendation();
         });
         dashboardProductSyncChannel?.addEventListener('message', (event) => {
             if (event.data?.type === 'products-updated' && Array.isArray(event.data.products)) {
                 localStorage.setItem(dashboardInventoryStorageKey, JSON.stringify(event.data.products));
                 localStorage.setItem(`${dashboardInventoryStorageKey}Initialized`, 'true');
                 renderDashboardProducts(true);
+                renderDashboardRecommendation();
             }
         });
         window.addEventListener('ilearn:blogs-updated', (event) => {
@@ -896,6 +991,7 @@
             renderDashboardProducts(true);
             renderDashboardBlogs(true);
             renderDashboardCart();
+            renderDashboardRecommendation();
         });
         setInterval(() => renderDashboardProducts(false), 1000);
         setInterval(() => renderDashboardBlogs(false), 1000);
