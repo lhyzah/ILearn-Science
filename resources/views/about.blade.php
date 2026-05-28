@@ -240,9 +240,9 @@
                             <img alt="Telescope" class="h-12 w-12 object-contain drop-shadow-[0_0_8px_rgba(0,242,255,0.4)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFOFpVyPHLEwBkrH4V2dcMuNgLnq8ulzmTeZMC5EqBYLCMqxhXS-rvvGiyxC0L7eZOxDoxRBrhMl9XJj-FgjHZT2wX4kgrl53AMx6V89Rr5CEh7wyWhbWUvcs9kqvZQPDQfjXJQKwHqvhmnlyitevGDASJpqp1HFnpexNmOkQLT4SdQ-aTmdUgsRFviW45Mt7TWxa0pESwkZ39bhnPW16R8cG0pc9fRw9NdsbyOElXaNQ7ljQmwffo0jiUrpWyA7DmBpfrLycvgks">
                         </div>
                         <div>
-                            <h3 class="mb-3 text-xl font-bold">Our Vision</h3>
+                            <h3 class="mb-3 text-xl font-bold">Vision</h3>
                             <p class="text-sm leading-relaxed text-slate-400">
-                                To be a leading global platform that transforms the way science is taught and learned through innovation, creativity, and meaningful educational experiences.
+                                iLearn Science Resources envisions becoming a trusted global source of innovative and high-quality science educational resources that inspire curiosity, creativity, and lifelong learning. The platform strives to empower educators and students through engaging digital learning materials that make science education more interactive, accessible, and effective for diverse learning environments.
                             </p>
                         </div>
                     </article>
