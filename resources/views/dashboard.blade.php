@@ -126,6 +126,9 @@
                     @if ($label === 'Cart')
                         <span class="ml-auto flex h-6 min-w-6 items-center justify-center rounded-full bg-primary-container px-1 font-label text-[11px] font-bold text-on-primary shadow-[0_0_14px_rgba(0,212,255,.55)]" data-cart-count data-dashboard-cart-count>0</span>
                     @endif
+                    @if ($label === 'Orders')
+                        <span class="ml-auto flex h-6 min-w-6 items-center justify-center rounded-full bg-primary-container px-1 font-label text-[11px] font-bold text-on-primary shadow-[0_0_14px_rgba(0,212,255,.55)]" data-dashboard-sidebar-orders-count>0</span>
+                    @endif
                 </a>
             @endforeach
         </nav>
@@ -260,16 +263,11 @@
                 <aside class="space-y-gutter xl:col-span-4">
                     <section class="glass-panel rounded-3xl p-6">
                         <h3 class="font-headline text-2xl font-semibold">Recent Orders</h3>
-                        <div class="mt-5 space-y-3">
-                            @foreach ([['#ILS-20260522-03', 'Cell Biology PowerPoint', 'Paid'], ['#ILS-20260518-02', 'Photosynthesis Pack', 'Delivered'], ['#ILS-20260512-01', 'Taxonomy Study Guide', 'Delivered']] as [$id, $name, $status])
-                                <div class="rounded-2xl border border-white/5 bg-surface-container-low/50 p-4">
-                                    <div class="flex items-center justify-between gap-3">
-                                        <p class="font-label text-xs text-primary">{{ $id }}</p>
-                                        <span class="rounded-full bg-green-400/10 px-3 py-1 font-label text-[10px] text-green-300">{{ $status }}</span>
-                                    </div>
-                                    <p class="mt-2 text-sm text-on-surface">{{ $name }}</p>
-                                </div>
-                            @endforeach
+                        <div class="mt-5 space-y-3" data-dashboard-recent-orders>
+                            <div class="rounded-2xl border border-white/5 bg-surface-container-low/50 p-5 text-center text-on-surface-variant">
+                                <span class="material-symbols-outlined text-4xl text-primary">receipt_long</span>
+                                <p class="mt-2">Loading your latest orders...</p>
+                            </div>
                         </div>
                     </section>
 
@@ -344,6 +342,7 @@
         const dashboardCartStorageKey = 'ilearnScienceCartItems';
         const dashboardCheckoutStorageKey = 'ilearnScienceLastCheckout';
         const dashboardDownloadedFilesStorageKey = 'ilearnScienceDownloadedFiles';
+        const dashboardDownloadedProductsStorageKey = 'ilearnScienceDownloadedProducts';
         const dashboardInventoryStorageKey = 'ilearnScienceInventoryProducts';
         const dashboardBlogStorageKey = 'ilearnScienceBlogPosts';
         const dashboardBlogInitializedKey = 'ilearnScienceBlogPostsInitialized';
@@ -457,17 +456,83 @@
         }
 
         function getDashboardPurchasedCount() {
-            const checkout = getDashboardLastCheckout();
-            const currentEmail = getDashboardSessionEmail();
-            const checkoutEmail = String(checkout?.customer?.email || '').toLowerCase();
-            if (!checkout?.items?.length || (checkoutEmail && currentEmail && checkoutEmail !== currentEmail)) return 0;
+            return getDashboardCustomerOrders().reduce((total, order) => {
+                return total + order.items.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
+            }, 0);
+        }
 
-            return checkout.items.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
+        function dashboardOrderDate(value) {
+            if (!value) return 'Recent checkout';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return 'Recent checkout';
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function dashboardOrderTitle(items = []) {
+            if (!items.length) return 'Science resources';
+            const names = items.slice(0, 2).map((item) => item.title || 'Science Resource').join(' + ');
+            return items.length > 2 ? `${names} + ${items.length - 2} more` : names;
+        }
+
+        function normalizeDashboardOrderItem(item) {
+            return {
+                id: item.id || dashboardSlugify(item.title || 'science-resource'),
+                title: item.title || 'Science Resource',
+                meta: item.meta || item.type || 'Digital Resource',
+                price: dashboardParsePeso(item.price),
+                image: item.image || '',
+                quantity: Math.max(1, Number.parseInt(item.quantity || '1', 10) || 1),
+            };
+        }
+
+        function getDashboardDownloadedOrders(email) {
+            if (!email) return [];
+            try {
+                const downloads = JSON.parse(localStorage.getItem(dashboardDownloadedProductsStorageKey) || '{}') || {};
+                const customerOrders = downloads[email] || {};
+                return Object.entries(customerOrders).map(([orderNumber, orderItems]) => {
+                    const items = Object.values(orderItems || {}).map(normalizeDashboardOrderItem);
+                    return {
+                        number: orderNumber,
+                        date: 'Downloaded resources',
+                        status: 'Downloaded',
+                        items,
+                        title: dashboardOrderTitle(items),
+                    };
+                }).filter((order) => order.items.length);
+            } catch {
+                return [];
+            }
+        }
+
+        function getDashboardCustomerOrders() {
+            const currentEmail = getDashboardSessionEmail();
+            const checkout = getDashboardLastCheckout();
+            const checkoutEmail = String(checkout?.customer?.email || '').toLowerCase();
+            const orders = [];
+
+            if (checkout?.items?.length && (!checkoutEmail || !currentEmail || checkoutEmail === currentEmail)) {
+                const items = checkout.items.map(normalizeDashboardOrderItem);
+                orders.push({
+                    number: checkout.orderNumber || '#ILS-LATEST',
+                    date: dashboardOrderDate(checkout.checkedOutAt),
+                    status: checkout.paymentStatus === 'verified' ? 'Paid' : 'Pending',
+                    items,
+                    title: dashboardOrderTitle(items),
+                });
+            }
+
+            getDashboardDownloadedOrders(currentEmail).forEach((order) => {
+                if (!orders.some((existing) => existing.number === order.number)) orders.push(order);
+            });
+
+            return orders;
         }
 
         function updateDashboardDownloadStats() {
             const downloads = getDashboardDownloadCount();
             const purchased = getDashboardPurchasedCount();
+            const orders = getDashboardCustomerOrders();
             document.querySelectorAll('[data-dashboard-purchased-count]').forEach((target) => {
                 target.textContent = purchased;
             });
@@ -475,8 +540,41 @@
                 target.textContent = downloads;
             });
             document.querySelectorAll('[data-dashboard-orders-count]').forEach((target) => {
-                target.textContent = purchased > 0 ? '1' : '0';
+                target.textContent = orders.length;
             });
+            document.querySelectorAll('[data-dashboard-sidebar-orders-count]').forEach((target) => {
+                target.textContent = orders.length;
+                target.classList.toggle('hidden', orders.length === 0);
+            });
+            renderDashboardRecentOrders(orders);
+        }
+
+        function renderDashboardRecentOrders(orders = getDashboardCustomerOrders()) {
+            const list = document.querySelector('[data-dashboard-recent-orders]');
+            if (!list) return;
+
+            if (!orders.length) {
+                list.innerHTML = `
+                    <div class="rounded-2xl border border-white/5 bg-surface-container-low/50 p-5 text-center">
+                        <span class="material-symbols-outlined text-4xl text-primary">receipt_long</span>
+                        <p class="mt-2 font-headline text-lg font-semibold">No orders yet</p>
+                        <p class="mt-1 text-sm text-on-surface-variant">Completed checkouts will appear here in real time.</p>
+                        <a class="mt-4 inline-flex rounded-xl border border-primary/30 px-4 py-2 font-label text-xs text-primary transition-all hover:bg-primary/10" href="{{ route('shop') }}">Shop Resources</a>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = orders.slice(0, 3).map((order) => `
+                <a class="block rounded-2xl border border-white/5 bg-surface-container-low/50 p-4 transition-all hover:border-primary/35 hover:bg-surface-container/70" href="{{ route('orders') }}">
+                    <div class="flex items-center justify-between gap-3">
+                        <p class="font-label text-xs text-primary">${dashboardEscapeHTML(order.number)}</p>
+                        <span class="rounded-full bg-green-400/10 px-3 py-1 font-label text-[10px] text-green-300">${dashboardEscapeHTML(order.status)}</span>
+                    </div>
+                    <p class="mt-2 line-clamp-1 text-sm text-on-surface">${dashboardEscapeHTML(order.title)}</p>
+                    <p class="mt-1 font-label text-[11px] text-on-surface-variant">${dashboardEscapeHTML(order.date)} - ${order.items.reduce((sum, item) => sum + item.quantity, 0)} item${order.items.reduce((sum, item) => sum + item.quantity, 0) === 1 ? '' : 's'}</p>
+                </a>
+            `).join('');
         }
 
         function setDashboardCartItems(items) {
@@ -764,7 +862,7 @@
         });
         window.addEventListener('storage', (event) => {
             if (event.key === dashboardCartStorageKey) renderDashboardCart();
-            if (event.key === dashboardCheckoutStorageKey || event.key === dashboardDownloadedFilesStorageKey || event.key === 'ilearnScienceCurrentUser' || event.key === 'ilearnScienceRememberedUser') updateDashboardDownloadStats();
+            if (event.key === dashboardCheckoutStorageKey || event.key === dashboardDownloadedFilesStorageKey || event.key === dashboardDownloadedProductsStorageKey || event.key === 'ilearnScienceCurrentUser' || event.key === 'ilearnScienceRememberedUser') updateDashboardDownloadStats();
             if (event.key === dashboardInventoryStorageKey || event.key === `${dashboardInventoryStorageKey}Initialized`) renderDashboardProducts(true);
             if (event.key === dashboardBlogStorageKey || event.key === dashboardBlogInitializedKey) renderDashboardBlogs(true);
         });
