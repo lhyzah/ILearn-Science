@@ -207,8 +207,8 @@
             <div class="mb-8 flex items-center justify-between">
                 <h3 class="font-headline text-2xl font-semibold">You May Also Like</h3>
                 <div class="flex gap-2">
-                    <button class="glass-panel rounded-full p-2 hover:bg-white/5"><span class="material-symbols-outlined">chevron_left</span></button>
-                    <button class="glass-panel rounded-full p-2 hover:bg-white/5"><span class="material-symbols-outlined">chevron_right</span></button>
+                    <button class="glass-panel flex h-12 w-12 items-center justify-center rounded-full border border-white/10 text-on-surface-variant transition-all hover:border-primary/70 hover:text-primary hover:shadow-[0_0_20px_rgba(0,212,255,0.35)]" type="button" data-cart-carousel="prev" aria-label="Show previous recommended products"><span class="material-symbols-outlined">chevron_left</span></button>
+                    <button class="glass-panel flex h-12 w-12 items-center justify-center rounded-full border border-white/10 text-on-surface-variant transition-all hover:border-primary/70 hover:text-primary hover:shadow-[0_0_20px_rgba(0,212,255,0.35)]" type="button" data-cart-carousel="next" aria-label="Show next recommended products"><span class="material-symbols-outlined">chevron_right</span></button>
                 </div>
             </div>
 
@@ -389,6 +389,18 @@
             `).join('');
         }
 
+        function slideCartRecommendations(direction = 1) {
+            const container = document.querySelector('[data-cart-recommendations]');
+            if (!container) return;
+            const firstCard = container.querySelector('article');
+            const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 280;
+            const gap = Number.parseFloat(getComputedStyle(container).columnGap || getComputedStyle(container).gap || '24') || 24;
+            container.scrollBy({
+                left: direction * (cardWidth + gap),
+                behavior: 'smooth',
+            });
+        }
+
         function ensureCartHasStarterItems() {
             if (window.iLearnAuth?.isSignedIn && !window.iLearnAuth.isSignedIn()) return;
             if (localStorage.getItem(cartStorageKey)) return;
@@ -541,6 +553,11 @@
         document.querySelector('[data-cart-recommendations]')?.addEventListener('click', (event) => {
             const addButton = event.target.closest('[data-cart-recommendation-add]');
             if (addButton) addRecommendedProductToCart(addButton.dataset.cartRecommendationAdd);
+        });
+        document.querySelectorAll('[data-cart-carousel]').forEach((button) => {
+            button.addEventListener('click', () => {
+                slideCartRecommendations(button.dataset.cartCarousel === 'prev' ? -1 : 1);
+            });
         });
 
         window.addEventListener('storage', (event) => {
