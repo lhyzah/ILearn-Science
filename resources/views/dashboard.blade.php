@@ -354,6 +354,48 @@
         <span id="dashboard-cart-toast-product">Science Resource</span>
     </div>
 
+    <div id="dashboard-preview-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-surface/75 p-5 backdrop-blur-xl">
+        <article class="glass-panel max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl">
+            <div class="relative">
+                <img id="dashboard-preview-image" class="h-64 w-full object-cover" alt="Science resource preview">
+                <button id="dashboard-preview-close" class="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-surface/80 text-on-surface transition-all hover:border-primary/50 hover:text-primary" type="button" aria-label="Close preview">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="space-y-5 p-6">
+                <div class="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                        <p id="dashboard-preview-category" class="font-label text-xs uppercase tracking-[0.3em] text-primary">Science Resource</p>
+                        <h3 id="dashboard-preview-title" class="mt-2 font-headline text-3xl font-bold text-on-surface">Resource Preview</h3>
+                    </div>
+                    <span id="dashboard-preview-price" class="rounded-full border border-primary/25 bg-primary-container/10 px-4 py-2 font-label text-sm text-primary">₱0.00</span>
+                </div>
+                <p id="dashboard-preview-description" class="text-on-surface-variant"></p>
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <div class="rounded-2xl border border-white/10 bg-surface-container-low/60 p-4">
+                        <p class="font-label text-[11px] uppercase tracking-widest text-on-surface-variant">Grade Level</p>
+                        <p id="dashboard-preview-grade" class="mt-1 font-headline text-lg text-on-surface">All Grades</p>
+                    </div>
+                    <div class="rounded-2xl border border-white/10 bg-surface-container-low/60 p-4">
+                        <p class="font-label text-[11px] uppercase tracking-widest text-on-surface-variant">Format</p>
+                        <p id="dashboard-preview-format" class="mt-1 font-headline text-lg text-on-surface">Digital File</p>
+                    </div>
+                </div>
+                <div class="grid gap-3 sm:grid-cols-3">
+                    <button id="dashboard-preview-add" class="rounded-xl bg-primary-container px-4 py-3 font-label text-sm font-bold text-on-primary transition-all hover:scale-[1.02]" type="button">
+                        <span class="material-symbols-outlined align-middle text-[18px]">add_shopping_cart</span>
+                        Cart
+                    </button>
+                    <button id="dashboard-preview-save" class="rounded-xl border border-primary/35 px-4 py-3 font-label text-sm font-bold text-primary transition-all hover:bg-primary/10" type="button">
+                        <span class="material-symbols-outlined align-middle text-[18px]">favorite</span>
+                        Save
+                    </button>
+                    <a class="rounded-xl border border-primary/35 px-4 py-3 text-center font-label text-sm font-bold text-primary transition-all hover:bg-primary/10" href="{{ route('shop') }}">View Shop</a>
+                </div>
+            </div>
+        </article>
+    </div>
+
     <script>
         const dashboardCartStorageKey = 'ilearnScienceCartItems';
         const dashboardCheckoutStorageKey = 'ilearnScienceLastCheckout';
@@ -928,6 +970,7 @@
                 description: product.description || 'Digital learning material for science classes.',
                 category,
                 grade: product.grade || 'All Grades',
+                format: product.format || product.fileType || 'Digital File',
                 status: product.status || 'Published',
                 updatedAt: product.updatedAt || product.publishedAt || product.createdAt || '',
             };
@@ -1035,7 +1078,8 @@
             });
 
             container.innerHTML = `
-                <a class="flex gap-4 rounded-2xl border border-primary/15 bg-primary-container/10 p-4 transition-all hover:border-primary/45 hover:bg-primary-container/15" href="{{ route('shop') }}">
+                <article class="rounded-2xl border border-primary/15 bg-primary-container/10 p-4 transition-all hover:border-primary/45 hover:bg-primary-container/15">
+                    <div class="flex gap-4">
                     ${product.image ? `<img class="h-20 w-20 rounded-xl object-cover" alt="${dashboardEscapeHTML(product.title)}" src="${dashboardEscapeHTML(product.image)}">` : `<div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-surface-container-high text-primary"><span class="material-symbols-outlined text-4xl">science</span></div>`}
                     <div class="min-w-0 flex-1">
                         <p class="line-clamp-2 font-headline font-semibold">${dashboardEscapeHTML(product.title)}</p>
@@ -1045,8 +1089,42 @@
                             <span class="font-label text-sm text-primary">${dashboardEscapeHTML(product.priceLabel)}</span>
                         </div>
                     </div>
-                </a>
+                    </div>
+                    <div class="mt-4 grid grid-cols-3 gap-2">
+                        <button class="rounded-xl border border-primary/25 px-3 py-2 font-label text-xs font-bold text-primary transition-all hover:bg-primary/10" type="button" data-dashboard-product-preview="${dashboardEscapeHTML(product.id)}">Preview</button>
+                        <button class="rounded-xl border border-primary/25 px-3 py-2 font-label text-xs font-bold text-primary transition-all hover:bg-primary/10" type="button" data-dashboard-product-save="${dashboardEscapeHTML(product.id)}">Save</button>
+                        <button class="rounded-xl bg-primary-container px-3 py-2 font-label text-xs font-bold text-on-primary transition-all hover:scale-[1.02]" type="button" data-dashboard-product-add="${dashboardEscapeHTML(product.id)}">
+                            <span class="material-symbols-outlined align-middle text-[16px]">add_shopping_cart</span>
+                        </button>
+                    </div>
+                </article>
             `;
+        }
+
+        let dashboardPreviewProduct = null;
+
+        function openDashboardPreview(product) {
+            dashboardPreviewProduct = product;
+            const image = document.getElementById('dashboard-preview-image');
+            if (image) {
+                image.src = product.image || '';
+                image.alt = product.title || 'Science resource preview';
+                image.classList.toggle('hidden', !product.image);
+            }
+            document.getElementById('dashboard-preview-title').textContent = product.title || 'Science Resource';
+            document.getElementById('dashboard-preview-category').textContent = product.category || product.meta || 'Science Resource';
+            document.getElementById('dashboard-preview-price').textContent = product.priceLabel || dashboardFormatPeso(product.price);
+            document.getElementById('dashboard-preview-description').textContent = product.description || 'Teacher-ready digital science learning material.';
+            document.getElementById('dashboard-preview-grade').textContent = product.grade || 'All Grades';
+            document.getElementById('dashboard-preview-format').textContent = product.format || product.meta || 'Digital File';
+            document.getElementById('dashboard-preview-modal')?.classList.remove('hidden');
+            document.getElementById('dashboard-preview-modal')?.classList.add('flex');
+        }
+
+        function closeDashboardPreview() {
+            document.getElementById('dashboard-preview-modal')?.classList.add('hidden');
+            document.getElementById('dashboard-preview-modal')?.classList.remove('flex');
+            dashboardPreviewProduct = null;
         }
 
         function showDashboardCartToast(productTitle, actionLabel = 'Added to cart:') {
@@ -1106,14 +1184,15 @@
                         </div>
                         <p class="mt-2 line-clamp-2 text-sm text-on-surface-variant">${dashboardEscapeHTML(product.description)}</p>
                         <p class="mt-2 font-label text-[11px] text-on-surface-variant">${dashboardEscapeHTML(product.grade)}</p>
-                        <div class="mt-4 grid grid-cols-2 gap-2">
+                        <div class="mt-4 grid grid-cols-3 gap-2">
+                            <button class="flex items-center justify-center rounded-xl border border-primary/25 px-3 py-2.5 font-label text-xs font-bold text-primary transition-all hover:bg-primary/10" type="button" data-dashboard-product-preview="${dashboardEscapeHTML(product.id)}">
+                                Preview
+                            </button>
                             <button class="flex items-center justify-center gap-2 rounded-xl bg-primary-container py-2.5 font-label text-xs font-bold text-on-primary shadow-[0_0_16px_rgba(0,212,255,.22)] transition-all hover:scale-[1.02]" type="button" data-dashboard-product-add="${dashboardEscapeHTML(product.id)}">
                                 <span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
-                                Add to Cart
                             </button>
                             <button class="flex items-center justify-center gap-2 rounded-xl border border-primary/25 px-3 py-2.5 font-label text-xs font-bold text-primary transition-all hover:bg-primary/10" type="button" title="Save item" data-dashboard-product-save="${dashboardEscapeHTML(product.id)}">
                                 <span class="material-symbols-outlined text-[18px]">favorite</span>
-                                Save
                             </button>
                         </div>
                     </div>
@@ -1256,15 +1335,43 @@
         document.querySelector('[data-dashboard-products-grid]')?.addEventListener('click', (event) => {
             const addButton = event.target.closest('[data-dashboard-product-add]');
             const saveButton = event.target.closest('[data-dashboard-product-save]');
-            if (!addButton && !saveButton) return;
-            const productId = addButton?.dataset.dashboardProductAdd || saveButton?.dataset.dashboardProductSave;
+            const previewButton = event.target.closest('[data-dashboard-product-preview]');
+            if (!addButton && !saveButton && !previewButton) return;
+            const productId = addButton?.dataset.dashboardProductAdd || saveButton?.dataset.dashboardProductSave || previewButton?.dataset.dashboardProductPreview;
             const product = readDashboardInventory()
                 .filter((item) => (item.status || 'Published') === 'Published')
                 .map(normalizeDashboardProduct)
                 .find((item) => item.id === productId);
             if (!product) return;
+            if (previewButton) openDashboardPreview(product);
             if (addButton) addDashboardProductToCart(product);
             if (saveButton) saveDashboardItem(product);
+        });
+        document.querySelector('[data-dashboard-recommendation]')?.addEventListener('click', (event) => {
+            const addButton = event.target.closest('[data-dashboard-product-add]');
+            const saveButton = event.target.closest('[data-dashboard-product-save]');
+            const previewButton = event.target.closest('[data-dashboard-product-preview]');
+            if (!addButton && !saveButton && !previewButton) return;
+            const productId = addButton?.dataset.dashboardProductAdd || saveButton?.dataset.dashboardProductSave || previewButton?.dataset.dashboardProductPreview;
+            const product = dashboardActiveProducts().find((item) => item.id === productId) || pickDashboardRecommendation();
+            if (!product) return;
+            if (previewButton) openDashboardPreview(product);
+            if (addButton) addDashboardProductToCart(product);
+            if (saveButton) saveDashboardItem(product);
+        });
+        document.getElementById('dashboard-preview-close')?.addEventListener('click', closeDashboardPreview);
+        document.getElementById('dashboard-preview-modal')?.addEventListener('click', (event) => {
+            if (event.target.id === 'dashboard-preview-modal') closeDashboardPreview();
+        });
+        document.getElementById('dashboard-preview-add')?.addEventListener('click', () => {
+            if (!dashboardPreviewProduct) return;
+            addDashboardProductToCart(dashboardPreviewProduct);
+            closeDashboardPreview();
+        });
+        document.getElementById('dashboard-preview-save')?.addEventListener('click', () => {
+            if (!dashboardPreviewProduct) return;
+            saveDashboardItem(dashboardPreviewProduct);
+            closeDashboardPreview();
         });
         window.addEventListener('storage', (event) => {
             if (event.key === dashboardCartStorageKey) renderDashboardCart();

@@ -233,13 +233,47 @@
         @endforeach
     </nav>
 
+    <div id="cart-preview-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-surface/75 p-5 backdrop-blur-xl">
+        <article class="glass-panel max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl">
+            <div class="relative">
+                <img id="cart-preview-image" class="h-64 w-full object-cover" alt="Science resource preview">
+                <button id="cart-preview-close" class="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-surface/80 text-on-surface transition-all hover:border-primary/50 hover:text-primary" type="button" aria-label="Close preview">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="space-y-5 p-6">
+                <div class="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                        <p id="cart-preview-category" class="font-label text-xs uppercase tracking-[0.3em] text-primary">Science Resource</p>
+                        <h3 id="cart-preview-title" class="mt-2 font-headline text-3xl font-bold text-on-surface">Resource Preview</h3>
+                    </div>
+                    <span id="cart-preview-price" class="rounded-full border border-primary/25 bg-primary-container/10 px-4 py-2 font-label text-sm text-primary">₱0.00</span>
+                </div>
+                <p id="cart-preview-description" class="text-on-surface-variant"></p>
+                <div class="grid gap-3 sm:grid-cols-3">
+                    <button id="cart-preview-add" class="rounded-xl bg-primary-container px-4 py-3 font-label text-sm font-bold text-on-primary transition-all hover:scale-[1.02]" type="button">
+                        <span class="material-symbols-outlined align-middle text-[18px]">add_shopping_cart</span>
+                        Cart
+                    </button>
+                    <button id="cart-preview-save" class="rounded-xl border border-primary/35 px-4 py-3 font-label text-sm font-bold text-primary transition-all hover:bg-primary/10" type="button">
+                        <span class="material-symbols-outlined align-middle text-[18px]">favorite</span>
+                        Save
+                    </button>
+                    <a class="rounded-xl border border-primary/35 px-4 py-3 text-center font-label text-sm font-bold text-primary transition-all hover:bg-primary/10" href="{{ route('shop') }}">View Shop</a>
+                </div>
+            </div>
+        </article>
+    </div>
+
     <script>
         const cartStorageKey = 'ilearnScienceCartItems';
+        const cartSavedItemsStorageKey = 'ilearnScienceSavedItems';
         const cartInventoryStorageKey = 'ilearnScienceInventoryProducts';
         const cartProductsEndpoint = '{{ route('products.index') }}';
         const taxRate = 0.08;
         const discountAmount = 5;
         let cartRecommendedProducts = [];
+        let cartPreviewProduct = null;
 
         function escapeCartHTML(value) {
             return String(value ?? '').replace(/[&<>"']/g, (character) => ({
@@ -280,6 +314,7 @@
                 price: parsePeso(product.price),
                 priceLabel: formatPeso(parsePeso(product.price)),
                 image: product.image || product.previewImage || '',
+                description: product.description || product.details || 'Admin-uploaded learning resource',
                 status: product.status || 'Published',
             };
         }
@@ -297,7 +332,8 @@
             try {
                 const response = await fetch(cartProductsEndpoint, { headers: { Accept: 'application/json' } });
                 if (!response.ok) return;
-                const products = await response.json();
+                const data = await response.json();
+                const products = Array.isArray(data) ? data : data.products;
                 if (!Array.isArray(products)) return;
                 localStorage.setItem(cartInventoryStorageKey, JSON.stringify(products));
                 renderCartRecommendations(products.map(normalizeCartRecommendation));
@@ -348,6 +384,69 @@
             renderCartItems();
         }
 
+        function getCartSessionEmail() {
+            try {
+                const session = JSON.parse(sessionStorage.getItem('ilearnScienceAuthSession') || localStorage.getItem('ilearnScienceCurrentUser') || localStorage.getItem('ilearnScienceRememberedUser') || 'null');
+                return String(session?.email || '').toLowerCase();
+            } catch {
+                return '';
+            }
+        }
+
+        function saveRecommendedProduct(productId) {
+            const product = cartRecommendedProducts.find((item) => item.id === productId);
+            if (!product) return;
+            const email = getCartSessionEmail();
+            if (!email) {
+                window.iLearnAuth?.openSignIn?.('Please sign in or create an account to save products.');
+                return;
+            }
+            let saved = {};
+            try {
+                saved = JSON.parse(localStorage.getItem(cartSavedItemsStorageKey) || '{}') || {};
+            } catch {
+                saved = {};
+            }
+            saved[email] = Array.isArray(saved[email]) ? saved[email] : Object.values(saved[email] || {});
+            const item = {
+                id: product.id,
+                title: product.title,
+                meta: product.category,
+                price: product.price,
+                image: product.image,
+                quantity: 1,
+            };
+            if (!saved[email].some((savedItem) => (savedItem.id || '') === item.id)) {
+                saved[email].push(item);
+            }
+            localStorage.setItem(cartSavedItemsStorageKey, JSON.stringify(saved));
+            window.dispatchEvent(new CustomEvent('ilearn:saved-updated'));
+        }
+
+        function openCartPreview(productId) {
+            const product = cartRecommendedProducts.find((item) => item.id === productId);
+            if (!product) return;
+            cartPreviewProduct = product;
+            const image = document.getElementById('cart-preview-image');
+            if (image) {
+                image.src = product.image || '';
+                image.alt = product.title || 'Science resource preview';
+                image.classList.toggle('hidden', !product.image);
+            }
+            document.getElementById('cart-preview-title').textContent = product.title || 'Science Resource';
+            document.getElementById('cart-preview-category').textContent = product.category || 'Science Resource';
+            document.getElementById('cart-preview-price').textContent = product.priceLabel || formatPeso(product.price);
+            document.getElementById('cart-preview-description').textContent = product.description || product.meta || 'Teacher-ready digital science learning material.';
+            document.getElementById('cart-preview-modal')?.classList.remove('hidden');
+            document.getElementById('cart-preview-modal')?.classList.add('flex');
+        }
+
+        function closeCartPreview() {
+            document.getElementById('cart-preview-modal')?.classList.add('hidden');
+            document.getElementById('cart-preview-modal')?.classList.remove('flex');
+            cartPreviewProduct = null;
+        }
+
         function renderCartRecommendations(products = readCartInventoryProducts()) {
             const container = document.querySelector('[data-cart-recommendations]');
             if (!container) return;
@@ -378,8 +477,14 @@
                     <div class="p-4">
                         <h5 class="mb-1 line-clamp-1 font-headline text-lg">${escapeCartHTML(product.title)}</h5>
                         <p class="mb-4 line-clamp-2 font-label text-xs text-on-surface-variant">${escapeCartHTML(product.meta)}</p>
-                        <div class="flex items-center justify-between">
+                        <div class="grid grid-cols-3 gap-2">
+                            <button class="rounded-xl border border-primary/25 px-3 py-2 font-label text-xs font-bold text-primary transition-all hover:bg-primary/10" type="button" data-cart-recommendation-preview="${escapeCartHTML(product.id)}">Preview</button>
+                            <button class="rounded-xl border border-primary/25 px-3 py-2 font-label text-xs font-bold text-primary transition-all hover:bg-primary/10" type="button" data-cart-recommendation-save="${escapeCartHTML(product.id)}">
+                                <span class="material-symbols-outlined align-middle text-[16px]">favorite</span>
+                            </button>
                             <span class="font-headline text-lg text-primary">${escapeCartHTML(product.priceLabel)}</span>
+                        </div>
+                        <div class="mt-3">
                             <button class="glass-panel flex h-10 w-10 items-center justify-center rounded-full text-primary transition-all hover:bg-primary hover:text-on-primary" type="button" data-cart-recommendation-add="${escapeCartHTML(product.id)}" aria-label="Add ${escapeCartHTML(product.title)} to cart">
                                 <span class="material-symbols-outlined">add_shopping_cart</span>
                             </button>
@@ -552,7 +657,25 @@
         });
         document.querySelector('[data-cart-recommendations]')?.addEventListener('click', (event) => {
             const addButton = event.target.closest('[data-cart-recommendation-add]');
+            const previewButton = event.target.closest('[data-cart-recommendation-preview]');
+            const saveButton = event.target.closest('[data-cart-recommendation-save]');
             if (addButton) addRecommendedProductToCart(addButton.dataset.cartRecommendationAdd);
+            if (previewButton) openCartPreview(previewButton.dataset.cartRecommendationPreview);
+            if (saveButton) saveRecommendedProduct(saveButton.dataset.cartRecommendationSave);
+        });
+        document.getElementById('cart-preview-close')?.addEventListener('click', closeCartPreview);
+        document.getElementById('cart-preview-modal')?.addEventListener('click', (event) => {
+            if (event.target.id === 'cart-preview-modal') closeCartPreview();
+        });
+        document.getElementById('cart-preview-add')?.addEventListener('click', () => {
+            if (!cartPreviewProduct) return;
+            addRecommendedProductToCart(cartPreviewProduct.id);
+            closeCartPreview();
+        });
+        document.getElementById('cart-preview-save')?.addEventListener('click', () => {
+            if (!cartPreviewProduct) return;
+            saveRecommendedProduct(cartPreviewProduct.id);
+            closeCartPreview();
         });
         document.querySelectorAll('[data-cart-carousel]').forEach((button) => {
             button.addEventListener('click', () => {
