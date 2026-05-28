@@ -157,13 +157,12 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <label class="group flex cursor-pointer items-center gap-3 rounded-full border border-primary/20 bg-surface-container/70 p-1 pr-3 transition-all hover:border-primary/50" title="Upload profile picture">
+                <label class="group flex cursor-pointer items-center rounded-full border border-primary/20 bg-surface-container/70 p-1 transition-all hover:border-primary/50" title="Upload profile picture">
                     <span class="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-primary/30 bg-primary-container/10 text-primary">
                         <img class="hidden h-full w-full object-cover" alt="Customer profile picture" data-dashboard-profile-image>
                         <span class="material-symbols-outlined" data-dashboard-profile-placeholder>account_circle</span>
                         <span class="absolute inset-0 hidden items-center justify-center bg-surface/70 text-[10px] font-bold text-primary group-hover:flex">Edit</span>
                     </span>
-                    <span class="hidden font-label text-xs text-primary sm:inline">Profile Photo</span>
                     <input class="hidden" type="file" accept="image/*" data-dashboard-profile-upload>
                 </label>
                 <div data-auth-mount class="flex items-center gap-2"></div>

@@ -281,14 +281,12 @@
                 <span class="material-symbols-outlined text-[20px]">add</span>
                 Quick Add
             </button>
-            <label class="group flex cursor-pointer items-center gap-3 rounded-full border border-primary/20 bg-surface-container/70 p-1 pr-3 transition-all hover:border-primary/50" title="Upload admin profile picture">
+            <label class="group flex cursor-pointer items-center rounded-full border border-primary/20 bg-surface-container/70 p-1 transition-all hover:border-primary/50" title="Upload admin profile picture">
                 <span class="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-primary/30 bg-primary-container/10 text-primary">
                     <img class="hidden h-full w-full object-cover" alt="Admin profile picture" data-admin-profile-image>
                     <span class="material-symbols-outlined" data-admin-profile-placeholder>admin_panel_settings</span>
                     <span class="absolute inset-0 hidden items-center justify-center bg-surface/75 text-[10px] font-bold text-primary group-hover:flex">Edit</span>
                 </span>
-                <span class="hidden font-label text-sm text-primary md:inline">Admin Nova</span>
-                <span class="material-symbols-outlined hidden text-[18px] text-on-surface-variant md:inline">upload</span>
                 <input class="hidden" type="file" accept="image/*" data-admin-profile-upload>
             </label>
         </div>
