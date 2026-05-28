@@ -121,6 +121,7 @@
             <span class="material-symbols-outlined text-primary md:hidden">menu</span>
             <h2 class="font-headline text-3xl font-bold text-primary">Mission Control: Your Cart</h2>
         </div>
+        <div class="ml-auto flex items-center justify-end" data-auth-mount></div>
     </header>
 
     <main class="min-h-screen px-6 pb-12 pt-24 md:ml-64 md:px-margin-desktop">
