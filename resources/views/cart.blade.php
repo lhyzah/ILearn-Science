@@ -107,11 +107,6 @@
         <div class="flex-1 space-y-1">
             @foreach ([
                 ['space_dashboard', 'Mission Control', route('mission-control')],
-                ['biotech', 'Science Labs', route('shop')],
-                ['receipt_long', 'Orders', route('orders')],
-                ['explore', 'Star Maps', '#'],
-                ['inventory_2', 'Resource Vault', route('resources.cell-biology')],
-                ['rocket_launch', 'Launch Pad', route('dashboard')],
             ] as [$icon, $label, $href])
                 <a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant transition-all hover:bg-white/5 hover:text-primary" href="{{ $href }}">
                     <span class="material-symbols-outlined">{{ $icon }}</span>
@@ -119,32 +114,12 @@
                 </a>
             @endforeach
         </div>
-
-        <div class="border-t border-white/5 px-6 py-6">
-            <button class="w-full rounded-lg border border-primary/30 bg-primary-container/10 py-3 font-label text-sm text-primary transition-all active:scale-95">Start Mission</button>
-        </div>
-        <div class="space-y-1 px-2">
-            <a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant transition-all hover:text-primary" href="#"><span class="material-symbols-outlined">settings</span><span class="font-label text-sm">Settings</span></a>
-        </div>
     </nav>
 
     <header class="fixed right-0 top-0 z-40 flex w-full items-center justify-between border-b border-white/5 bg-background/50 px-6 py-4 backdrop-blur-lg md:w-[calc(100%-16rem)] md:px-margin-desktop">
         <div class="flex items-center gap-4">
             <span class="material-symbols-outlined text-primary md:hidden">menu</span>
             <h2 class="font-headline text-3xl font-bold text-primary">Mission Control: Your Cart</h2>
-        </div>
-        <div class="flex items-center gap-6">
-            <div class="relative hidden sm:block">
-                <input class="w-64 rounded-full border border-white/10 bg-surface-container/50 px-5 py-2 font-label text-sm focus:border-primary/50 focus:outline-none" placeholder="Search resources..." type="text">
-                <span class="material-symbols-outlined absolute right-4 top-2 text-on-surface-variant">search</span>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="relative">
-                    <span class="material-symbols-outlined cursor-pointer text-on-surface-variant transition-colors hover:text-primary">notifications</span>
-                    <span class="neon-glow-cyan absolute -right-1 -top-1 h-2 w-2 rounded-full bg-primary"></span>
-                </div>
-                <span class="material-symbols-outlined cursor-pointer text-on-surface-variant transition-colors hover:text-primary">account_circle</span>
-            </div>
         </div>
     </header>
 
@@ -236,35 +211,11 @@
                 </div>
             </div>
 
-            @php
-                $recommendations = [
-                    ['Stellar Life Cycles', 'Complete Presentation Deck', 'SPACE', '₱15.00', 'tertiary-container', 'on-tertiary-container', 'https://lh3.googleusercontent.com/aida-public/AB6AXuC7gzr2NhFsvN_QeXsLN_Lk_l0EbWsG9dSXjSsLjidEPflu_zm441NsSruhkabsN0SZ7cfDowmJ2qPfwgtwX4EZUQrH_AsCUT25cF3_2RVf4FdJ6cfIBfqLYSGZeYE6E5OoQ2XzCLLWdUkajSBdSju5ritVgDA6lahAQDlJLgmaR5VwPWTIxqK6VWh8zHzpCGzFWPxkb9nykkZTexu1ZgeauhNnBaKMFFs3bey94l6CFCKP77WlNBoZr2J7grdFmmZcBgi73HAGJSY'],
-                    ['Safety Protocols v3', 'Interactive VR Module', 'LAB', '₱9.99', 'primary-container', 'on-primary-container', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCn0wQrfhaq-Zg44ued3umxEJV99oan2JyyFhOxup8729fsODd7zx3Ak8qhx4hcZ2Om2YwZTwD2KkIDYUOBFFy_sGLjfyMvYy75Z3GaiegiEG_3P20zpEpK3R7W8LL5eKZyOEGXgr2JNcLWC5gH4G4uOtbgCsBfky1FPA4sPrkafAmuALyQXe0Ojar5pIavN32o1O5JgLU0tCY8Y7tiVg4_wc04FTCGCs8w__go0QDnmYwQng41L8kNGKq6ekdWr87kpnk_3n2tCe0'],
-                    ['Genetic Mapping Kit', 'Printable Logic Puzzles', 'GENETICS', '₱18.50', 'secondary-container', 'on-secondary-container', 'https://lh3.googleusercontent.com/aida-public/AB6AXuATRGKmhV6rWyvbHr5FVmQsXPyfsgLYYx90LrO6R9qv4ZFC1gFyJlCjagoIKC8yisds2Jq-A7pTnQgach0xQ-QBvSnCg5lDFGmmDk1znv0TNEdW21B8peZIJGGgrgAuamINcASssZpPAqc5JgO4r4QyZ2UymKVX3QhUSWhPgbiCeggJb1M4GIuiIaxU4uiaJUhZvo_RZxC5p8CpLj81PAp6wt8J5f9sqxuf0Nn5Cea18FgWHcAypcIJ3P7ujQ4yQOi45rghCYxfiLc'],
-                    ['Quantum Circuits', 'Advanced Simulation Software', 'PHYSICS', '₱24.99', 'error-container', 'on-error-container', 'https://lh3.googleusercontent.com/aida-public/AB6AXuArUexJxLpCr6ifg4BEP25YfWt4Y9Mj4bemMN2UB65sN6lew_JUtFLvJGY7gyRBORx2vhhc6LqZ4ytlGq6oUB8T3asiuOuURLj_b0yC4qzodS8vKdB4ZCv1XW0f2tdJ_TVG3Gaglwa_gv3aETOdqkahorVQb2VKDjDUaQoEnXXdxtE2l3meGEE1zNBylDaXsHzwgvw0bQLHVlegO1bqoJa-ndeQ6X1UO2aqI75p7IEdxKC5b-6rGvFHdWsd_FIcDVHrJ6Tqk7nGUAA'],
-                ];
-            @endphp
-
-            <div class="custom-scrollbar flex gap-gutter overflow-x-auto pb-8 scroll-smooth">
-                @foreach ($recommendations as [$title, $copy, $tag, $price, $bg, $fg, $image])
-                    <article class="glass-panel group min-w-[280px] overflow-hidden rounded-xl">
-                        <div class="relative h-40 overflow-hidden">
-                            <img alt="{{ $title }}" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" src="{{ $image }}">
-                            <div class="absolute inset-0 bg-gradient-to-t from-background to-transparent opacity-60"></div>
-                            <span class="absolute left-3 top-3 rounded bg-{{ $bg }}/80 px-2 py-1 font-label text-[10px] text-{{ $fg }}">{{ $tag }}</span>
-                        </div>
-                        <div class="p-4">
-                            <h5 class="mb-1 font-headline text-lg">{{ $title }}</h5>
-                            <p class="mb-4 font-label text-xs text-on-surface-variant">{{ $copy }}</p>
-                            <div class="flex items-center justify-between">
-                                <span class="font-headline text-lg text-primary">{{ $price }}</span>
-                                <button class="glass-panel flex h-10 w-10 items-center justify-center rounded-full text-primary transition-all hover:bg-primary hover:text-on-primary">
-                                    <span class="material-symbols-outlined">add_shopping_cart</span>
-                                </button>
-                            </div>
-                        </div>
-                    </article>
-                @endforeach
+            <div class="custom-scrollbar flex gap-gutter overflow-x-auto pb-8 scroll-smooth" data-cart-recommendations>
+                <article class="glass-panel min-w-[280px] rounded-xl p-6 text-center text-on-surface-variant">
+                    <span class="material-symbols-outlined mb-2 text-4xl text-primary">auto_awesome</span>
+                    <p>Loading admin-uploaded recommendations...</p>
+                </article>
             </div>
         </section>
     </main>
@@ -283,8 +234,22 @@
 
     <script>
         const cartStorageKey = 'ilearnScienceCartItems';
+        const cartInventoryStorageKey = 'ilearnScienceInventoryProducts';
+        const cartProductsEndpoint = '{{ route('products.index') }}';
         const taxRate = 0.08;
         const discountAmount = 5;
+        let cartRecommendedProducts = [];
+
+        function escapeCartHTML(value) {
+            return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;',
+            }[character]));
+        }
+
         function parsePeso(value) {
             return Number.parseFloat(String(value).replace(/[₱,]/g, '')) || 0;
         }
@@ -304,6 +269,42 @@
             };
         }
 
+        function normalizeCartRecommendation(product) {
+            const title = product.title || product.name || 'Science Resource';
+            return {
+                id: product.id || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+                title,
+                meta: product.description || product.details || 'Admin-uploaded learning resource',
+                category: product.category || product.type || 'Science',
+                price: parsePeso(product.price),
+                priceLabel: formatPeso(parsePeso(product.price)),
+                image: product.image || product.previewImage || '',
+                status: product.status || 'Published',
+            };
+        }
+
+        function readCartInventoryProducts() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(cartInventoryStorageKey) || '[]') || [];
+                return Array.isArray(saved) ? saved.map(normalizeCartRecommendation) : [];
+            } catch {
+                return [];
+            }
+        }
+
+        async function syncCartRecommendationsFromServer() {
+            try {
+                const response = await fetch(cartProductsEndpoint, { headers: { Accept: 'application/json' } });
+                if (!response.ok) return;
+                const products = await response.json();
+                if (!Array.isArray(products)) return;
+                localStorage.setItem(cartInventoryStorageKey, JSON.stringify(products));
+                renderCartRecommendations(products.map(normalizeCartRecommendation));
+            } catch {
+                renderCartRecommendations(readCartInventoryProducts());
+            }
+        }
+
         function getStoredCartItems() {
             if (window.iLearnAuth?.getCartItems) return window.iLearnAuth.getCartItems().map(normalizeCartItem);
             try {
@@ -319,6 +320,72 @@
                 return;
             }
             localStorage.setItem(cartStorageKey, JSON.stringify(items.map(normalizeCartItem)));
+        }
+
+        function addRecommendedProductToCart(productId) {
+            const product = cartRecommendedProducts.find((item) => item.id === productId);
+            if (!product) return;
+            if (window.iLearnAuth?.isSignedIn && !window.iLearnAuth.isSignedIn()) {
+                window.iLearnAuth.openSignIn?.('Please sign in or create an account to add products to your cart.');
+                return;
+            }
+            const cartItems = getStoredCartItems();
+            const existing = cartItems.find((item) => item.id === product.id);
+            if (existing) {
+                existing.quantity = (Number(existing.quantity) || 1) + 1;
+            } else {
+                cartItems.push({
+                    id: product.id,
+                    title: product.title,
+                    meta: product.category,
+                    price: product.price,
+                    image: product.image,
+                    quantity: 1,
+                });
+            }
+            saveStoredCartItems(cartItems);
+            renderCartItems();
+        }
+
+        function renderCartRecommendations(products = readCartInventoryProducts()) {
+            const container = document.querySelector('[data-cart-recommendations]');
+            if (!container) return;
+            const cartIds = new Set(getStoredCartItems().map((item) => item.id));
+            cartRecommendedProducts = products
+                .filter((product) => ['published', 'active'].includes(String(product.status || 'Published').toLowerCase()))
+                .filter((product) => !cartIds.has(product.id))
+                .slice(0, 8);
+
+            if (!cartRecommendedProducts.length) {
+                container.innerHTML = `
+                    <article class="glass-panel min-w-[280px] rounded-xl p-6 text-center text-on-surface-variant">
+                        <span class="material-symbols-outlined mb-2 text-4xl text-primary">inventory_2</span>
+                        <p class="font-headline text-lg text-on-surface">No recommendations yet</p>
+                        <p class="mt-1 text-sm">Admin-published products will appear here automatically.</p>
+                    </article>
+                `;
+                return;
+            }
+
+            container.innerHTML = cartRecommendedProducts.map((product) => `
+                <article class="glass-panel group min-w-[280px] overflow-hidden rounded-xl">
+                    <div class="relative h-40 overflow-hidden">
+                        ${product.image ? `<img alt="${escapeCartHTML(product.title)}" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" src="${escapeCartHTML(product.image)}">` : `<div class="flex h-full w-full items-center justify-center bg-surface-container-high text-primary"><span class="material-symbols-outlined text-5xl">science</span></div>`}
+                        <div class="absolute inset-0 bg-gradient-to-t from-background to-transparent opacity-60"></div>
+                        <span class="absolute left-3 top-3 rounded bg-primary-container/80 px-2 py-1 font-label text-[10px] text-on-primary-container">${escapeCartHTML(product.category)}</span>
+                    </div>
+                    <div class="p-4">
+                        <h5 class="mb-1 line-clamp-1 font-headline text-lg">${escapeCartHTML(product.title)}</h5>
+                        <p class="mb-4 line-clamp-2 font-label text-xs text-on-surface-variant">${escapeCartHTML(product.meta)}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="font-headline text-lg text-primary">${escapeCartHTML(product.priceLabel)}</span>
+                            <button class="glass-panel flex h-10 w-10 items-center justify-center rounded-full text-primary transition-all hover:bg-primary hover:text-on-primary" type="button" data-cart-recommendation-add="${escapeCartHTML(product.id)}" aria-label="Add ${escapeCartHTML(product.title)} to cart">
+                                <span class="material-symbols-outlined">add_shopping_cart</span>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
         }
 
         function ensureCartHasStarterItems() {
@@ -436,10 +503,13 @@
 
             showEmptyCartMessage();
             updateOrderSummary();
+            renderCartRecommendations();
         }
 
         ensureCartHasStarterItems();
         renderCartItems();
+        renderCartRecommendations();
+        syncCartRecommendationsFromServer();
 
         document.getElementById('cart-items-list')?.addEventListener('click', (event) => {
             const quantityButton = event.target.closest('.qty-minus, .qty-plus');
@@ -467,15 +537,33 @@
                 showEmptyCartMessage();
             }
         });
+        document.querySelector('[data-cart-recommendations]')?.addEventListener('click', (event) => {
+            const addButton = event.target.closest('[data-cart-recommendation-add]');
+            if (addButton) addRecommendedProductToCart(addButton.dataset.cartRecommendationAdd);
+        });
 
         window.addEventListener('storage', (event) => {
             if (event.key === cartStorageKey) {
                 renderCartItems();
             }
+            if (event.key === cartInventoryStorageKey || event.key === `${cartInventoryStorageKey}Initialized`) {
+                renderCartRecommendations();
+            }
         });
         window.addEventListener('ilearn:cart-updated', renderCartItems);
+        window.addEventListener('ilearn:products-updated', (event) => {
+            if (Array.isArray(event.detail?.products)) {
+                renderCartRecommendations(event.detail.products.map(normalizeCartRecommendation));
+                return;
+            }
+            renderCartRecommendations();
+        });
 
-        window.addEventListener('pageshow', renderCartItems);
+        window.addEventListener('pageshow', () => {
+            renderCartItems();
+            renderCartRecommendations();
+            syncCartRecommendationsFromServer();
+        });
 
         function createParticle() {
             const particle = document.createElement('div');

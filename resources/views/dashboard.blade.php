@@ -147,14 +147,6 @@
                 <h2 class="font-headline text-2xl font-bold text-on-surface md:text-3xl" data-customer-dashboard-title>Customer Dashboard</h2>
             </div>
             <div class="flex items-center gap-3">
-                <label class="group flex cursor-pointer items-center rounded-full border border-primary/20 bg-surface-container/70 p-1 transition-all hover:border-primary/50" title="Upload profile picture">
-                    <span class="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-primary/30 bg-primary-container/10 text-primary">
-                        <img class="hidden h-full w-full object-cover" alt="Customer profile picture" data-dashboard-profile-image>
-                        <span class="material-symbols-outlined" data-dashboard-profile-placeholder>account_circle</span>
-                        <span class="absolute inset-0 hidden items-center justify-center bg-surface/70 text-[10px] font-bold text-primary group-hover:flex">Edit</span>
-                    </span>
-                    <input class="hidden" type="file" accept="image/*" data-dashboard-profile-upload>
-                </label>
                 <div data-auth-mount class="flex items-center gap-2"></div>
             </div>
         </div>
@@ -370,7 +362,6 @@
         const dashboardSavedItemsStorageKey = 'ilearnScienceSavedItems';
         const dashboardWishlistStorageKey = 'ilearnScienceWishlistItems';
         const dashboardActivityStorageKey = 'ilearnScienceCustomerActivity';
-        const dashboardProfilePhotosStorageKey = 'ilearnScienceProfilePhotos';
         const dashboardInventoryStorageKey = 'ilearnScienceInventoryProducts';
         const dashboardBlogStorageKey = 'ilearnScienceBlogPosts';
         const dashboardBlogInitializedKey = 'ilearnScienceBlogPostsInitialized';
@@ -460,41 +451,6 @@
             } catch {
                 return '';
             }
-        }
-
-        function dashboardProfileKey() {
-            return getDashboardSessionEmail() || 'guest';
-        }
-
-        function getDashboardProfilePhotos() {
-            try {
-                return JSON.parse(localStorage.getItem(dashboardProfilePhotosStorageKey) || '{}') || {};
-            } catch {
-                return {};
-            }
-        }
-
-        function renderDashboardProfilePhoto() {
-            const photos = getDashboardProfilePhotos();
-            const image = document.querySelector('[data-dashboard-profile-image]');
-            const placeholder = document.querySelector('[data-dashboard-profile-placeholder]');
-            const source = photos[dashboardProfileKey()];
-            if (!image || !placeholder) return;
-            image.classList.toggle('hidden', !source);
-            placeholder.classList.toggle('hidden', Boolean(source));
-            if (source) image.src = source;
-        }
-
-        function saveDashboardProfilePhoto(file) {
-            if (!file?.type?.startsWith('image/')) return;
-            const reader = new FileReader();
-            reader.onload = () => {
-                const photos = getDashboardProfilePhotos();
-                photos[dashboardProfileKey()] = reader.result;
-                localStorage.setItem(dashboardProfilePhotosStorageKey, JSON.stringify(photos));
-                renderDashboardProfilePhoto();
-            };
-            reader.readAsDataURL(file);
         }
 
         function getDashboardLastCheckout() {
@@ -1290,7 +1246,6 @@
         }
 
         updateCustomerDashboardTitle();
-        renderDashboardProfilePhoto();
         updateDashboardDownloadStats();
         renderDashboardProducts(true);
         refreshDashboardInventoryFromServer();
@@ -1311,14 +1266,9 @@
             if (addButton) addDashboardProductToCart(product);
             if (saveButton) saveDashboardItem(product);
         });
-        document.querySelector('[data-dashboard-profile-upload]')?.addEventListener('change', (event) => {
-            saveDashboardProfilePhoto(event.target.files?.[0]);
-            event.target.value = '';
-        });
         window.addEventListener('storage', (event) => {
             if (event.key === dashboardCartStorageKey) renderDashboardCart();
             if (event.key === dashboardCheckoutStorageKey || event.key === dashboardDownloadedFilesStorageKey || event.key === dashboardDownloadedProductsStorageKey || event.key === dashboardSavedItemsStorageKey || event.key === dashboardWishlistStorageKey || event.key === dashboardActivityStorageKey || event.key === 'ilearnScienceCurrentUser' || event.key === 'ilearnScienceRememberedUser') updateDashboardDownloadStats();
-            if (event.key === dashboardProfilePhotosStorageKey || event.key === 'ilearnScienceCurrentUser' || event.key === 'ilearnScienceRememberedUser') renderDashboardProfilePhoto();
             if (event.key === dashboardInventoryStorageKey || event.key === `${dashboardInventoryStorageKey}Initialized`) {
                 renderDashboardProducts(true);
                 renderDashboardRecommendation();
@@ -1327,7 +1277,6 @@
         });
         window.addEventListener('ilearn:cart-updated', renderDashboardCart);
         window.addEventListener('ilearn:auth-updated', updateDashboardDownloadStats);
-        window.addEventListener('ilearn:auth-updated', renderDashboardProfilePhoto);
         window.addEventListener('ilearn:saved-updated', renderDashboardSavedItems);
         window.addEventListener('ilearn:products-updated', (event) => {
             if (Array.isArray(event.detail?.products)) {
@@ -1360,7 +1309,6 @@
             renderDashboardBlogs(true);
             renderDashboardCart();
             renderDashboardSavedItems();
-            renderDashboardProfilePhoto();
             renderDashboardRecommendation();
         });
         setInterval(() => renderDashboardProducts(false), 1000);
