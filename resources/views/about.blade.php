@@ -77,7 +77,6 @@
             <a class="text-slate-400 transition-colors hover:text-white" href="{{ route('home') }}#resources">Resources</a>
             <a class="text-slate-400 transition-colors hover:text-white" href="{{ route('blog') }}">Blog</a>
             <a class="border-b-2 border-neon-cyan pb-1 text-neon-cyan" href="{{ route('about') }}">About</a>
-            <a class="text-slate-400 transition-colors hover:text-white" href="#">Contact</a>
         </nav>
 
         <div class="flex items-center gap-4 md:gap-6">
