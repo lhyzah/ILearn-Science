@@ -70,13 +70,6 @@
                     <span class="text-sm font-semibold tracking-wider text-neon-cyan">Science</span>
                 </div>
             </a>
-
-            <div class="relative hidden w-64 md:block">
-                <input class="w-full rounded-full border border-white/10 bg-white/5 py-1.5 pl-10 pr-4 text-sm focus:border-neon-cyan/50 focus:outline-none" placeholder="Search resources..." type="text">
-                <svg class="absolute left-3 top-2 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
-                </svg>
-            </div>
         </div>
 
         <nav class="hidden items-center gap-8 text-sm font-medium lg:flex">
