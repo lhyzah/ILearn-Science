@@ -231,6 +231,7 @@
                 ['analytics', 'Reports', '#', false],
                 ['mark_email_unread', 'Email Subscribers', '#', false],
                 ['support_agent', 'Support Tickets', '#', false],
+                ['playlist_add', 'Wishlist', '#admin-wishlist', false],
                 ['admin_panel_settings', 'User Management', '#', false],
                 ['settings', 'Website Settings', '#', false],
                 ['logout', 'Logout', '#', false],
@@ -653,6 +654,23 @@
                                 <span class="rounded-full bg-primary-container/10 px-3 py-1 font-label text-xs text-primary">{{ $status }}</span>
                             </div>
                         @endforeach
+                    </div>
+                </article>
+
+                <article id="admin-wishlist" class="glass-panel scroll-mt-24 rounded-3xl p-6">
+                    <div class="mb-5 flex items-start justify-between gap-4">
+                        <div>
+                            <p class="font-label text-xs uppercase tracking-[0.3em] text-primary">Customer Topic Requests</p>
+                            <h3 class="mt-2 font-headline text-2xl font-semibold">Wishlist</h3>
+                            <p class="mt-1 text-sm text-on-surface-variant">See the topics customers wish to have as future iLearn Science resources.</p>
+                        </div>
+                        <span class="rounded-full border border-primary/25 bg-primary-container/10 px-3 py-1 font-label text-xs text-primary" data-admin-wishlist-count>0 wishes</span>
+                    </div>
+                    <div class="space-y-3" data-admin-wishlist-list>
+                        <div class="rounded-2xl border border-white/5 bg-surface-container-low/50 p-5 text-center text-on-surface-variant">
+                            <span class="material-symbols-outlined text-4xl text-primary">playlist_add</span>
+                            <p class="mt-2">Waiting for customer wishlist topics...</p>
+                        </div>
                     </div>
                 </article>
 
@@ -1308,6 +1326,7 @@
         const checkoutStorageKey = 'ilearnScienceLastCheckout';
         const activityStorageKey = 'ilearnScienceCustomerActivity';
         const profilePhotosStorageKey = 'ilearnScienceProfilePhotos';
+        const topicWishlistStorageKey = 'ilearnScienceTopicWishlist';
         const adminProfileKey = 'admin:lhyzah@ilearnscience.com';
         const currency = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' });
 
@@ -1340,6 +1359,59 @@
                 renderAdminProfilePhoto();
             };
             reader.readAsDataURL(file);
+        }
+
+        function escapeAdminHTML(value = '') {
+            return String(value).replace(/[&<>"']/g, (character) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;',
+            }[character]));
+        }
+
+        function renderAdminWishlist() {
+            const list = document.querySelector('[data-admin-wishlist-list]');
+            const count = document.querySelector('[data-admin-wishlist-count]');
+            if (!list) return;
+
+            const wishlist = safeJSON(topicWishlistStorageKey, {});
+            const wishes = Object.entries(wishlist).flatMap(([email, entries]) => {
+                return (Array.isArray(entries) ? entries : []).map((entry) => ({
+                    ...entry,
+                    customerEmail: entry.customerEmail || email,
+                    customerName: entry.customerName || 'Customer',
+                }));
+            }).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+            if (count) count.textContent = `${wishes.length} wish${wishes.length === 1 ? '' : 'es'}`;
+
+            if (!wishes.length) {
+                list.innerHTML = `
+                    <div class="rounded-2xl border border-white/5 bg-surface-container-low/50 p-5 text-center text-on-surface-variant">
+                        <span class="material-symbols-outlined text-4xl text-primary">playlist_add</span>
+                        <p class="mt-2 font-headline text-lg text-on-surface">No customer wishlist topics yet</p>
+                        <p class="mt-1 text-sm">Customer topic wishes will appear here as soon as they submit them.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = wishes.map((wish) => `
+                <article class="rounded-2xl border border-white/5 bg-surface-container-low/50 p-4 transition-all hover:border-primary/30">
+                    <div class="flex flex-col justify-between gap-3 md:flex-row md:items-start">
+                        <div>
+                            <p class="font-headline text-lg font-semibold text-on-surface">${escapeAdminHTML(wish.topic)}</p>
+                            <p class="mt-2 font-label text-xs text-on-surface-variant">${escapeAdminHTML(wish.customerName)} - ${escapeAdminHTML(wish.customerEmail)}</p>
+                        </div>
+                        <div class="text-left md:text-right">
+                            <span class="rounded-full border border-primary/25 bg-primary-container/10 px-3 py-1 font-label text-[10px] text-primary">${escapeAdminHTML(wish.status || 'New')}</span>
+                            <p class="mt-2 font-label text-[11px] text-on-surface-variant">${escapeAdminHTML(relativeTime(wish.createdAt))}</p>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
         }
 
         function normalizeMoney(value) {
@@ -1533,10 +1605,12 @@
         window.addEventListener('storage', (event) => {
             if ([cartStorageKey, userCartsStorageKey, checkoutStorageKey, activityStorageKey].includes(event.key)) refreshAdminLiveData();
             if (event.key === profilePhotosStorageKey) renderAdminProfilePhoto();
+            if (event.key === topicWishlistStorageKey) renderAdminWishlist();
         });
         window.addEventListener('pageshow', refreshAdminLiveData);
         setInterval(refreshAdminLiveData, 1000);
         renderAdminProfilePhoto();
+        renderAdminWishlist();
         refreshAdminLiveData();
     </script>
 </body>

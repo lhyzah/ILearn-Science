@@ -102,7 +102,7 @@
                 ['shopping_cart', 'Shop Resources', route('shop'), true],
                 ['receipt_long', 'Orders', route('orders'), false],
                 ['download', 'Downloads', '#', false],
-                ['favorite', 'Wishlist', '#', false],
+                ['favorite', 'Wishlist', route('dashboard') . '#dashboard-wishlist', false],
                 ['monitoring', 'Analytics', '#', false],
                 ['group', 'Customers', '#', false],
                 ['settings', 'Settings', '#', false],

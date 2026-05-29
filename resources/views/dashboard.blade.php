@@ -119,6 +119,7 @@
                 ['receipt_long', 'Orders', route('orders'), false],
                 ['article', 'Blog', route('blog'), false],
                 ['favorite', 'Saved Items', '#dashboard-saved-items', false],
+                ['playlist_add', 'Wishlist', '#dashboard-wishlist', false],
             ] as [$icon, $label, $href, $active])
                 <a class="{{ $active ? 'nav-active' : 'border-transparent text-on-surface-variant hover:border-primary/30 hover:bg-surface-variant/35 hover:text-primary' }} relative flex items-center gap-3 rounded-xl border px-4 py-3 font-label text-sm transition-all" href="{{ $href }}">
                     <span class="material-symbols-outlined">{{ $icon }}</span>
@@ -134,6 +135,9 @@
                     @endif
                     @if ($label === 'Saved Items')
                         <span class="ml-auto flex h-6 min-w-6 items-center justify-center rounded-full bg-primary-container px-1 font-label text-[11px] font-bold text-on-primary shadow-[0_0_14px_rgba(0,212,255,.55)]" data-dashboard-sidebar-saved-count>0</span>
+                    @endif
+                    @if ($label === 'Wishlist')
+                        <span class="ml-auto flex h-6 min-w-6 items-center justify-center rounded-full bg-primary-container px-1 font-label text-[11px] font-bold text-on-primary shadow-[0_0_14px_rgba(0,212,255,.55)]" data-dashboard-wishlist-count>0</span>
                     @endif
                 </a>
             @endforeach
@@ -239,6 +243,33 @@
                         <div class="rounded-2xl border border-white/5 bg-surface-container-low/50 p-5 text-center text-on-surface-variant">
                             <span class="material-symbols-outlined text-4xl text-primary">favorite</span>
                             <p class="mt-2">Loading saved items...</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article id="dashboard-wishlist" class="glass-panel scroll-mt-24 rounded-3xl p-6">
+                    <div class="mb-5 flex flex-col justify-between gap-4 md:flex-row md:items-start">
+                        <div>
+                            <p class="font-label text-xs uppercase tracking-[0.3em] text-primary">Topic Requests</p>
+                            <h3 class="mt-2 font-headline text-2xl font-semibold">Wishlist</h3>
+                            <p class="mt-1 text-sm text-on-surface-variant">Write the science topics or resources you wish iLearn Science would create next.</p>
+                        </div>
+                    </div>
+                    <form class="space-y-3" data-dashboard-wishlist-form>
+                        <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant" for="dashboard-wishlist-topic">Topic wish</label>
+                        <textarea id="dashboard-wishlist-topic" class="min-h-28 w-full rounded-2xl border border-primary/20 bg-surface-container-low/70 p-4 text-on-surface outline-none transition-all placeholder:text-on-surface-variant focus:border-primary/60 focus:shadow-[0_0_20px_rgba(60,215,255,.18)]" placeholder="Example: Human body systems quiz, volcano infographic, Grade 8 chemistry worksheet..." data-dashboard-wishlist-input></textarea>
+                        <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                            <p class="min-h-5 text-sm text-on-surface-variant" data-dashboard-wishlist-message></p>
+                            <button class="rounded-xl bg-primary-container px-5 py-3 font-label text-sm font-bold text-on-primary shadow-[0_0_18px_rgba(0,212,255,.28)] transition-all hover:scale-[1.02]" type="submit">
+                                <span class="material-symbols-outlined align-middle text-[18px]">playlist_add</span>
+                                Add to Wishlist
+                            </button>
+                        </div>
+                    </form>
+                    <div class="mt-5 space-y-3" data-dashboard-wishlist-list>
+                        <div class="rounded-2xl border border-white/5 bg-surface-container-low/50 p-5 text-center text-on-surface-variant">
+                            <span class="material-symbols-outlined text-4xl text-primary">playlist_add</span>
+                            <p class="mt-2">Loading wishlist topics...</p>
                         </div>
                     </div>
                 </article>
@@ -403,6 +434,7 @@
         const dashboardDownloadedProductsStorageKey = 'ilearnScienceDownloadedProducts';
         const dashboardSavedItemsStorageKey = 'ilearnScienceSavedItems';
         const dashboardWishlistStorageKey = 'ilearnScienceWishlistItems';
+        const dashboardTopicWishlistStorageKey = 'ilearnScienceTopicWishlist';
         const dashboardActivityStorageKey = 'ilearnScienceCustomerActivity';
         const dashboardInventoryStorageKey = 'ilearnScienceInventoryProducts';
         const dashboardBlogStorageKey = 'ilearnScienceBlogPosts';
@@ -492,6 +524,14 @@
                 return String(session?.email || '').toLowerCase();
             } catch {
                 return '';
+            }
+        }
+
+        function getDashboardSessionUser() {
+            try {
+                return JSON.parse(sessionStorage.getItem('ilearnScienceAuthSession') || localStorage.getItem('ilearnScienceCurrentUser') || localStorage.getItem('ilearnScienceRememberedUser') || 'null') || null;
+            } catch {
+                return null;
             }
         }
 
@@ -892,6 +932,77 @@
                     </div>
                     <span class="material-symbols-outlined text-primary">arrow_forward</span>
                 </a>
+            `).join('');
+        }
+
+        function readDashboardTopicWishlist() {
+            try {
+                return JSON.parse(localStorage.getItem(dashboardTopicWishlistStorageKey) || '{}') || {};
+            } catch {
+                return {};
+            }
+        }
+
+        function getDashboardTopicWishlist() {
+            const email = getDashboardSessionEmail();
+            const allTopics = readDashboardTopicWishlist();
+            return email && Array.isArray(allTopics[email]) ? allTopics[email] : [];
+        }
+
+        function saveDashboardTopicWish(topic) {
+            const user = getDashboardSessionUser();
+            const email = String(user?.email || '').toLowerCase();
+            if (!email) {
+                window.iLearnAuth?.openSignIn?.('Please sign in or create an account to add wishlist topics.');
+                return false;
+            }
+
+            const wishlist = readDashboardTopicWishlist();
+            wishlist[email] = Array.isArray(wishlist[email]) ? wishlist[email] : [];
+            wishlist[email].unshift({
+                id: `wish-${Date.now()}`,
+                topic,
+                customerName: user?.name || 'Customer',
+                customerEmail: email,
+                createdAt: new Date().toISOString(),
+                status: 'New',
+            });
+            localStorage.setItem(dashboardTopicWishlistStorageKey, JSON.stringify(wishlist));
+            window.dispatchEvent(new CustomEvent('ilearn:wishlist-updated'));
+            renderDashboardTopicWishlist();
+            return true;
+        }
+
+        function renderDashboardTopicWishlist() {
+            const list = document.querySelector('[data-dashboard-wishlist-list]');
+            const wishes = getDashboardTopicWishlist();
+
+            document.querySelectorAll('[data-dashboard-wishlist-count]').forEach((target) => {
+                target.textContent = wishes.length;
+                target.classList.toggle('hidden', wishes.length === 0);
+            });
+
+            if (!list) return;
+
+            if (!wishes.length) {
+                list.innerHTML = `
+                    <div class="rounded-2xl border border-white/5 bg-surface-container-low/50 p-5 text-center text-on-surface-variant">
+                        <span class="material-symbols-outlined text-4xl text-primary">playlist_add</span>
+                        <p class="mt-2 font-headline text-lg font-semibold text-on-surface">No wishlist topics yet</p>
+                        <p class="mt-1 text-sm">Add a topic you want the author to create next.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = wishes.slice(0, 5).map((wish) => `
+                <article class="rounded-2xl border border-white/5 bg-surface-container-low/50 p-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <p class="font-headline text-base font-semibold text-on-surface">${dashboardEscapeHTML(wish.topic)}</p>
+                        <span class="rounded-full border border-primary/20 bg-primary-container/10 px-3 py-1 font-label text-[10px] text-primary">${dashboardEscapeHTML(wish.status || 'New')}</span>
+                    </div>
+                    <p class="mt-2 font-label text-[11px] text-on-surface-variant">${dashboardEscapeHTML(dashboardOrderDate(wish.createdAt))}</p>
+                </article>
             `).join('');
         }
 
@@ -1326,6 +1437,7 @@
 
         updateCustomerDashboardTitle();
         updateDashboardDownloadStats();
+        renderDashboardTopicWishlist();
         renderDashboardProducts(true);
         refreshDashboardInventoryFromServer();
         renderDashboardBlogs(true);
@@ -1373,9 +1485,24 @@
             saveDashboardItem(dashboardPreviewProduct);
             closeDashboardPreview();
         });
+        document.querySelector('[data-dashboard-wishlist-form]')?.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const input = document.querySelector('[data-dashboard-wishlist-input]');
+            const message = document.querySelector('[data-dashboard-wishlist-message]');
+            const topic = input?.value.trim();
+            if (!topic) {
+                if (message) message.textContent = 'Please write a topic before adding it to your wishlist.';
+                return;
+            }
+            if (saveDashboardTopicWish(topic)) {
+                input.value = '';
+                if (message) message.textContent = 'Wishlist topic sent to the admin dashboard.';
+            }
+        });
         window.addEventListener('storage', (event) => {
             if (event.key === dashboardCartStorageKey) renderDashboardCart();
-            if (event.key === dashboardCheckoutStorageKey || event.key === dashboardDownloadedFilesStorageKey || event.key === dashboardDownloadedProductsStorageKey || event.key === dashboardSavedItemsStorageKey || event.key === dashboardWishlistStorageKey || event.key === dashboardActivityStorageKey || event.key === 'ilearnScienceCurrentUser' || event.key === 'ilearnScienceRememberedUser') updateDashboardDownloadStats();
+            if (event.key === dashboardCheckoutStorageKey || event.key === dashboardDownloadedFilesStorageKey || event.key === dashboardDownloadedProductsStorageKey || event.key === dashboardSavedItemsStorageKey || event.key === dashboardWishlistStorageKey || event.key === dashboardTopicWishlistStorageKey || event.key === dashboardActivityStorageKey || event.key === 'ilearnScienceCurrentUser' || event.key === 'ilearnScienceRememberedUser') updateDashboardDownloadStats();
+            if (event.key === dashboardTopicWishlistStorageKey || event.key === 'ilearnScienceCurrentUser' || event.key === 'ilearnScienceRememberedUser') renderDashboardTopicWishlist();
             if (event.key === dashboardInventoryStorageKey || event.key === `${dashboardInventoryStorageKey}Initialized`) {
                 renderDashboardProducts(true);
                 renderDashboardRecommendation();
@@ -1385,6 +1512,7 @@
         window.addEventListener('ilearn:cart-updated', renderDashboardCart);
         window.addEventListener('ilearn:auth-updated', updateDashboardDownloadStats);
         window.addEventListener('ilearn:saved-updated', renderDashboardSavedItems);
+        window.addEventListener('ilearn:wishlist-updated', renderDashboardTopicWishlist);
         window.addEventListener('ilearn:products-updated', (event) => {
             if (Array.isArray(event.detail?.products)) {
                 localStorage.setItem(dashboardInventoryStorageKey, JSON.stringify(event.detail.products));
@@ -1416,6 +1544,7 @@
             renderDashboardBlogs(true);
             renderDashboardCart();
             renderDashboardSavedItems();
+            renderDashboardTopicWishlist();
             renderDashboardRecommendation();
         });
         setInterval(() => renderDashboardProducts(false), 1000);
