@@ -1202,10 +1202,14 @@
                     </div>
                     </div>
                     <div class="mt-4 grid grid-cols-3 gap-2">
-                        <button class="rounded-xl border border-primary/25 px-3 py-2 font-label text-xs font-bold text-primary transition-all hover:bg-primary/10" type="button" data-dashboard-product-preview="${dashboardEscapeHTML(product.id)}">Preview</button>
-                        <button class="rounded-xl border border-primary/25 px-3 py-2 font-label text-xs font-bold text-primary transition-all hover:bg-primary/10" type="button" data-dashboard-product-save="${dashboardEscapeHTML(product.id)}">Save</button>
-                        <button class="rounded-xl bg-primary-container px-3 py-2 font-label text-xs font-bold text-on-primary transition-all hover:scale-[1.02]" type="button" data-dashboard-product-add="${dashboardEscapeHTML(product.id)}">
-                            <span class="material-symbols-outlined align-middle text-[16px]">add_shopping_cart</span>
+                        <button class="flex h-10 items-center justify-center rounded-xl border border-primary/25 text-primary transition-all hover:bg-primary/10" type="button" title="Preview" aria-label="Preview ${dashboardEscapeHTML(product.title)}" data-dashboard-product-preview="${dashboardEscapeHTML(product.id)}">
+                            <span class="material-symbols-outlined text-[18px]">visibility</span>
+                        </button>
+                        <button class="flex h-10 items-center justify-center rounded-xl border border-primary/25 text-primary transition-all hover:bg-primary/10" type="button" title="Save" aria-label="Save ${dashboardEscapeHTML(product.title)}" data-dashboard-product-save="${dashboardEscapeHTML(product.id)}">
+                            <span class="material-symbols-outlined text-[18px]">favorite</span>
+                        </button>
+                        <button class="flex h-10 items-center justify-center rounded-xl bg-primary-container text-on-primary transition-all hover:scale-[1.02]" type="button" title="Add to cart" aria-label="Add ${dashboardEscapeHTML(product.title)} to cart" data-dashboard-product-add="${dashboardEscapeHTML(product.id)}">
+                            <span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
                         </button>
                     </div>
                 </article>
@@ -1296,13 +1300,13 @@
                         <p class="mt-2 line-clamp-2 text-sm text-on-surface-variant">${dashboardEscapeHTML(product.description)}</p>
                         <p class="mt-2 font-label text-[11px] text-on-surface-variant">${dashboardEscapeHTML(product.grade)}</p>
                         <div class="mt-4 grid grid-cols-3 gap-2">
-                            <button class="flex items-center justify-center rounded-xl border border-primary/25 px-3 py-2.5 font-label text-xs font-bold text-primary transition-all hover:bg-primary/10" type="button" data-dashboard-product-preview="${dashboardEscapeHTML(product.id)}">
-                                Preview
+                            <button class="flex h-10 items-center justify-center rounded-xl border border-primary/25 text-primary transition-all hover:bg-primary/10" type="button" title="Preview" aria-label="Preview ${dashboardEscapeHTML(product.title)}" data-dashboard-product-preview="${dashboardEscapeHTML(product.id)}">
+                                <span class="material-symbols-outlined text-[18px]">visibility</span>
                             </button>
-                            <button class="flex items-center justify-center gap-2 rounded-xl bg-primary-container py-2.5 font-label text-xs font-bold text-on-primary shadow-[0_0_16px_rgba(0,212,255,.22)] transition-all hover:scale-[1.02]" type="button" data-dashboard-product-add="${dashboardEscapeHTML(product.id)}">
+                            <button class="flex h-10 items-center justify-center rounded-xl bg-primary-container text-on-primary shadow-[0_0_16px_rgba(0,212,255,.22)] transition-all hover:scale-[1.02]" type="button" title="Add to cart" aria-label="Add ${dashboardEscapeHTML(product.title)} to cart" data-dashboard-product-add="${dashboardEscapeHTML(product.id)}">
                                 <span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
                             </button>
-                            <button class="flex items-center justify-center gap-2 rounded-xl border border-primary/25 px-3 py-2.5 font-label text-xs font-bold text-primary transition-all hover:bg-primary/10" type="button" title="Save item" data-dashboard-product-save="${dashboardEscapeHTML(product.id)}">
+                            <button class="flex h-10 items-center justify-center rounded-xl border border-primary/25 text-primary transition-all hover:bg-primary/10" type="button" title="Save" aria-label="Save ${dashboardEscapeHTML(product.title)}" data-dashboard-product-save="${dashboardEscapeHTML(product.id)}">
                                 <span class="material-symbols-outlined text-[18px]">favorite</span>
                             </button>
                         </div>
