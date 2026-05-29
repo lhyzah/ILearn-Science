@@ -114,12 +114,10 @@
         <nav class="flex-1 space-y-1">
             @foreach ([
                 ['space_dashboard', 'Dashboard', route('dashboard'), true],
-                ['cloud_download', 'Downloads', '#dashboard-downloads', false],
                 ['shopping_cart', 'Cart', route('cart'), false],
                 ['receipt_long', 'Orders', route('orders'), false],
                 ['article', 'Blog', route('blog'), false],
                 ['favorite', 'Saved Items', '#dashboard-saved-items', false],
-                ['playlist_add', 'Wishlist', '#dashboard-wishlist', false],
             ] as [$icon, $label, $href, $active])
                 <a class="{{ $active ? 'nav-active' : 'border-transparent text-on-surface-variant hover:border-primary/30 hover:bg-surface-variant/35 hover:text-primary' }} relative flex items-center gap-3 rounded-xl border px-4 py-3 font-label text-sm transition-all" href="{{ $href }}">
                     <span class="material-symbols-outlined">{{ $icon }}</span>
@@ -169,7 +167,6 @@
                             <h1 class="mt-5 font-headline text-4xl font-bold leading-tight text-on-surface md:text-5xl">Welcome back to your science resource vault.</h1>
                             <p class="mt-4 max-w-2xl text-on-surface-variant">Track your purchases, open downloads, continue saved lessons, and discover resource recommendations for your next classroom mission.</p>
                             <div class="mt-6 flex flex-wrap gap-3">
-                                <a class="rounded-xl bg-primary-container px-5 py-3 font-label text-sm font-bold text-on-primary shadow-[0_0_20px_rgba(0,212,255,.32)] transition-all hover:scale-[1.02]" href="{{ route('shop') }}">Shop Resources</a>
                                 <a class="rounded-xl border border-primary/35 px-5 py-3 font-label text-sm text-primary transition-all hover:bg-primary/10" href="{{ route('orders') }}">View Orders</a>
                             </div>
                         </div>
@@ -779,7 +776,7 @@
                         <span class="material-symbols-outlined mb-2 text-4xl text-primary">inventory_2</span>
                         <p class="font-headline text-lg text-on-surface">No purchased resources yet</p>
                         <p class="mt-1 text-sm">Products will appear here after the customer successfully checks out.</p>
-                        <a class="mt-4 inline-flex rounded-xl border border-primary/30 px-4 py-2 font-label text-xs text-primary transition-all hover:bg-primary/10" href="{{ route('shop') }}">Shop Resources</a>
+                        <a class="mt-4 inline-flex rounded-xl border border-primary/30 px-4 py-2 font-label text-xs text-primary transition-all hover:bg-primary/10" href="{{ route('orders') }}">View Orders</a>
                     </div>
                 `;
                 return;
@@ -845,7 +842,7 @@
                         <span class="material-symbols-outlined text-4xl text-primary">receipt_long</span>
                         <p class="mt-2 font-headline text-lg font-semibold">No orders yet</p>
                         <p class="mt-1 text-sm text-on-surface-variant">Completed checkouts will appear here in real time.</p>
-                        <a class="mt-4 inline-flex rounded-xl border border-primary/30 px-4 py-2 font-label text-xs text-primary transition-all hover:bg-primary/10" href="{{ route('shop') }}">Shop Resources</a>
+                        <a class="mt-4 inline-flex rounded-xl border border-primary/30 px-4 py-2 font-label text-xs text-primary transition-all hover:bg-primary/10" href="{{ route('orders') }}">View Orders</a>
                     </div>
                 `;
                 return;

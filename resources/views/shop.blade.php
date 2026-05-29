@@ -101,11 +101,8 @@
                 ['dashboard', 'Dashboard', route('dashboard'), false],
                 ['shopping_cart', 'Shop Resources', route('shop'), true],
                 ['receipt_long', 'Orders', route('orders'), false],
-                ['download', 'Downloads', '#', false],
-                ['favorite', 'Wishlist', route('dashboard') . '#dashboard-wishlist', false],
                 ['monitoring', 'Analytics', '#', false],
                 ['group', 'Customers', '#', false],
-                ['settings', 'Settings', '#', false],
             ] as [$icon, $label, $href, $active])
                 <a class="flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-300 {{ $active ? 'border-l-4 border-primary bg-primary-container/20 text-primary-fixed-dim shadow-[0_0_20px_rgba(60,215,255,0.3)]' : 'text-on-surface-variant hover:translate-x-1 hover:bg-surface-variant/30' }}" href="{{ $href }}">
                     <span class="material-symbols-outlined">{{ $icon }}</span>
@@ -126,45 +123,20 @@
                 <input class="w-full border-none bg-transparent font-label text-sm text-on-surface focus:ring-0" placeholder="Scan galactic databases..." type="text">
             </div>
         </div>
-        <div class="flex items-center gap-4">
-            <a class="relative flex h-11 w-11 items-center justify-center rounded-full border border-primary/20 bg-surface-variant/30 text-on-surface-variant transition-all hover:border-primary/50 hover:text-primary hover:shadow-[0_0_16px_rgba(60,215,255,0.22)] active:scale-95" href="{{ route('cart') }}" data-cart-link aria-label="Cart with 3 items">
-                <span class="material-symbols-outlined">shopping_cart_checkout</span>
-                <span class="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-container px-1 font-label text-[10px] font-bold leading-none text-on-primary shadow-[0_0_12px_rgba(0,212,255,0.65)]" data-cart-count>3</span>
-            </a>
-            <button class="p-2 text-on-surface-variant transition-colors hover:text-primary active:scale-90">
-                <span class="material-symbols-outlined">notifications</span>
-            </button>
-        </div>
+        <div data-auth-mount class="flex items-center gap-2"></div>
     </header>
 
     <main class="mx-auto max-w-[1600px] space-y-12 px-4 py-8 md:px-12 lg:pl-72">
-        <section class="grid grid-cols-1 gap-gutter lg:grid-cols-12">
-            <div class="grid grid-cols-2 gap-4 lg:col-span-4">
-                @foreach ([
-                    ['Total Resources', '12.8k', '+12% this month', 'primary'],
-                    ['Best-Sellers', '432', 'Core curriculum', 'secondary-fixed'],
-                    ['New Arrivals', '85', 'Awaiting review', 'tertiary-fixed-dim'],
-                    ['Total Sales', '₱45k', 'Growth: High', 'primary-fixed-dim'],
-                ] as [$label, $value, $detail, $color])
-                    <article class="glass-panel glow-hover flex flex-col justify-between rounded-xl p-6 transition-all duration-300">
-                        <span class="font-label text-xs uppercase tracking-widest text-{{ $color }}">{{ $label }}</span>
-                        <div class="mt-4">
-                            <h3 class="font-headline text-3xl font-semibold text-white">{{ $value }}</h3>
-                            <p class="mt-1 text-xs {{ str_contains($detail, '+') || str_contains($detail, 'Growth') ? 'text-green-400' : 'text-on-surface-variant' }}">{{ $detail }}</p>
-                        </div>
-                    </article>
-                @endforeach
-            </div>
-
-            <article class="glass-panel group relative min-h-[280px] overflow-hidden rounded-xl lg:col-span-8">
-                <div class="absolute inset-0 z-10 bg-gradient-to-r from-background via-background/40 to-transparent"></div>
-                <img alt="Futuristic laboratory" class="absolute inset-0 h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeA7aDCt1BhhNA6WQB-EGoUJittQ_zWiHMhgO7UPQFu7ewJlQywHQ2i9svSlMorENGTB4OXPPtG55T78teaOLzwgFzwc-rXcBlrY9S7EriKVyoAMS_0W1w8Bm-UMKPwrjdaX4C3T5Y8jMLETbi5n1naMUsffVmwTf3I2gaYr3_wzuw5_glmvYgGz7MSRbhMdOTObD3QzMyx02dZ4UVVpX67_pEhFd3iPZcf5NVpVESqINm3KdWCrlz5nViUL_8oe1G-y2p3r4ur3I">
-                <div class="relative z-20 flex h-full flex-col justify-center p-8 md:p-12">
-                    <span class="mb-4 inline-block w-fit rounded-full border border-primary/30 bg-primary/20 px-3 py-1 font-label text-xs text-primary">MISSION CRITICAL</span>
-                    <h2 class="mb-4 font-display text-4xl font-bold leading-tight text-white md:text-5xl">Teaching Materials <br><span class="text-primary">Ready for Launch</span></h2>
-                    <p class="mb-8 max-w-lg text-lg leading-8 text-on-surface-variant">Deploy comprehensive, high-fidelity scientific modules designed to inspire the next generation of interstellar explorers.</p>
-                    <button class="w-fit rounded-full bg-primary px-8 py-3 font-label text-sm text-on-primary transition-all hover:shadow-[0_0_25px_rgba(60,215,255,0.6)] active:scale-95">Initialize Deployment</button>
-                </div>
+        <section class="grid grid-cols-1 gap-gutter md:grid-cols-2">
+            <article class="glass-panel glow-hover rounded-xl p-6 transition-all duration-300">
+                <span class="font-label text-xs uppercase tracking-widest text-primary">Total Resources</span>
+                <h3 class="mt-4 font-headline text-4xl font-semibold text-white" data-shop-total-resources>0</h3>
+                <p class="mt-1 text-sm text-on-surface-variant">Published products from the admin inventory</p>
+            </article>
+            <article class="glass-panel glow-hover rounded-xl p-6 transition-all duration-300">
+                <span class="font-label text-xs uppercase tracking-widest text-secondary-fixed">Best Seller</span>
+                <h3 class="mt-4 line-clamp-1 font-headline text-2xl font-semibold text-white" data-shop-best-seller>Loading resources...</h3>
+                <p class="mt-1 text-sm text-on-surface-variant">Based on downloads and checkout activity</p>
             </article>
         </section>
 
@@ -176,14 +148,24 @@
                     @endforeach
                 </div>
                 <div class="flex flex-wrap items-center gap-4">
-                    @foreach ([['filter_list', 'Science Branch'], ['attach_money', 'Price: Any'], ['sort', 'Sort: Popularity']] as [$icon, $label])
-                        <label class="glass-panel flex items-center gap-2 rounded-xl border border-outline-variant/20 px-4 py-2">
-                            <span class="material-symbols-outlined text-sm">{{ $icon }}</span>
-                            <select class="cursor-pointer appearance-none border-none bg-transparent pr-6 font-label text-sm text-on-surface focus:ring-0">
-                                <option>{{ $label }}</option>
-                            </select>
-                        </label>
-                    @endforeach
+                    <label class="glass-panel flex items-center gap-2 rounded-xl border border-outline-variant/20 px-4 py-2">
+                        <span class="material-symbols-outlined text-sm">attach_money</span>
+                        <select id="shop-price-filter" class="cursor-pointer appearance-none border-none bg-transparent pr-6 font-label text-sm text-on-surface focus:ring-0">
+                            <option value="any">Price: Any</option>
+                            <option value="under-10">Under ₱10</option>
+                            <option value="10-20">₱10 - ₱20</option>
+                            <option value="over-20">Over ₱20</option>
+                        </select>
+                    </label>
+                    <label class="glass-panel flex items-center gap-2 rounded-xl border border-outline-variant/20 px-4 py-2">
+                        <span class="material-symbols-outlined text-sm">sort</span>
+                        <select id="shop-sort-filter" class="cursor-pointer appearance-none border-none bg-transparent pr-6 font-label text-sm text-on-surface focus:ring-0">
+                            <option value="popularity">Sort: Popularity</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                            <option value="title">Title: A to Z</option>
+                        </select>
+                    </label>
                 </div>
             </div>
         </section>
@@ -261,7 +243,7 @@
                                 <span>{{ $downloads }}</span>
                             </div>
                         </div>
-                        <div class="grid grid-cols-[1fr_auto_1fr] gap-3 pt-2">
+                        <div class="grid grid-cols-3 gap-3 pt-2">
                             <button
                                 class="shop-resource-preview flex h-10 items-center justify-center rounded-lg border border-primary/30 text-primary transition-all hover:bg-primary/10"
                                 type="button"
@@ -279,6 +261,9 @@
                                 data-product-includes="{{ $includes }}"
                                 data-product-image="{{ $displayImage }}"
                             ><span class="material-symbols-outlined text-[18px]">visibility</span></button>
+                            <button class="shop-resource-save flex h-10 items-center justify-center rounded-lg border border-primary/30 text-primary transition-all hover:bg-primary/10" type="button" title="Save" aria-label="Save {{ $title }}" data-product-id="{{ \Illuminate\Support\Str::slug($title) }}" data-product-title="{{ $title }}" data-product-meta="{{ $type === 'Visual Resource' ? 'Visual Resource' : $type . ' Resource' }}" data-product-price="{{ $price }}" data-product-image="{{ $displayImage }}">
+                                <span class="material-symbols-outlined text-sm">favorite</span>
+                            </button>
                             <button class="shop-resource-add flex h-10 items-center justify-center rounded-lg bg-primary text-on-primary transition-all hover:shadow-[0_0_15px_rgba(60,215,255,0.4)]" type="button" title="Add to cart" aria-label="Add {{ $title }} to cart" data-product-id="{{ \Illuminate\Support\Str::slug($title) }}" data-product-title="{{ $title }}" data-product-meta="{{ $type === 'Visual Resource' ? 'Visual Resource' : $type . ' Resource' }}" data-product-price="{{ $price }}" data-product-image="{{ $displayImage }}">
                                 <span class="material-symbols-outlined text-sm">shopping_cart</span>
                             </button>
@@ -288,46 +273,6 @@
             @endforeach
         </section>
 
-        <section class="grid grid-cols-1 gap-gutter xl:grid-cols-3">
-            <article class="glass-panel space-y-6 rounded-xl p-8 xl:col-span-2">
-                <div class="flex items-center justify-between">
-                    <h3 class="font-headline text-2xl font-semibold text-white">Sales Performance</h3>
-                    <div class="flex items-center gap-2">
-                        <span class="h-3 w-3 rounded-full bg-primary"></span>
-                        <span class="font-label text-xs text-on-surface-variant">Units Sold</span>
-                    </div>
-                </div>
-                <div class="flex h-64 items-end justify-between gap-4 pt-10">
-                    @foreach ([40, 65, 55, 85, 70, 95, 60] as $height)
-                        <div class="relative flex-1 rounded-t-lg bg-primary/20 transition-all hover:bg-primary/40" style="height: {{ $height }}%"></div>
-                    @endforeach
-                </div>
-                <div class="flex justify-between px-2 font-label text-xs text-on-surface-variant">
-                    @foreach (['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'] as $day)
-                        <span>{{ $day }}</span>
-                    @endforeach
-                </div>
-            </article>
-
-            <aside class="glass-panel space-y-6 rounded-xl p-8">
-                <h3 class="font-headline text-2xl font-semibold text-white">Trending Now</h3>
-                <div class="space-y-4">
-                    @foreach ([['rocket_launch', 'Astrophysics Basics', '412 downloads today', '+24%', 'primary'], ['magnification_small', 'Microbiology Atlas', '285 downloads today', '+18%', 'secondary-fixed'], ['public', 'Climate Systems V3', '192 downloads today', '+11%', 'tertiary-fixed-dim']] as [$icon, $title, $copy, $change, $color])
-                        <div class="flex cursor-pointer items-center gap-4 rounded-lg p-3 transition-all hover:bg-surface-variant/30">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-lg border border-{{ $color }}/20 bg-surface-container text-{{ $color }}">
-                                <span class="material-symbols-outlined">{{ $icon }}</span>
-                            </div>
-                            <div class="flex-1">
-                                <p class="font-label text-sm text-white">{{ $title }}</p>
-                                <p class="font-label text-xs text-on-surface-variant">{{ $copy }}</p>
-                            </div>
-                            <div class="font-label text-xs text-green-400">{{ $change }}</div>
-                        </div>
-                    @endforeach
-                </div>
-                <button class="w-full rounded-xl border border-outline-variant/30 py-3 font-label text-sm text-on-surface-variant transition-all hover:border-primary/50 hover:text-white">View Comprehensive Report</button>
-            </aside>
-        </section>
     </main>
 
     <button class="fixed bottom-8 right-8 z-50 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-on-primary shadow-[0_0_30px_rgba(60,215,255,0.5)] transition-all hover:scale-110 active:scale-95">
@@ -446,6 +391,16 @@
             return `₱${amount.toFixed(2)}`;
         }
 
+        function parseShopPrice(value) {
+            return Number.parseFloat(String(value).replace(/[₱,]/g, '')) || 0;
+        }
+
+        function parseShopPopularity(value) {
+            const text = String(value || '0').toLowerCase().replace(/,/g, '');
+            const number = Number.parseFloat(text) || 0;
+            return text.includes('k') ? number * 1000 : number;
+        }
+
         function getAdminInventory() {
             try {
                 const saved = JSON.parse(localStorage.getItem(inventoryStorageKey) || 'null');
@@ -511,6 +466,36 @@
 
         function activeShopField() {
             return document.querySelector('.shop-field-filter.bg-primary')?.dataset.field || 'all-fields';
+        }
+
+        function activePriceFilter() {
+            return document.getElementById('shop-price-filter')?.value || 'any';
+        }
+
+        function activeSortFilter() {
+            return document.getElementById('shop-sort-filter')?.value || 'popularity';
+        }
+
+        function getDisplayedShopProducts() {
+            const selectedField = activeShopField();
+            const selectedPrice = activePriceFilter();
+            const selectedSort = activeSortFilter();
+            const filtered = getShopProducts().filter((product) => {
+                const price = parseShopPrice(product.price);
+                const fieldMatch = selectedField === 'all-fields' || product.field === selectedField;
+                const priceMatch = selectedPrice === 'any'
+                    || (selectedPrice === 'under-10' && price < 10)
+                    || (selectedPrice === '10-20' && price >= 10 && price <= 20)
+                    || (selectedPrice === 'over-20' && price > 20);
+                return fieldMatch && priceMatch;
+            });
+
+            return filtered.sort((a, b) => {
+                if (selectedSort === 'price-low') return parseShopPrice(a.price) - parseShopPrice(b.price);
+                if (selectedSort === 'price-high') return parseShopPrice(b.price) - parseShopPrice(a.price);
+                if (selectedSort === 'title') return a.title.localeCompare(b.title);
+                return parseShopPopularity(b.downloads) - parseShopPopularity(a.downloads);
+            });
         }
 
         function getCartItems() {
@@ -675,7 +660,7 @@
                                 <span>${escapeHTML(product.downloads)}</span>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-3 pt-2">
+                        <div class="grid grid-cols-3 gap-3 pt-2">
                             <button
                                 class="shop-resource-preview flex h-10 items-center justify-center rounded-lg border border-primary/30 text-primary transition-all hover:bg-primary/10"
                                 type="button"
@@ -706,19 +691,23 @@
         }
 
         function applyShopFieldFilter() {
-            const selectedField = activeShopField();
-            document.querySelectorAll('.shop-resource-card').forEach((card) => {
-                const shouldShow = selectedField === 'all-fields' || card.dataset.field === selectedField;
-                card.classList.toggle('hidden', !shouldShow);
-            });
+            renderShopResources(true);
+        }
+
+        function updateShopStats(products = getShopProducts()) {
+            const total = products.length;
+            const best = [...products].sort((a, b) => parseShopPopularity(b.downloads) - parseShopPopularity(a.downloads))[0];
+            document.querySelector('[data-shop-total-resources]').textContent = total;
+            document.querySelector('[data-shop-best-seller]').textContent = best?.title || 'No products yet';
         }
 
         function renderShopResources(force = false) {
             const inventory = getAdminInventory();
-            const snapshot = inventory ? JSON.stringify(inventory) : 'server-rendered';
+            const snapshot = `${inventory ? JSON.stringify(inventory) : 'server-rendered'}|${activeShopField()}|${activePriceFilter()}|${activeSortFilter()}`;
             if (!force && snapshot === lastInventorySnapshot) return;
             lastInventorySnapshot = snapshot;
-            const products = getShopProducts();
+            const products = getDisplayedShopProducts();
+            updateShopStats(getShopProducts());
             if (!shopResourceGrid) return;
             shopResourceGrid.innerHTML = products.length
                 ? products.map(shopProductCard).join('')
@@ -727,7 +716,6 @@
                     <h3 class="font-headline text-2xl text-on-surface">No published products yet</h3>
                     <p class="mt-2">Products published from the admin inventory will appear here in real time.</p>
                 </div>`;
-            applyShopFieldFilter();
         }
 
         shopResourceGrid?.addEventListener('click', (event) => {
@@ -803,9 +791,12 @@
                     filter.classList.toggle('hover:bg-surface-variant/30', !active);
                 });
 
-                applyShopFieldFilter();
+                renderShopResources(true);
             });
         });
+
+        document.getElementById('shop-price-filter')?.addEventListener('change', () => renderShopResources(true));
+        document.getElementById('shop-sort-filter')?.addEventListener('change', () => renderShopResources(true));
 
         renderShopResources(true);
         refreshShopInventoryFromServer();

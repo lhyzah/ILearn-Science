@@ -633,6 +633,23 @@
             }
         }
 
+        function saveCompletedOrder(order) {
+            const email = String(order?.customer?.email || '').toLowerCase();
+            if (!email) return;
+            let orders = {};
+            try {
+                orders = JSON.parse(localStorage.getItem('ilearnScienceOrders') || '{}') || {};
+            } catch {
+                orders = {};
+            }
+            orders[email] = Array.isArray(orders[email]) ? orders[email] : [];
+            const existingIndex = orders[email].findIndex((entry) => entry.orderNumber === order.orderNumber);
+            if (existingIndex >= 0) orders[email][existingIndex] = order;
+            else orders[email].unshift(order);
+            localStorage.setItem('ilearnScienceOrders', JSON.stringify(orders));
+            window.dispatchEvent(new CustomEvent('ilearn:orders-updated', { detail: { orders: orders[email] } }));
+        }
+
         async function completePurchase() {
             if (checkoutProcessing) return;
             if (!validateCheckout(true)) return;
@@ -667,6 +684,7 @@
             order.emailSent = Boolean(receipt.ok && receipt.sent);
             order.emailMessage = receipt.message;
             localStorage.setItem('ilearnScienceLastCheckout', JSON.stringify(order));
+            saveCompletedOrder(order);
             if (window.iLearnAuth?.clearCart) window.iLearnAuth.clearCart();
             else localStorage.setItem(cartStorageKey, JSON.stringify([]));
             document.querySelector('[data-modal-order-number]').textContent = orderNumber;

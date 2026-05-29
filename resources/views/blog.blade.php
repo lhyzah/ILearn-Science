@@ -118,12 +118,16 @@
                     <a class="rounded-xl border border-primary/35 px-5 py-3 font-label text-sm text-primary transition-all hover:bg-primary/10" href="{{ route('shop') }}">Explore Resources</a>
                 </div>
             </div>
-            <article class="glass-panel overflow-hidden rounded-3xl">
-                <img alt="Students exploring science resources" class="h-80 w-full object-cover opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeA7aDCt1BhhNA6WQB-EGoUJittQ_zWiHMhgO7UPQFu7ewJlQywHQ2i9svSlMorENGTB4OXPPtG55T78teaOLzwgFzwc-rXcBlrY9S7EriKVyoAMS_0W1w8Bm-UMKPwrjdaX4C3T5Y8jMLETbi5n1naMUsffVmwTf3I2gaYr3_wzuw5_glmvYgGz7MSRbhMdOTObD3QzMyx02dZ4UVVpX67_pEhFd3iPZcf5NVpVESqINm3KdWCrlz5nViUL_8oe1G-y2p3r4ur3I">
+            <article class="glass-panel overflow-hidden rounded-3xl" id="featured-blog-card">
+                <img alt="Featured science blog post" class="h-80 w-full object-cover opacity-80" id="featured-blog-image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeA7aDCt1BhhNA6WQB-EGoUJittQ_zWiHMhgO7UPQFu7ewJlQywHQ2i9svSlMorENGTB4OXPPtG55T78teaOLzwgFzwc-rXcBlrY9S7EriKVyoAMS_0W1w8Bm-UMKPwrjdaX4C3T5Y8jMLETbi5n1naMUsffVmwTf3I2gaYr3_wzuw5_glmvYgGz7MSRbhMdOTObD3QzMyx02dZ4UVVpX67_pEhFd3iPZcf5NVpVESqINm3KdWCrlz5nViUL_8oe1G-y2p3r4ur3I">
                 <div class="p-6">
-                    <span class="inline-flex rounded-full border border-primary/25 bg-primary-container/10 px-3 py-1 font-label text-xs text-primary">Featured</span>
-                    <h2 class="mt-4 font-headline text-2xl font-bold">How to Turn Digital Science Resources Into Active Learning Missions</h2>
-                    <p class="mt-3 text-on-surface-variant">A practical guide for using presentations, worksheets, quizzes, and visuals as one connected classroom experience.</p>
+                    <span class="inline-flex rounded-full border border-primary/25 bg-primary-container/10 px-3 py-1 font-label text-xs text-primary" id="featured-blog-category">Featured</span>
+                    <h2 class="mt-4 font-headline text-2xl font-bold" id="featured-blog-title">Loading featured article...</h2>
+                    <p class="mt-3 text-on-surface-variant" id="featured-blog-summary">Admin-published blog posts appear here automatically.</p>
+                    <button class="mt-5 inline-flex items-center gap-2 font-label text-sm text-primary" type="button" id="featured-blog-read">
+                        Read Featured Article
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                    </button>
                 </div>
             </article>
         </section>
@@ -275,12 +279,37 @@
             return `${Math.max(2, Math.ceil(words / 180))} min read`;
         }
 
+        function publishedBlogPosts() {
+            return readBlogPosts()
+                .filter((post) => post.status === 'Published')
+                .sort((a, b) => new Date(b.publishedAt || b.updatedAt || 0) - new Date(a.publishedAt || a.updatedAt || 0));
+        }
+
+        function renderFeaturedBlog(posts = publishedBlogPosts()) {
+            const featured = posts[0];
+            const card = document.getElementById('featured-blog-card');
+            if (!card) return;
+            if (!featured) {
+                document.getElementById('featured-blog-title').textContent = 'No featured article yet';
+                document.getElementById('featured-blog-summary').textContent = 'Publish a blog post from the admin dashboard to feature it here.';
+                document.getElementById('featured-blog-read').classList.add('hidden');
+                return;
+            }
+            document.getElementById('featured-blog-image').src = featured.image || defaultBlogImage;
+            document.getElementById('featured-blog-image').alt = featured.title || 'Featured science blog post';
+            document.getElementById('featured-blog-category').textContent = `${featured.category || 'Science'} • Featured`;
+            document.getElementById('featured-blog-title').textContent = featured.title || 'Untitled Post';
+            document.getElementById('featured-blog-summary').textContent = featured.meta || String(featured.content || '').slice(0, 150);
+            const readButton = document.getElementById('featured-blog-read');
+            readButton.dataset.readBlog = featured.id;
+            readButton.classList.remove('hidden');
+        }
+
         function renderPublicBlogPosts() {
             const grid = document.getElementById('public-blog-grid');
             if (!grid) return;
-            const published = readBlogPosts()
-                .filter((post) => post.status === 'Published')
-                .sort((a, b) => new Date(b.publishedAt || b.updatedAt || 0) - new Date(a.publishedAt || a.updatedAt || 0));
+            const published = publishedBlogPosts();
+            renderFeaturedBlog(published);
 
             if (!published.length) {
                 grid.innerHTML = `
@@ -344,6 +373,11 @@
             const button = event.target.closest('[data-read-blog]');
             if (!button) return;
             const post = readBlogPosts().find((item) => item.id === button.dataset.readBlog);
+            if (post) openBlogReader(post);
+        });
+
+        document.getElementById('featured-blog-read')?.addEventListener('click', (event) => {
+            const post = readBlogPosts().find((item) => item.id === event.currentTarget.dataset.readBlog);
             if (post) openBlogReader(post);
         });
 

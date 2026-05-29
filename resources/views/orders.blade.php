@@ -78,11 +78,7 @@
         <nav class="flex-1 space-y-1 px-4">
             @foreach ([
                 ['dashboard', 'Dashboard', route('dashboard'), false],
-                ['shopping_cart', 'Shop Resources', route('shop'), false],
                 ['receipt_long', 'Orders', route('orders'), true],
-                ['download', 'Downloads', '#', false],
-                ['favorite', 'Wishlist', '#', false],
-                ['settings', 'Settings', '#', false],
             ] as [$icon, $label, $href, $active])
                 <a class="{{ $active ? 'border-l-4 border-primary bg-primary-container/20 text-primary shadow-[0_0_20px_rgba(60,215,255,0.25)]' : 'text-on-surface-variant hover:translate-x-1 hover:bg-surface-container-high/50 hover:text-primary' }} flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-300" href="{{ $href }}">
                     <span class="material-symbols-outlined">{{ $icon }}</span>
@@ -97,13 +93,7 @@
             <img alt="iLearn Logo" class="h-10 w-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSBO56sJas6rQHK4VWyVv9zYvpVKsJP9aGm9I-zZ4Xp8RSH3TgIUxiNSFgYgSOEW-AD7ysC9slLFlObe30xoXRuZ2usUrzLaCr6C4UGL_A6_skVaPmwRJCOSWXxTz1ZZ5j3Ozg8zvZyd26aw1EyQvtPJzzb40BcFMiHArG9g9pAoV2NRyQC968hCEkCk1-k29rGdPmYK0TRKmKUkWUDd2gMt8XPS0sbLsyz2ySSzbMTEVa9zmrFuXcOziQjR6_EdazHqPNl2A2iRk">
             <span class="font-headline text-2xl font-bold text-primary">iLearn Science</span>
         </a>
-        <div class="flex items-center gap-4">
-            <a class="relative text-on-surface-variant transition-colors hover:text-primary" href="{{ route('cart') }}" aria-label="Cart">
-                <span class="material-symbols-outlined">shopping_cart_checkout</span>
-                <span class="absolute -right-3 -top-2 hidden h-5 min-w-5 items-center justify-center rounded-full bg-primary-container px-1 text-[10px] font-bold text-on-primary shadow-[0_0_10px_rgba(0,212,255,0.5)]" data-cart-count>0</span>
-            </a>
-            <a class="rounded-full border border-primary/30 px-4 py-2 font-label text-sm text-primary transition-all hover:bg-primary/10" href="{{ route('shop') }}">Shop</a>
-        </div>
+        <div data-auth-mount class="flex items-center gap-2"></div>
     </header>
 
     <main class="min-h-screen px-4 py-10 md:px-gutter lg:ml-64 lg:px-margin-desktop">
@@ -121,15 +111,15 @@
 
         <section class="mb-gutter grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             @foreach ([
-                ['receipt_long', 'Completed Orders', '3'],
-                ['download_done', 'Downloads Ready', '7'],
-                ['payments', 'Total Spent', '₱1,245.39'],
-                ['schedule', 'Latest Order', '#ILS-2024-X1'],
-            ] as [$icon, $label, $value])
+                ['receipt_long', 'Completed Orders', '0', 'orders-count'],
+                ['download_done', 'Downloads Ready', '0', 'orders-downloads'],
+                ['payments', 'Total Spent', '₱0.00', 'orders-spent'],
+                ['schedule', 'Latest Order', 'No orders yet', 'orders-latest'],
+            ] as [$icon, $label, $value, $key])
                 <div class="glass-panel rounded-xl p-5">
                     <span class="material-symbols-outlined mb-4 text-3xl text-primary">{{ $icon }}</span>
                     <p class="font-label text-xs uppercase tracking-widest text-on-surface-variant">{{ $label }}</p>
-                    <p class="mt-1 font-headline text-2xl font-semibold text-on-surface">{{ $value }}</p>
+                    <p class="mt-1 font-headline text-2xl font-semibold text-on-surface" data-order-stat="{{ $key }}">{{ $value }}</p>
                 </div>
             @endforeach
         </section>
@@ -140,31 +130,7 @@
                     <div class="border-b border-white/10 p-6">
                         <h3 class="font-headline text-2xl font-semibold">Purchase Log</h3>
                     </div>
-                    <div class="divide-y divide-white/10">
-                        @foreach ([
-                            ['ILS-2024-X1', 'Oct 24, 2024', 'Cell Biology PowerPoint + Grade 8 Physics Worksheet', '2 items', '₱570.00', 'Completed'],
-                            ['ILS-2026-CART', 'Live Cart', 'Current products in your cart', 'Updating now', 'Calculating', 'Ready'],
-                            ['ILS-2026-ASTRO', 'May 18, 2026', 'Astrophysics Basics', '1 item', '₱12.00', 'Completed'],
-                        ] as [$number, $date, $items, $count, $total, $status])
-                            <article class="order-row p-5 transition-all hover:bg-white/5" data-order="{{ $number }}">
-                                <div class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto] md:items-center">
-                                    <div>
-                                        <div class="mb-2 flex flex-wrap items-center gap-3">
-                                            <span class="font-label text-sm text-primary">#{{ $number }}</span>
-                                            <span class="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 font-label text-xs text-primary">{{ $status }}</span>
-                                        </div>
-                                        <h4 class="font-headline text-xl font-semibold text-on-surface">{{ $items }}</h4>
-                                        <p class="mt-1 font-label text-xs text-on-surface-variant">{{ $date }} • {{ $count }} • {{ $total }}</p>
-                                    </div>
-                                    <div class="flex flex-wrap gap-2">
-                                        <button class="order-action rounded-lg border border-primary/30 px-4 py-2 font-label text-xs text-primary transition-all hover:bg-primary/10" data-action="view" data-order="{{ $number }}">View Receipt</button>
-                                        <button class="order-action rounded-lg border border-outline-variant/30 px-4 py-2 font-label text-xs text-on-surface-variant transition-all hover:border-primary hover:text-primary" data-action="download" data-order="{{ $number }}">Download Files</button>
-                                        <button class="order-action rounded-lg bg-primary text-on-primary px-4 py-2 font-label text-xs font-bold transition-all hover:brightness-110" data-action="reorder" data-order="{{ $number }}">Reorder</button>
-                                    </div>
-                                </div>
-                            </article>
-                        @endforeach
-                    </div>
+                    <div class="divide-y divide-white/10" data-orders-list></div>
                 </div>
             </section>
 
@@ -207,40 +173,11 @@
         const cartStorageKey = 'ilearnScienceCartItems';
         const downloadedFilesStorageKey = 'ilearnScienceDownloadedFiles';
         const downloadedProductsStorageKey = 'ilearnScienceDownloadedProducts';
+        const ordersStorageKey = 'ilearnScienceOrders';
+        const checkoutStorageKey = 'ilearnScienceLastCheckout';
         const taxRate = 0.08;
         const discountAmount = 5;
-        const orders = {
-            'ILS-2024-X1': {
-                number: 'ILS-2024-X1',
-                date: 'Oct 24, 2024',
-                method: 'GCash',
-                total: '₱570.00',
-                items: [
-                    { id: 'cell-biology-powerpoint', title: 'Cell Biology PowerPoint', meta: 'Interactive High School • PPTX', price: 450, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDB29hlsu6znAHyJwVa-GZ2GEL1qRnewIXPnir5KUIvPk3vY2FFuEYqNxWpbBb_S4i1_9cmj6hfXbbm0wq8LMsxrMXm3otjI_lesrFSTbydTwMWXd2Cgx9zkMYsIX8pugR8DnnL3y8EtZLVBl1HYoCZObeGk9hhHuXl2iqlfEy5qpaQUtNcVcZt18lXM0RWiJZuPFwCoH01n7k71hV_8pOjscUwmXnCjDxQgRKCdPBDeqczACKtuekX2CyfsEtKl8-YdFotM9lhUWc' },
-                    { id: 'grade-8-physics-worksheet', title: 'Grade 8 Physics Worksheet', meta: 'PDF • 15 Pages', price: 120, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDMokBMJR1t7wkiWOcVTvvT6zQcHsNSLs6dj8cfLE-IrASPqDdJgS6BqyMujhAhYFB7UN_SzyaC-dBNMp5aXKQPUt5h5ePmcf--IP0AUOoTklEbEdnrNMzEZlj7C2shusUbhK7zkA1KDn1bYin1EpOX--mC_l9UHHD5KHi6QdCFsV_gwoq9V8lQaQ_D6EEYFolZWNpZtoDGziVu2yT4aNi0lAfrdlyrRhZWIWBLlu_YN-eBKpOqtdLR2y5muxtWfq75_VVlakk1eIA' },
-                ],
-            },
-            'ILS-2026-CART': {
-                number: 'ILS-2026-CART',
-                date: 'May 22, 2026',
-                method: 'Card',
-                total: '₱37.09',
-                items: [
-                    { id: 'advanced-biology-ppt', title: 'Advanced Biology PPT', meta: 'Digital Resource • v2.4', price: 12.99, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDAukcxKIeiLZnlciZdGHXQXy4iKMk5x-tGgi6TFF9Sfe2xAbJvYHL-ZC8QnE7ffN8aNYOAezSH0Tj97sk_N4jSWS0Fi-fLIIOe_GEcsQDy-Q3Git7Zsvv9jd-3aksYLZm4n_e9Nwev_zdKaEgIZetNpoYFBQIvs1CsSN9Rj8uZXbmpC3w1SXnltKVlUgxzOY6l7SiVFE5VBWD9mn3M13-GXtO6fWm6DG_Z3oeCsZ474bR-1i29uZ1PURiMSTDrjBNPKGoExuy-MHk' },
-                    { id: 'physics-lab-worksheets', title: 'Physics Lab Worksheets', meta: 'PDF Bundle • 45 Pages', price: 12.99, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBojzpBdmxN9PsX8hQhpf-SAKxoOzUasNe7LVwmHLwKmusbXaGCTShjD13RlH4TahuD0TLcy5RDFo_-rk_pIgulmr8vhpELtSAVpvE4-i6GIzL5vqnjan5AsqkKAeeTYV1zcxqh-GwPk224UNAqPXYnbYJ7gv5sHGYd8ta3nrnfvkHDI17Rq9TN0hHgzafutTJMBNMjgDHwopj_jhKZRw8AMPKlpweS9z0mJCinBPQQc-w2M4LAdBCjyVswiTkfNyu14SBEGeuz2A8' },
-                    { id: 'chemistry-study-guide', title: 'Chemistry Study Guide', meta: 'Interactive E-Book', price: 12.99, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCPPifHph78pWofuqtVNjb6V-PLYAh0tthoPV29K8qbg1Hv1B-iMoInZd5zkM3IEUG-p70cbjpgCovfozMZv5CRK-WCHZbyV9qSJARc43tSFj5y0Zy7gIRSHAeHUrbTXYsHGfC1JUD7z0HVOmVRxQ0YLyG5ot_ckNO2l2D3y4RKVsGMl2Vc-96aVEuTetl-Fl96i8qBsHzyRsS5UB7I7_B1lhFS8Z1JW-Fp6LE5l1CDj9BJmh0ha-yaEL7VtNDyl3Dvy25kJZO_dy0' },
-                ],
-            },
-            'ILS-2026-ASTRO': {
-                number: 'ILS-2026-ASTRO',
-                date: 'May 18, 2026',
-                method: 'PayPal',
-                total: '₱12.00',
-                items: [
-                    { id: 'astrophysics-basics', title: 'Astrophysics Basics', meta: 'Introductory Guide', price: 12, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBb6FKiPZoCpP8IrnOU8jUhMfQzNHGb2aAPPerRQftL9nF4PP90AuT8woLbzalh33QGFqbFtYJZZeONSClrXQ8zF6_gqnD0yJLUxFBBGZ-yJUX7KHd6Y_-pzZ4EDqqXUb2IcWYO0X5wiRoq2J9r1l2JbdUDt1-dALf1wPzjOMhhHtQ7EKdmOolt5D7YAWnD6mGMB506iB2PKxv6sC8G2uKBGxT4gO-FbuieYzYBPJCpZEsKKRvI1pdS_6Jx3InWOqLRak7pOQIBXLk' },
-                ],
-            },
-        };
+        let orders = {};
 
         function getCartItems() {
             if (window.iLearnAuth?.getCartItems) return window.iLearnAuth.getCartItems();
@@ -254,9 +191,9 @@
         function currentCustomerEmail() {
             try {
                 const session = JSON.parse(sessionStorage.getItem('ilearnScienceAuthSession') || localStorage.getItem('ilearnScienceCurrentUser') || localStorage.getItem('ilearnScienceRememberedUser') || 'null');
-                return String(session?.email || '').toLowerCase();
+                return String(session?.email || getLastCheckout()?.customer?.email || '').toLowerCase();
             } catch {
-                return '';
+                return String(getLastCheckout()?.customer?.email || '').toLowerCase();
             }
         }
 
@@ -277,6 +214,114 @@
                 image: item.image || '',
                 quantity: Math.max(1, Number.parseInt(item.quantity || '1', 10) || 1),
             };
+        }
+
+        function orderDate(value) {
+            if (!value) return 'Recent checkout';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return 'Recent checkout';
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function orderTitle(items = []) {
+            if (!items.length) return 'Science resources';
+            const names = items.slice(0, 2).map((item) => item.title || 'Science Resource').join(' + ');
+            return items.length > 2 ? `${names} + ${items.length - 2} more` : names;
+        }
+
+        function normalizeCompletedOrder(order) {
+            const items = (order?.items || []).map(normalizeCartItem);
+            return {
+                number: String(order?.orderNumber || order?.number || `#ILS-${Date.now()}`),
+                date: orderDate(order?.checkedOutAt || order?.date),
+                method: order?.paymentMethod || order?.method || 'Verified payment',
+                total: formatPeso(order?.totals?.total ?? order?.total ?? items.reduce((sum, item) => sum + (item.price * item.quantity), 0)),
+                status: order?.paymentStatus === 'verified' || order?.status === 'Completed' ? 'Completed' : 'Completed',
+                title: orderTitle(items),
+                items,
+                checkedOutAt: order?.checkedOutAt || order?.date || '',
+            };
+        }
+
+        function getLastCheckout() {
+            try {
+                return JSON.parse(localStorage.getItem(checkoutStorageKey) || 'null');
+            } catch {
+                return null;
+            }
+        }
+
+        function getCustomerOrders() {
+            const email = currentCustomerEmail();
+            let completed = [];
+            try {
+                const allOrders = JSON.parse(localStorage.getItem(ordersStorageKey) || '{}') || {};
+                completed = Array.isArray(allOrders[email]) ? allOrders[email] : [];
+            } catch {
+                completed = [];
+            }
+            const lastCheckout = getLastCheckout();
+            if (lastCheckout?.items?.length) {
+                const checkoutEmail = String(lastCheckout?.customer?.email || '').toLowerCase();
+                if (!checkoutEmail || !email || checkoutEmail === email) {
+                    completed = [lastCheckout, ...completed.filter((order) => order.orderNumber !== lastCheckout.orderNumber)];
+                }
+            }
+            return completed
+                .map(normalizeCompletedOrder)
+                .filter((order) => order.items.length)
+                .sort((a, b) => new Date(b.checkedOutAt || 0) - new Date(a.checkedOutAt || 0));
+        }
+
+        function updateOrderStats(customerOrders = getCustomerOrders()) {
+            const downloads = customerOrders.reduce((sum, order) => sum + order.items.reduce((itemSum, item) => itemSum + item.quantity, 0), 0);
+            const spent = customerOrders.reduce((sum, order) => sum + parsePeso(order.total), 0);
+            const latest = customerOrders[0]?.number || 'No orders yet';
+            document.querySelector('[data-order-stat="orders-count"]').textContent = customerOrders.length;
+            document.querySelector('[data-order-stat="orders-downloads"]').textContent = downloads;
+            document.querySelector('[data-order-stat="orders-spent"]').textContent = formatPeso(spent);
+            document.querySelector('[data-order-stat="orders-latest"]').textContent = latest;
+        }
+
+        function renderOrderRows(customerOrders = getCustomerOrders()) {
+            orders = Object.fromEntries(customerOrders.map((order) => [order.number, order]));
+            const list = document.querySelector('[data-orders-list]');
+            if (!list) return;
+            updateOrderStats(customerOrders);
+            if (!customerOrders.length) {
+                list.innerHTML = `
+                    <div class="p-8 text-center text-on-surface-variant">
+                        <span class="material-symbols-outlined text-5xl text-primary">receipt_long</span>
+                        <p class="mt-3 font-headline text-xl text-on-surface">No completed purchases yet</p>
+                        <p class="mt-2 text-sm">Your purchase log will update here after a successful checkout.</p>
+                    </div>
+                `;
+                renderReceipt(null);
+                return;
+            }
+            list.innerHTML = customerOrders.map((order) => {
+                const count = order.items.reduce((sum, item) => sum + item.quantity, 0);
+                return `
+                    <article class="order-row p-5 transition-all hover:bg-white/5" data-order="${order.number}">
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto] md:items-center">
+                            <div>
+                                <div class="mb-2 flex flex-wrap items-center gap-3">
+                                    <span class="font-label text-sm text-primary">${order.number}</span>
+                                    <span class="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 font-label text-xs text-primary">${order.status}</span>
+                                </div>
+                                <h4 class="font-headline text-xl font-semibold text-on-surface">${order.title}</h4>
+                                <p class="mt-1 font-label text-xs text-on-surface-variant">${order.date} • ${count} item${count === 1 ? '' : 's'} • ${order.total}</p>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <button class="order-action rounded-lg border border-primary/30 px-4 py-2 font-label text-xs text-primary transition-all hover:bg-primary/10" data-action="view" data-order="${order.number}">View Receipt</button>
+                                <button class="order-action rounded-lg border border-outline-variant/30 px-4 py-2 font-label text-xs text-on-surface-variant transition-all hover:border-primary hover:text-primary" data-action="download" data-order="${order.number}">Download Files</button>
+                                <button class="order-action rounded-lg bg-primary px-4 py-2 font-label text-xs font-bold text-on-primary transition-all hover:brightness-110" data-action="reorder" data-order="${order.number}">Reorder</button>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+            renderReceipt(customerOrders[0].number);
         }
 
         function getLiveCartItems() {
@@ -351,10 +396,23 @@
         }
 
         function renderReceipt(orderId) {
-            const order = orderId === 'ILS-2026-CART' ? getCurrentCartOrder() : orders[orderId];
-            if (!order) return;
-            const totals = orderId === 'ILS-2026-CART' ? calculateCartTotals(order.items) : null;
-            document.querySelector('[data-receipt-number]').textContent = `#${order.number}`;
+            const order = orderId ? orders[orderId] : null;
+            if (!order) {
+                document.querySelector('[data-receipt-number]').textContent = 'No Receipt';
+                document.querySelector('[data-receipt-date]').textContent = '-';
+                document.querySelector('[data-receipt-method]').textContent = '-';
+                document.querySelector('[data-receipt-total]').textContent = '₱0.00';
+                document.querySelector('[data-receipt-download]').dataset.order = '';
+                document.querySelector('[data-receipt-items]').innerHTML = `
+                    <div class="rounded-xl border border-white/10 bg-white/5 p-5 text-center">
+                        <span class="material-symbols-outlined mb-2 text-4xl text-primary">receipt_long</span>
+                        <p class="font-headline text-lg text-on-surface">No purchase selected</p>
+                        <p class="mt-1 text-sm text-on-surface-variant">Successful checkouts will generate receipts here.</p>
+                    </div>
+                `;
+                return;
+            }
+            document.querySelector('[data-receipt-number]').textContent = order.number;
             document.querySelector('[data-receipt-date]').textContent = order.date;
             document.querySelector('[data-receipt-method]').textContent = order.method;
             document.querySelector('[data-receipt-total]').textContent = order.total;
@@ -375,22 +433,13 @@
                     <p class="mt-1 text-sm text-on-surface-variant">Add a resource to generate a live receipt.</p>
                 </div>
             `;
-            if (totals) {
-                document.querySelector('[data-receipt-items]').insertAdjacentHTML('beforeend', `
-                    <div class="rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm">
-                        <div class="flex justify-between text-on-surface-variant"><span>Subtotal</span><span>${formatPeso(totals.subtotal)}</span></div>
-                        <div class="mt-2 flex justify-between text-on-surface-variant"><span>Est. Taxes</span><span>${formatPeso(totals.tax)}</span></div>
-                        <div class="mt-2 flex justify-between text-primary"><span>Science Discount</span><span>-${formatPeso(totals.discount)}</span></div>
-                    </div>
-                `);
-            }
             document.querySelectorAll('.order-row').forEach((row) => {
                 row.classList.toggle('bg-white/5', row.dataset.order === orderId);
             });
         }
 
         function reorder(orderId) {
-            const order = orderId === 'ILS-2026-CART' ? getCurrentCartOrder() : orders[orderId];
+            const order = orders[orderId];
             if (!order) return;
             const cart = getCartItems();
             order.items.forEach((item) => {
@@ -408,7 +457,7 @@
 
         function markOrderDownloaded(orderId) {
             const email = currentCustomerEmail();
-            const order = orderId === 'ILS-2026-CART' ? getCurrentCartOrder() : orders[orderId];
+            const order = orders[orderId];
             if (!email || !order?.items?.length) return;
 
             const itemCount = order.items.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
@@ -434,40 +483,39 @@
             localStorage.setItem(downloadedProductsStorageKey, JSON.stringify(productDownloads));
         }
 
-        document.querySelectorAll('.order-action').forEach((button) => {
-            button.addEventListener('click', () => {
-                const orderId = button.dataset.order;
-                if (button.dataset.action === 'view') {
-                    renderReceipt(orderId);
-                    showToast(`Receipt #${orderId} opened.`);
-                }
-                if (button.dataset.action === 'download') {
-                    renderReceipt(orderId);
-                    markOrderDownloaded(orderId);
-                    showToast(`Downloads for #${orderId} are ready.`);
-                }
-                if (button.dataset.action === 'reorder') {
-                    renderReceipt(orderId);
-                    reorder(orderId);
-                }
-            });
+        document.addEventListener('click', (event) => {
+            const button = event.target.closest('.order-action');
+            if (!button) return;
+            event.preventDefault();
+            const orderId = button.dataset.order;
+            if (!orderId) return;
+            if (button.dataset.action === 'view') {
+                renderReceipt(orderId);
+                showToast(`Receipt ${orderId} opened.`);
+            }
+            if (button.dataset.action === 'download') {
+                renderReceipt(orderId);
+                markOrderDownloaded(orderId);
+                showToast(`Downloads for ${orderId} are ready.`);
+            }
+            if (button.dataset.action === 'reorder') {
+                renderReceipt(orderId);
+                reorder(orderId);
+            }
         });
 
         function refreshLiveCartReceipt() {
-            syncCurrentCartRow();
+            renderOrderRows();
             updateCartCount();
-            if (document.querySelector('.order-row[data-order="ILS-2026-CART"]')?.classList.contains('bg-white/5')) {
-                renderReceipt('ILS-2026-CART');
-            }
         }
 
-        syncCurrentCartRow();
-        renderReceipt('ILS-2026-CART');
+        renderOrderRows();
         updateCartCount();
         window.addEventListener('storage', (event) => {
-            if (event.key === cartStorageKey) refreshLiveCartReceipt();
+            if ([ordersStorageKey, checkoutStorageKey, cartStorageKey].includes(event.key)) refreshLiveCartReceipt();
         });
         window.addEventListener('ilearn:cart-updated', refreshLiveCartReceipt);
+        window.addEventListener('ilearn:orders-updated', refreshLiveCartReceipt);
         window.addEventListener('pageshow', refreshLiveCartReceipt);
     </script>
     @include('partials.auth-ui')
