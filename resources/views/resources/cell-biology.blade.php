@@ -209,13 +209,11 @@
                         A comprehensive, gamified journey through the microscopic world. Designed for Grade 9-12 students with stunning animations and embedded quizzes.
                     </p>
                     <div class="mt-4 flex flex-col gap-4 sm:flex-row">
-                        <button id="add-cell-biology-to-cart" class="flex h-16 flex-1 items-center justify-center gap-2 rounded-2xl bg-primary font-bold text-on-primary shadow-[0_0_20px_rgba(60,215,255,0.4)] transition-all hover:scale-[1.02] active:scale-[0.98]">
+                        <button id="add-cell-biology-to-cart" class="flex h-16 flex-1 items-center justify-center rounded-2xl bg-primary text-on-primary shadow-[0_0_20px_rgba(60,215,255,0.4)] transition-all hover:scale-[1.02] active:scale-[0.98]" title="Add to cart" aria-label="Add Cell Biology Interactive PowerPoint to cart">
                             <span class="material-symbols-outlined">shopping_cart</span>
-                            Add to Cart
                         </button>
-                        <button id="save-cell-biology" class="flex h-16 flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-primary font-bold text-primary transition-all hover:bg-primary/10">
+                        <button id="save-cell-biology" class="flex h-16 flex-1 items-center justify-center rounded-2xl border-2 border-primary text-primary transition-all hover:bg-primary/10" title="Save" aria-label="Save Cell Biology Interactive PowerPoint">
                             <span class="material-symbols-outlined">favorite</span>
-                            Save
                         </button>
                         <button class="flex h-16 flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-primary font-bold text-primary transition-all hover:bg-primary/10">Buy Now</button>
                     </div>

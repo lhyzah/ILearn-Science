@@ -516,13 +516,11 @@
                     <div class="mt-8 flex flex-wrap items-center justify-between gap-4">
                         <span id="resource-preview-price" class="font-headline text-3xl font-semibold text-primary"></span>
                         <div class="flex flex-wrap items-center gap-3">
-                            <button id="resource-preview-save" class="flex items-center gap-2 rounded-lg border border-primary/35 px-5 py-3 font-label text-sm font-bold text-primary transition-all hover:bg-primary/10 active:scale-95" type="button">
+                            <button id="resource-preview-save" class="flex h-12 w-12 items-center justify-center rounded-lg border border-primary/35 text-primary transition-all hover:bg-primary/10 active:scale-95" type="button" title="Save" aria-label="Save resource">
                                 <span class="material-symbols-outlined">favorite</span>
-                                Save
                             </button>
-                            <button id="resource-preview-add" class="flex items-center gap-2 rounded-lg bg-primary px-5 py-3 font-label text-sm font-bold text-on-primary transition-all hover:scale-[1.02] active:scale-95" type="button">
+                            <button id="resource-preview-add" class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-on-primary transition-all hover:scale-[1.02] active:scale-95" type="button" title="Add to cart" aria-label="Add resource to cart">
                                 <span class="material-symbols-outlined">add_shopping_cart</span>
-                                Add to Cart
                             </button>
                         </div>
                     </div>
@@ -923,17 +921,14 @@
                         <div class="flex flex-col gap-4">
                             <span class="font-headline text-2xl font-semibold text-primary">${escapeHTML(normalized.price)}</span>
                             <div class="grid grid-cols-3 gap-2">
-                                <button class="top-resource-preview flex items-center justify-center gap-1 rounded-lg border border-primary/30 bg-surface-container-high px-3 py-2 font-label text-xs text-primary transition-colors hover:bg-primary hover:text-on-primary-container" type="button" aria-label="Preview ${escapeHTML(normalized.title)}" data-product-title="${escapeHTML(normalized.title)}" data-product-type="${escapeHTML(normalized.type)}" data-product-price="${escapeHTML(normalized.price)}" data-product-reviews="${escapeHTML(normalized.reviews)}" data-product-grade="${escapeHTML(normalized.grade)}" data-product-format="${escapeHTML(normalized.format)}" data-product-description="${escapeHTML(normalized.description)}" data-product-includes="${escapeHTML(normalized.includes)}" data-product-image="${escapeHTML(normalized.image)}">
+                                <button class="top-resource-preview flex h-10 items-center justify-center rounded-lg border border-primary/30 bg-surface-container-high text-primary transition-colors hover:bg-primary hover:text-on-primary-container" type="button" title="Preview" aria-label="Preview ${escapeHTML(normalized.title)}" data-product-title="${escapeHTML(normalized.title)}" data-product-type="${escapeHTML(normalized.type)}" data-product-price="${escapeHTML(normalized.price)}" data-product-reviews="${escapeHTML(normalized.reviews)}" data-product-grade="${escapeHTML(normalized.grade)}" data-product-format="${escapeHTML(normalized.format)}" data-product-description="${escapeHTML(normalized.description)}" data-product-includes="${escapeHTML(normalized.includes)}" data-product-image="${escapeHTML(normalized.image)}">
                                     <span class="material-symbols-outlined">visibility</span>
-                                    Preview
                                 </button>
-                                <button class="top-resource-save flex items-center justify-center gap-1 rounded-lg border border-primary/30 bg-surface-container-high px-3 py-2 font-label text-xs text-primary transition-colors hover:bg-primary hover:text-on-primary-container" type="button" aria-label="Save ${escapeHTML(normalized.title)}" data-product-id="${escapeHTML(normalized.id)}" data-product-title="${escapeHTML(normalized.title)}" data-product-meta="${escapeHTML(normalized.meta)}" data-product-price="${escapeHTML(normalized.price)}" data-product-image="${escapeHTML(normalized.image)}">
+                                <button class="top-resource-save flex h-10 items-center justify-center rounded-lg border border-primary/30 bg-surface-container-high text-primary transition-colors hover:bg-primary hover:text-on-primary-container" type="button" title="Save" aria-label="Save ${escapeHTML(normalized.title)}" data-product-id="${escapeHTML(normalized.id)}" data-product-title="${escapeHTML(normalized.title)}" data-product-meta="${escapeHTML(normalized.meta)}" data-product-price="${escapeHTML(normalized.price)}" data-product-image="${escapeHTML(normalized.image)}">
                                     <span class="material-symbols-outlined">favorite</span>
-                                    Save
                                 </button>
-                                <button class="top-resource-add-to-cart flex items-center justify-center gap-1 rounded-lg bg-primary-container px-3 py-2 font-label text-xs font-bold text-on-primary-container transition-colors hover:bg-primary hover:text-on-primary-container" type="button" aria-label="Add ${escapeHTML(normalized.title)} to cart" data-product-id="${escapeHTML(normalized.id)}" data-product-title="${escapeHTML(normalized.title)}" data-product-meta="${escapeHTML(normalized.meta)}" data-product-price="${escapeHTML(normalized.price)}" data-product-image="${escapeHTML(normalized.image)}">
+                                <button class="top-resource-add-to-cart flex h-10 items-center justify-center rounded-lg bg-primary-container text-on-primary-container transition-colors hover:bg-primary hover:text-on-primary-container" type="button" title="Add to cart" aria-label="Add ${escapeHTML(normalized.title)} to cart" data-product-id="${escapeHTML(normalized.id)}" data-product-title="${escapeHTML(normalized.title)}" data-product-meta="${escapeHTML(normalized.meta)}" data-product-price="${escapeHTML(normalized.price)}" data-product-image="${escapeHTML(normalized.image)}">
                                     <span class="material-symbols-outlined">add_shopping_cart</span>
-                                    Cart
                                 </button>
                             </div>
                         </div>
@@ -1078,9 +1073,9 @@
                         </div>
                         <p class="mt-2 line-clamp-2 text-sm text-on-surface-variant">${product.description}</p>
                         <div class="mt-3 flex flex-wrap gap-2">
-                            <button class="search-preview rounded-lg border border-primary/30 px-3 py-2 font-label text-xs text-primary transition hover:bg-primary/10" type="button" data-search-product-id="${product.id}">Preview</button>
-                            <button class="search-save rounded-lg border border-primary/30 px-3 py-2 font-label text-xs text-primary transition hover:bg-primary/10" type="button" data-search-product-id="${product.id}">Save</button>
-                            <button class="search-add rounded-lg bg-primary px-3 py-2 font-label text-xs font-bold text-on-primary transition hover:brightness-110" type="button" data-search-product-id="${product.id}">Add to Cart</button>
+                            <button class="search-preview flex h-10 w-10 items-center justify-center rounded-lg border border-primary/30 text-primary transition hover:bg-primary/10" type="button" title="Preview" aria-label="Preview ${product.title}" data-search-product-id="${product.id}"><span class="material-symbols-outlined text-[18px]">visibility</span></button>
+                            <button class="search-save flex h-10 w-10 items-center justify-center rounded-lg border border-primary/30 text-primary transition hover:bg-primary/10" type="button" title="Save" aria-label="Save ${product.title}" data-search-product-id="${product.id}"><span class="material-symbols-outlined text-[18px]">favorite</span></button>
+                            <button class="search-add flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-on-primary transition hover:brightness-110" type="button" title="Add to cart" aria-label="Add ${product.title} to cart" data-search-product-id="${product.id}"><span class="material-symbols-outlined text-[18px]">add_shopping_cart</span></button>
                         </div>
                     </div>
                 </article>

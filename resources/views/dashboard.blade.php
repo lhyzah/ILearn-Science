@@ -413,13 +413,11 @@
                     </div>
                 </div>
                 <div class="grid gap-3 sm:grid-cols-3">
-                    <button id="dashboard-preview-add" class="rounded-xl bg-primary-container px-4 py-3 font-label text-sm font-bold text-on-primary transition-all hover:scale-[1.02]" type="button">
+                    <button id="dashboard-preview-add" class="flex h-12 items-center justify-center rounded-xl bg-primary-container text-on-primary transition-all hover:scale-[1.02]" type="button" title="Add to cart" aria-label="Add resource to cart">
                         <span class="material-symbols-outlined align-middle text-[18px]">add_shopping_cart</span>
-                        Cart
                     </button>
-                    <button id="dashboard-preview-save" class="rounded-xl border border-primary/35 px-4 py-3 font-label text-sm font-bold text-primary transition-all hover:bg-primary/10" type="button">
+                    <button id="dashboard-preview-save" class="flex h-12 items-center justify-center rounded-xl border border-primary/35 text-primary transition-all hover:bg-primary/10" type="button" title="Save" aria-label="Save resource">
                         <span class="material-symbols-outlined align-middle text-[18px]">favorite</span>
-                        Save
                     </button>
                     <a class="rounded-xl border border-primary/35 px-4 py-3 text-center font-label text-sm font-bold text-primary transition-all hover:bg-primary/10" href="{{ route('shop') }}">View Shop</a>
                 </div>

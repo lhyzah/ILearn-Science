@@ -263,8 +263,10 @@
                         </div>
                         <div class="grid grid-cols-[1fr_auto_1fr] gap-3 pt-2">
                             <button
-                                class="shop-resource-preview rounded-lg border border-primary/30 py-2 text-center font-label text-sm text-primary transition-all hover:bg-primary/10"
+                                class="shop-resource-preview flex h-10 items-center justify-center rounded-lg border border-primary/30 text-primary transition-all hover:bg-primary/10"
                                 type="button"
+                                title="Preview"
+                                aria-label="Preview {{ $title }}"
                                 data-product-title="{{ $title }}"
                                 data-product-type="{{ $type }}"
                                 data-product-price="{{ $price }}"
@@ -276,10 +278,9 @@
                                 data-product-focus="{{ $focus }}"
                                 data-product-includes="{{ $includes }}"
                                 data-product-image="{{ $displayImage }}"
-                            >Preview</button>
-                            <button class="shop-resource-add flex items-center justify-center gap-1 rounded-lg bg-primary py-2 font-label text-sm text-on-primary transition-all hover:shadow-[0_0_15px_rgba(60,215,255,0.4)]" type="button" data-product-id="{{ \Illuminate\Support\Str::slug($title) }}" data-product-title="{{ $title }}" data-product-meta="{{ $type === 'Visual Resource' ? 'Visual Resource' : $type . ' Resource' }}" data-product-price="{{ $price }}" data-product-image="{{ $displayImage }}">
+                            ><span class="material-symbols-outlined text-[18px]">visibility</span></button>
+                            <button class="shop-resource-add flex h-10 items-center justify-center rounded-lg bg-primary text-on-primary transition-all hover:shadow-[0_0_15px_rgba(60,215,255,0.4)]" type="button" title="Add to cart" aria-label="Add {{ $title }} to cart" data-product-id="{{ \Illuminate\Support\Str::slug($title) }}" data-product-title="{{ $title }}" data-product-meta="{{ $type === 'Visual Resource' ? 'Visual Resource' : $type . ' Resource' }}" data-product-price="{{ $price }}" data-product-image="{{ $displayImage }}">
                                 <span class="material-symbols-outlined text-sm">shopping_cart</span>
-                                Add
                             </button>
                         </div>
                     </div>
@@ -372,13 +373,11 @@
                     <div class="mt-8 flex flex-wrap items-center justify-between gap-4">
                         <span id="shop-preview-price" class="font-headline text-3xl font-semibold text-primary"></span>
                         <div class="flex flex-wrap items-center gap-3">
-                            <button id="shop-preview-save" class="flex items-center gap-2 rounded-lg border border-primary/35 px-5 py-3 font-label text-sm font-bold text-primary transition-all hover:bg-primary/10 active:scale-95" type="button">
+                            <button id="shop-preview-save" class="flex h-12 w-12 items-center justify-center rounded-lg border border-primary/35 text-primary transition-all hover:bg-primary/10 active:scale-95" type="button" title="Save" aria-label="Save resource">
                                 <span class="material-symbols-outlined">favorite</span>
-                                Save
                             </button>
-                            <button id="shop-preview-add" class="flex items-center gap-2 rounded-lg bg-primary px-5 py-3 font-label text-sm font-bold text-on-primary transition-all hover:scale-[1.02] active:scale-95" type="button">
+                            <button id="shop-preview-add" class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-on-primary transition-all hover:scale-[1.02] active:scale-95" type="button" title="Add to cart" aria-label="Add resource to cart">
                                 <span class="material-symbols-outlined">shopping_cart</span>
-                                Add
                             </button>
                         </div>
                     </div>
@@ -678,8 +677,10 @@
                         </div>
                         <div class="grid grid-cols-2 gap-3 pt-2">
                             <button
-                                class="shop-resource-preview rounded-lg border border-primary/30 py-2 text-center font-label text-sm text-primary transition-all hover:bg-primary/10"
+                                class="shop-resource-preview flex h-10 items-center justify-center rounded-lg border border-primary/30 text-primary transition-all hover:bg-primary/10"
                                 type="button"
+                                title="Preview"
+                                aria-label="Preview ${escapeHTML(product.title)}"
                                 data-product-title="${escapeHTML(product.title)}"
                                 data-product-type="${escapeHTML(product.type)}"
                                 data-product-price="${escapeHTML(product.price)}"
@@ -691,14 +692,12 @@
                                 data-product-focus="${escapeHTML(product.focus)}"
                                 data-product-includes="${escapeHTML(product.includes)}"
                                 data-product-image="${escapeHTML(product.image)}"
-                            >Preview</button>
-                            <button class="shop-resource-save flex items-center justify-center gap-1 rounded-lg border border-primary/30 px-3 font-label text-xs text-primary transition-all hover:bg-primary/10" type="button" aria-label="Save ${escapeHTML(product.title)}" data-product-id="${escapeHTML(product.id)}" data-product-title="${escapeHTML(product.title)}" data-product-meta="${escapeHTML(product.meta)}" data-product-price="${escapeHTML(product.price)}" data-product-image="${escapeHTML(product.image)}">
+                            ><span class="material-symbols-outlined text-[18px]">visibility</span></button>
+                            <button class="shop-resource-save flex h-10 items-center justify-center rounded-lg border border-primary/30 text-primary transition-all hover:bg-primary/10" type="button" title="Save" aria-label="Save ${escapeHTML(product.title)}" data-product-id="${escapeHTML(product.id)}" data-product-title="${escapeHTML(product.title)}" data-product-meta="${escapeHTML(product.meta)}" data-product-price="${escapeHTML(product.price)}" data-product-image="${escapeHTML(product.image)}">
                                 <span class="material-symbols-outlined text-sm">favorite</span>
-                                Save
                             </button>
-                            <button class="shop-resource-add flex items-center justify-center gap-1 rounded-lg bg-primary py-2 font-label text-sm text-on-primary transition-all hover:shadow-[0_0_15px_rgba(60,215,255,0.4)]" type="button" data-product-id="${escapeHTML(product.id)}" data-product-title="${escapeHTML(product.title)}" data-product-meta="${escapeHTML(product.meta)}" data-product-price="${escapeHTML(product.price)}" data-product-image="${escapeHTML(product.image)}">
+                            <button class="shop-resource-add flex h-10 items-center justify-center rounded-lg bg-primary text-on-primary transition-all hover:shadow-[0_0_15px_rgba(60,215,255,0.4)]" type="button" title="Add to cart" aria-label="Add ${escapeHTML(product.title)} to cart" data-product-id="${escapeHTML(product.id)}" data-product-title="${escapeHTML(product.title)}" data-product-meta="${escapeHTML(product.meta)}" data-product-price="${escapeHTML(product.price)}" data-product-image="${escapeHTML(product.image)}">
                                 <span class="material-symbols-outlined text-sm">shopping_cart</span>
-                                Add
                             </button>
                         </div>
                     </div>

@@ -166,8 +166,8 @@
                                     <button class="qty-plus px-3 py-1 text-on-surface-variant hover:bg-white/5" type="button">+</button>
                                 </div>
                                 <div class="flex items-center gap-4">
-                                    <button class="remove-cart-item flex items-center gap-1 font-label text-xs text-on-surface-variant transition-colors hover:text-error" type="button"><span class="material-symbols-outlined text-lg">delete</span> Remove</button>
-                                    <button class="flex items-center gap-1 font-label text-xs text-on-surface-variant transition-colors hover:text-tertiary" type="button"><span class="material-symbols-outlined text-lg">bookmark</span> Save for later</button>
+                                    <button class="remove-cart-item flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-on-surface-variant transition-colors hover:border-error/40 hover:text-error" type="button" title="Remove" aria-label="Remove item from cart"><span class="material-symbols-outlined text-lg">delete</span></button>
+                                    <button class="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-on-surface-variant transition-colors hover:border-tertiary/40 hover:text-tertiary" type="button" title="Save for later" aria-label="Save item for later"><span class="material-symbols-outlined text-lg">bookmark</span></button>
                                 </div>
                             </div>
                         </div>
@@ -251,13 +251,11 @@
                 </div>
                 <p id="cart-preview-description" class="text-on-surface-variant"></p>
                 <div class="grid gap-3 sm:grid-cols-3">
-                    <button id="cart-preview-add" class="rounded-xl bg-primary-container px-4 py-3 font-label text-sm font-bold text-on-primary transition-all hover:scale-[1.02]" type="button">
+                    <button id="cart-preview-add" class="flex h-12 items-center justify-center rounded-xl bg-primary-container text-on-primary transition-all hover:scale-[1.02]" type="button" title="Add to cart" aria-label="Add resource to cart">
                         <span class="material-symbols-outlined align-middle text-[18px]">add_shopping_cart</span>
-                        Cart
                     </button>
-                    <button id="cart-preview-save" class="rounded-xl border border-primary/35 px-4 py-3 font-label text-sm font-bold text-primary transition-all hover:bg-primary/10" type="button">
+                    <button id="cart-preview-save" class="flex h-12 items-center justify-center rounded-xl border border-primary/35 text-primary transition-all hover:bg-primary/10" type="button" title="Save" aria-label="Save resource">
                         <span class="material-symbols-outlined align-middle text-[18px]">favorite</span>
-                        Save
                     </button>
                     <a class="rounded-xl border border-primary/35 px-4 py-3 text-center font-label text-sm font-bold text-primary transition-all hover:bg-primary/10" href="{{ route('shop') }}">View Shop</a>
                 </div>
@@ -478,8 +476,8 @@
                         <h5 class="mb-1 line-clamp-1 font-headline text-lg">${escapeCartHTML(product.title)}</h5>
                         <p class="mb-4 line-clamp-2 font-label text-xs text-on-surface-variant">${escapeCartHTML(product.meta)}</p>
                         <div class="grid grid-cols-3 gap-2">
-                            <button class="rounded-xl border border-primary/25 px-3 py-2 font-label text-xs font-bold text-primary transition-all hover:bg-primary/10" type="button" data-cart-recommendation-preview="${escapeCartHTML(product.id)}">Preview</button>
-                            <button class="rounded-xl border border-primary/25 px-3 py-2 font-label text-xs font-bold text-primary transition-all hover:bg-primary/10" type="button" data-cart-recommendation-save="${escapeCartHTML(product.id)}">
+                            <button class="flex h-10 items-center justify-center rounded-xl border border-primary/25 text-primary transition-all hover:bg-primary/10" type="button" title="Preview" aria-label="Preview ${escapeCartHTML(product.title)}" data-cart-recommendation-preview="${escapeCartHTML(product.id)}"><span class="material-symbols-outlined text-[18px]">visibility</span></button>
+                            <button class="flex h-10 items-center justify-center rounded-xl border border-primary/25 text-primary transition-all hover:bg-primary/10" type="button" title="Save" aria-label="Save ${escapeCartHTML(product.title)}" data-cart-recommendation-save="${escapeCartHTML(product.id)}">
                                 <span class="material-symbols-outlined align-middle text-[16px]">favorite</span>
                             </button>
                             <span class="font-headline text-lg text-primary">${escapeCartHTML(product.priceLabel)}</span>
@@ -609,8 +607,8 @@
                                 <button class="qty-plus px-3 py-1 text-on-surface-variant hover:bg-white/5" type="button">+</button>
                             </div>
                             <div class="flex items-center gap-4">
-                                <button class="remove-cart-item flex items-center gap-1 font-label text-xs text-on-surface-variant transition-colors hover:text-error" type="button"><span class="material-symbols-outlined text-lg">delete</span> Remove</button>
-                                <button class="flex items-center gap-1 font-label text-xs text-on-surface-variant transition-colors hover:text-tertiary" type="button"><span class="material-symbols-outlined text-lg">bookmark</span> Save for later</button>
+                                <button class="remove-cart-item flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-on-surface-variant transition-colors hover:border-error/40 hover:text-error" type="button" title="Remove" aria-label="Remove item from cart"><span class="material-symbols-outlined text-lg">delete</span></button>
+                                <button class="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-on-surface-variant transition-colors hover:border-tertiary/40 hover:text-tertiary" type="button" title="Save for later" aria-label="Save item for later"><span class="material-symbols-outlined text-lg">bookmark</span></button>
                             </div>
                         </div>
                     </div>
